@@ -1,14 +1,14 @@
-import { useRef } from "react";
+import { useTheme } from "@/contexts/ThemeContext";
 import { motion, useInView } from "framer-motion";
 import { Sparkles } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useMemo, useRef } from "react";
 
-import TextGlitch from "@/components/contact/TextGlitch";
-import ContactInfo from "@/components/contact/ContactInfo";
-import SocialLinks from "@/components/contact/SocialLinks";
 import AvailabilityBadges from "@/components/contact/AvailabilityBadges";
-import InteractiveMap from "@/components/contact/InteractiveMap";
 import ContactForm from "@/components/contact/ContactForm";
+import ContactInfo from "@/components/contact/ContactInfo";
+import InteractiveMap from "@/components/contact/InteractiveMap";
+import SocialLinks from "@/components/contact/SocialLinks";
+import TextGlitch from "@/components/contact/TextGlitch";
 
 const ContactSection = () => {
   const sectionRef = useRef(null);
@@ -19,36 +19,48 @@ const ContactSection = () => {
   const { isDark, getAccentColors } = useTheme();
   const accentColors = getAccentColors();
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
+  // Memoize animation variants to prevent recreation on every render
+  const containerVariants = useMemo(
+    () => ({
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          staggerChildren: 0.1,
+        },
       },
-    },
-  };
+    }),
+    []
+  );
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-    },
-  };
+  const itemVariants = useMemo(
+    () => ({
+      hidden: { y: 20, opacity: 0 },
+      visible: {
+        y: 0,
+        opacity: 1,
+        transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
+      },
+    }),
+    []
+  );
+
+  // Memoize background style to prevent recalculation
+  const backgroundStyle = useMemo(
+    () => ({
+      background: isDark
+        ? `radial-gradient(ellipse at center, ${accentColors.primary}05 0%, transparent 50%)`
+        : `radial-gradient(ellipse at center, ${accentColors.primary}08 0%, transparent 50%)`,
+    }),
+    [isDark, accentColors.primary]
+  );
 
   return (
     <section
       ref={sectionRef}
       className="py-24 px-6 relative overflow-hidden theme-transition"
       id="contact"
-      style={{
-        background: isDark
-          ? `radial-gradient(ellipse at center, ${accentColors.primary}05 0%, transparent 50%)`
-          : `radial-gradient(ellipse at center, ${accentColors.primary}08 0%, transparent 50%)`,
-      }}
+      style={backgroundStyle}
     >
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

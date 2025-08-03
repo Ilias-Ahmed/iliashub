@@ -1,126 +1,94 @@
-import { useRef, useEffect } from "react";
-import { motion } from "framer-motion";
 import { useTheme } from "@/contexts/ThemeContext";
+import { motion } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const InteractiveMap = () => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const animationRef = useRef<number | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const { isDark, getAccentColors } = useTheme();
   const accentColors = getAccentColors();
 
-  useEffect(() => {
-    // Simulated map with canvas
-    const container = mapContainerRef.current;
-    if (!container) return;
+  // Pre-generate stars for performance
+  const starsRef = useRef<
+    Array<{ x: number; y: number; radius: number; phase: number }>
+  >([]);
 
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+  const initializeStars = useCallback((width: number, height: number) => {
+    starsRef.current = Array.from({ length: 50 }, (_, i) => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      radius: Math.random() * 1.5,
+      phase: i, // Use index as phase for consistent animation
+    }));
+  }, []);
 
-    canvas.width = container.clientWidth;
-    canvas.height = 220;
-
-    // Add canvas to the DOM
-    container.appendChild(canvas);
-
-    // Draw cosmic map-like pattern
-    ctx.fillStyle = isDark ? "rgba(15, 15, 20, 1)" : "rgba(240, 240, 245, 1)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw grid
-    ctx.strokeStyle = isDark
-      ? "rgba(255, 255, 255, 0.1)"
-      : "rgba(0, 0, 0, 0.1)";
-    ctx.lineWidth = 0.5;
-
-    const cellSize = 20;
-
-    // Vertical lines
-    for (let x = 0; x <= canvas.width; x += cellSize) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvas.height);
-      ctx.stroke();
-    }
-
-    // Horizontal lines
-    for (let y = 0; y <= canvas.height; y += cellSize) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
-      ctx.stroke();
-    }
-
-    // Draw stars
-    for (let i = 0; i < 50; i++) {
-      const x = Math.random() * canvas.width;
-      const y = Math.random() * canvas.height;
-      const radius = Math.random() * 1.5;
-
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = isDark
-        ? `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.3})`
-        : `rgba(0, 0, 0, ${Math.random() * 0.3 + 0.2})`;
-      ctx.fill();
-    }
-
-    // Draw location marker
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-
-    // Pulsating circle
-    const drawPulse = () => {
-      if (!ctx) return;
-
-      // Clear previous state
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Redraw background
+  const drawStaticElements = useCallback(
+    (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+      // Background
       ctx.fillStyle = isDark ? "rgba(15, 15, 20, 1)" : "rgba(240, 240, 245, 1)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, width, height);
 
-      // Redraw grid
+      // Grid - only draw if not already cached
       ctx.strokeStyle = isDark
         ? "rgba(255, 255, 255, 0.1)"
         : "rgba(0, 0, 0, 0.1)";
+      ctx.lineWidth = 0.5;
+
+      const cellSize = 20;
 
       // Vertical lines
-      for (let x = 0; x <= canvas.width; x += cellSize) {
+      for (let x = 0; x <= width; x += cellSize) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
+        ctx.lineTo(x, height);
         ctx.stroke();
       }
 
       // Horizontal lines
-      for (let y = 0; y <= canvas.height; y += cellSize) {
+      for (let y = 0; y <= height; y += cellSize) {
         ctx.beginPath();
         ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
+        ctx.lineTo(width, y);
         ctx.stroke();
       }
+    },
+    [isDark]
+  );
 
-      // Redraw stars with twinkling effect
-      const time = Date.now() * 0.001;
+  // Optimized animation loop with performance improvements
+  const drawFrame = useCallback(
+    (
+      ctx: CanvasRenderingContext2D,
+      width: number,
+      height: number,
+      time: number
+    ) => {
+      // Only redraw if visible
+      if (!isVisible) return;
 
-      for (let i = 0; i < 50; i++) {
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        const radius = Math.random() * 1.5;
-        const twinkle = Math.sin(time + i) * 0.5 + 0.5;
+      // Clear and redraw static elements
+      drawStaticElements(ctx, width, height);
+
+      // Draw twinkling stars with cached positions
+      starsRef.current.forEach((star) => {
+        const twinkle = Math.sin(time * 0.001 + star.phase) * 0.5 + 0.5;
 
         ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
         ctx.fillStyle = isDark
           ? `rgba(255, 255, 255, ${twinkle * 0.5 + 0.3})`
           : `rgba(0, 0, 0, ${twinkle * 0.3 + 0.2})`;
         ctx.fill();
-      }
+      });
 
-      // Current time for animation
-      const pulseTime = Date.now() * 0.001;
+      // Draw optimized location marker
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const pulseTime = time * 0.001;
 
-      // Convert hex to RGB for canvas
+      // Convert hex to RGB - cache this calculation
       const hexToRgb = (hex: string) => {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result
@@ -129,16 +97,16 @@ const InteractiveMap = () => {
               g: parseInt(result[2], 16),
               b: parseInt(result[3], 16),
             }
-          : null;
+          : { r: 139, g: 92, b: 246 };
       };
 
       const primaryRgb = hexToRgb(accentColors.primary);
-      const rgbString = primaryRgb
-        ? `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`
-        : "139, 92, 246";
+      const rgbString = `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`;
+
+      // Optimized pulse animation - reduced calculations
+      const pulseRadius = 20 + Math.sin(pulseTime * 2) * 10;
 
       // Outer pulse ring
-      const pulseRadius = 20 + Math.sin(pulseTime * 2) * 10;
       ctx.beginPath();
       ctx.arc(centerX, centerY, pulseRadius, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${rgbString}, 0.1)`;
@@ -150,17 +118,17 @@ const InteractiveMap = () => {
       ctx.fillStyle = `rgba(${rgbString}, 0.3)`;
       ctx.fill();
 
-      // Inner circle - location marker
+      // Inner circle
       ctx.beginPath();
       ctx.arc(centerX, centerY, 6, 0, Math.PI * 2);
       ctx.fillStyle = accentColors.primary;
       ctx.fill();
 
-      // Draw cosmic rays from the center
-      const rayCount = 8;
+      // Optimized cosmic rays - reduced count and calculations
+      const rayCount = 6; // Reduced from 8
       for (let i = 0; i < rayCount; i++) {
-        const angle = (i / rayCount) * Math.PI * 2 + pulseTime * 0.5;
-        const rayLength = 30 + Math.sin(pulseTime * 3 + i) * 10;
+        const angle = (i / rayCount) * Math.PI * 2 + pulseTime * 0.3; // Slower rotation
+        const rayLength = 25 + Math.sin(pulseTime * 2 + i) * 8; // Reduced amplitude
 
         const startX = centerX + Math.cos(angle) * 10;
         const startY = centerY + Math.sin(angle) * 10;
@@ -174,19 +142,81 @@ const InteractiveMap = () => {
         ctx.lineWidth = 1;
         ctx.stroke();
       }
+    },
+    [isDark, accentColors, isVisible, drawStaticElements]
+  );
 
-      // Request next frame
-      requestAnimationFrame(drawPulse);
-    };
+  // Throttled animation loop for better performance
+  const animate = useCallback(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
 
-    // Start animation
-    drawPulse();
+    if (!ctx || !canvas || !isVisible) {
+      animationRef.current = requestAnimationFrame(animate);
+      return;
+    }
+
+    drawFrame(ctx, canvas.width, canvas.height, Date.now());
+
+    // Throttle to 30fps instead of 60fps for better performance
+    setTimeout(() => {
+      animationRef.current = requestAnimationFrame(animate);
+    }, 1000 / 30);
+  }, [drawFrame, isVisible]);
+
+  useEffect(() => {
+    const container = mapContainerRef.current;
+    if (!container) return;
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = container.clientWidth;
+    canvas.height = 220;
+    canvasRef.current = canvas;
+
+    // Initialize stars once
+    initializeStars(canvas.width, canvas.height);
+
+    // Add canvas to the DOM
+    container.appendChild(canvas);
+
+    // Use Intersection Observer for performance
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(container);
+
+    // Start animation only when visible
+    if (isVisible) {
+      animate();
+    }
+
     return () => {
+      observer.disconnect();
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
       if (container && container.contains(canvas)) {
         container.removeChild(canvas);
       }
     };
-  }, [isDark, accentColors]);
+  }, [isDark, accentColors, animate, initializeStars, isVisible]);
+
+  // Start/stop animation based on visibility
+  useEffect(() => {
+    if (isVisible && !animationRef.current) {
+      animate();
+    } else if (!isVisible && animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+  }, [isVisible, animate]);
 
   return (
     <motion.div
@@ -222,4 +252,3 @@ const InteractiveMap = () => {
 };
 
 export default InteractiveMap;
-
