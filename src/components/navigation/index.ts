@@ -3,13 +3,20 @@ import {
   useNavigation,
 } from "@/contexts/NavigationContext";
 import CommandPalette from "../ui/CommandPalette";
+import DockNavigation from "./DockNavigation";
 import DotsNavigation from "./DotsNavigation";
+import { Dock, DockIcon, DockItem, DockLabel } from "./MacDock";
 import Navigation from "./Navigation";
 import NavigationMenu from "./NavigationMenu";
 import VoiceNavigation from "./VoiceNavigation";
 
 export {
   CommandPalette,
+  Dock,
+  DockIcon,
+  DockItem,
+  DockLabel,
+  DockNavigation,
   DotsNavigation,
   Navigation,
   NavigationMenu,

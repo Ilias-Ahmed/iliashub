@@ -32,6 +32,7 @@
 ## ✨ Features
 
 ### 🎨 Interactive Experience
+
 - **3D Visualizations** - Immersive Three.js graphics and WebGL effects
 - **Smooth Animations** - Framer Motion powered transitions and micro-interactions
 - **Custom Cursor** - Dynamic cursor that responds to user interactions
@@ -40,6 +41,7 @@
 - **Interactive Background** - Mouse-following gradients and particle effects
 
 ### 📱 Responsive Design
+
 - **Mobile-First Approach** - Seamless experience across all devices
 - **Progressive Web App (PWA)** - Installable app with offline capabilities
 - **Cross-Browser Compatibility** - Tested on Chrome, Firefox, Safari, Edge
@@ -47,6 +49,7 @@
 - **Adaptive Loading** - Content loads based on connection speed
 
 ### 🔧 Advanced Features
+
 - **Multiple View Modes** - Grid, mastery, comparison, and timeline views
 - **Interactive Resume** - Dynamic PDF generation and real-time viewing
 - **Skill Comparison** - Side-by-side technical skill analysis
@@ -57,6 +60,7 @@
 - **Sound Effects** - Optional audio feedback for interactions
 
 ### 🛡️ Modern Development
+
 - **TypeScript** - Full type safety throughout the application
 - **Component Architecture** - Reusable, maintainable component system
 - **Performance Monitoring** - Built-in analytics and performance tracking
@@ -67,17 +71,20 @@
 ## 🛠️ Tech Stack
 
 ### **Frontend Framework**
+
 - ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB) **React 18** - Latest React features with concurrent rendering
 - ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white) **TypeScript 5.0** - Type-safe development with latest features
 - ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white) **Vite 5.0** - Lightning-fast build tool and dev server
 
 ### **Styling & UI**
+
 - ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white) **Tailwind CSS 3.0** - Utility-first CSS framework
 - **PostCSS** - CSS processing and optimization
 - **CSS Variables** - Dynamic theming system
 - **Responsive Design** - Mobile-first approach with breakpoints
 
 ### **Animation & 3D**
+
 - ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=flat&logo=framer&logoColor=white) **Framer Motion** - Production-ready motion library
 - ![Three.js](https://img.shields.io/badge/Three.js-000000?style=flat&logo=three.js&logoColor=white) **Three.js** - 3D graphics and WebGL rendering
 - **@react-three/fiber** - React renderer for Three.js
@@ -86,12 +93,14 @@
 - **React Spring** - Spring-physics based animations
 
 ### **Data Visualization**
+
 - **Recharts** - Composable charting library built on React components
 - **D3.js** - Data-driven document manipulation
 - **Custom SVG** - Hand-crafted graphics and icons
 - **Canvas API** - High-performance drawing operations
 
 ### **Development Tools**
+
 - ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=flat&logo=eslint&logoColor=white) **ESLint** - Code linting with TypeScript rules
 - **Prettier** - Code formatting and style consistency
 - **Husky** - Git hooks for quality assurance
@@ -99,12 +108,14 @@
 - **React Developer Tools** - Debugging and profiling
 
 ### **Routing & State**
+
 - **React Router 6** - Client-side routing with nested routes
 - **Context API** - Global state management
 - **Custom Hooks** - Reusable stateful logic
 - **Local Storage** - Persistent user preferences
 
 ### **Utilities & Libraries**
+
 - **Sonner** - Beautiful toast notifications
 - **Lucide React** - Beautiful & consistent icon library
 - **clsx** - Conditional className utility
@@ -113,7 +124,9 @@
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 Make sure you have the following installed:
+
 - **Node.js** (v18.0.0 or higher) - [Download here](https://nodejs.org/)
 - **npm** (v8.0.0 or higher) or **yarn** (v1.22.0 or higher)
 - **Git** - [Download here](https://git-scm.com/)
@@ -121,12 +134,14 @@ Make sure you have the following installed:
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/iliasahmed/portfolio.git
    cd portfolio
    ```
 
 2. **Install dependencies**
+
    ```bash
    # Using npm
    npm install
@@ -139,11 +154,13 @@ Make sure you have the following installed:
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env.local
    ```
 
    Edit `.env.local` with your configuration:
+
    ```env
    VITE_APP_TITLE=Ilias Ahmed - Portfolio
    VITE_EMAILJS_SERVICE_ID=your_service_id
@@ -153,6 +170,7 @@ Make sure you have the following installed:
    ```
 
 4. **Start the development server**
+
    ```bash
    npm run dev
    # or
@@ -285,6 +303,7 @@ portfolio/
 ## 🎯 Key Sections
 
 ### **🏠 Hero Section**
+
 - Animated greeting with typewriter effect
 - Interactive background with mouse-following gradients
 - Call-to-action buttons with micro-interactions
@@ -292,6 +311,7 @@ portfolio/
 - Dynamic particles system
 
 ### **👨‍💻 About Section**
+
 - Interactive profile card with flip animations
 - Professional timeline with milestone markers
 - Certification gallery with smooth scrolling
@@ -299,6 +319,7 @@ portfolio/
 - Downloadable resume with PDF generation
 
 ### **🛠️ Skills Section**
+
 - **Grid View** - Visual skill cards with progress indicators
 - **Mastery View** - Skill proficiency levels and experience
 - **Comparison View** - Side-by-side skill analysis
@@ -306,6 +327,7 @@ portfolio/
 - **Search & Filter** - Real-time skill filtering and search
 
 ### **💼 Projects Section**
+
 - **Showcase Mode** - Featured projects carousel with 3D effects
 - **Grid Layout** - All projects in responsive grid
 - **Timeline View** - Chronological project progression
@@ -313,6 +335,7 @@ portfolio/
 - **Live Demos** - Direct links to working applications
 
 ### **📞 Contact Section**
+
 - Interactive contact form with validation
 - Real-time form feedback and error handling
 - Social media integration with hover effects
@@ -320,6 +343,7 @@ portfolio/
 - Email integration with EmailJS
 
 ### **🧭 Navigation**
+
 - Multiple navigation styles (dots, dock, menu)
 - Voice command support
 - Gesture navigation for mobile
@@ -370,6 +394,7 @@ The portfolio supports multiple themes defined in `src/styles/globals.css`:
 ### **Content Customization**
 
 #### **Skills Data** (`src/components/skills/skillsData.ts`)
+
 ```typescript
 export const skills: Skill[] = [
   {
@@ -382,13 +407,14 @@ export const skills: Skill[] = [
     description: "Building scalable web applications",
     projects: 15,
     yearsExperience: 3,
-    keywords: ["Components", "Hooks", "Context", "Redux"]
+    keywords: ["Components", "Hooks", "Context", "Redux"],
   },
   // Add more skills...
 ];
 ```
 
 #### **Projects Data** (`src/components/projects/projectsData.ts`)
+
 ```typescript
 export const projects: Project[] = [
   {
@@ -401,13 +427,14 @@ export const projects: Project[] = [
     github: "https://github.com/username/project",
     color: "#8a2be2",
     featured: true,
-    completionDate: "2024-01-15"
+    completionDate: "2024-01-15",
   },
   // Add more projects...
 ];
 ```
 
 #### **About Information** (`src/components/about/aboutData.ts`)
+
 ```typescript
 export const aboutData = {
   bio: "Full-Stack Developer with 3+ years of experience...",
@@ -416,7 +443,7 @@ export const aboutData = {
       year: "2024",
       title: "Senior Full-Stack Developer",
       company: "Tech Company",
-      description: "Leading development of web applications..."
+      description: "Leading development of web applications...",
     },
     // Add more timeline entries...
   ],
@@ -425,10 +452,10 @@ export const aboutData = {
       name: "AWS Solutions Architect",
       issuer: "Amazon Web Services",
       date: "2023",
-      image: "/images/certs/aws.png"
+      image: "/images/certs/aws.png",
     },
     // Add more certifications...
-  ]
+  ],
 };
 ```
 
@@ -439,10 +466,12 @@ export const aboutData = {
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/iliasahmed/portfolio)
 
 1. **Connect Repository**
+
    - Import your GitHub repository to Vercel
    - Vercel will automatically detect the framework
 
 2. **Configure Environment Variables**
+
    - Add your environment variables in Vercel dashboard
    - Go to Project Settings → Environment Variables
 
@@ -453,6 +482,7 @@ export const aboutData = {
 ### **Netlify**
 
 1. **Build Settings**
+
    ```
    Build command: npm run build
    Publish directory: dist
@@ -464,12 +494,13 @@ export const aboutData = {
 ### **GitHub Pages**
 
 1. **GitHub Actions Workflow** (`.github/workflows/deploy.yml`)
+
    ```yaml
    name: Deploy to GitHub Pages
 
    on:
      push:
-       branches: [ main ]
+       branches: [main]
 
    jobs:
      build-and-deploy:
@@ -481,8 +512,8 @@ export const aboutData = {
          - name: Setup Node.js
            uses: actions/setup-node@v3
            with:
-             node-version: '18'
-             cache: 'npm'
+             node-version: "18"
+             cache: "npm"
 
          - name: Install dependencies
            run: npm ci
@@ -515,6 +546,7 @@ npm run preview
 ### **Adding New Skills**
 
 1. **Update Skills Data**
+
    ```typescript
    // src/components/skills/skillsData.ts
    {
@@ -538,6 +570,7 @@ npm run preview
 ### **Adding New Projects**
 
 1. **Add Project Data**
+
    ```typescript
    // src/components/projects/projectsData.ts
    {
@@ -566,13 +599,14 @@ npm run preview
 export const customAnimation = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: "easeOut" }
+  transition: { duration: 0.6, ease: "easeOut" },
 };
 ```
 
 ### **Adding New Themes**
 
 1. **Define Theme Colors**
+
    ```css
    /* src/styles/globals.css */
    :root {
@@ -583,12 +617,19 @@ export const customAnimation = {
 2. **Update Theme Context**
    ```typescript
    // src/contexts/ThemeContext.tsx
-   export type ThemeAccent = 'purple' | 'blue' | 'green' | 'pink' | 'orange' | 'custom';
+   export type ThemeAccent =
+     | "purple"
+     | "blue"
+     | "green"
+     | "pink"
+     | "orange"
+     | "custom";
    ```
 
 ## 📊 Performance
 
 ### **Lighthouse Scores**
+
 - **Performance**: 95+
 - **Accessibility**: 100
 - **Best Practices**: 100
@@ -597,39 +638,40 @@ export const customAnimation = {
 ### **Optimization Techniques**
 
 #### **Code Splitting**
+
 ```typescript
 // Lazy loading components
-const ProjectModal = lazy(() => import('./ProjectModal'));
-const SkillsComparison = lazy(() => import('./SkillsComparison'));
+const ProjectModal = lazy(() => import("./ProjectModal"));
+const SkillsComparison = lazy(() => import("./SkillsComparison"));
 ```
 
 #### **Image Optimization**
+
 - WebP format with fallbacks
 - Responsive images with `srcset`
 - Lazy loading for below-the-fold images
 - Optimized thumbnails for projects
 
 #### **Bundle Optimization**
+
 - Tree shaking for unused code
 - Dynamic imports for large dependencies
 - Vendor chunk splitting
 - Gzip compression
 
 #### **Caching Strategy**
+
 ```typescript
 // Service Worker for caching
-const CACHE_NAME = 'portfolio-v1';
-const urlsToCache = [
-  '/',
-  '/static/css/main.css',
-  '/static/js/main.js'
-];
+const CACHE_NAME = "portfolio-v1";
+const urlsToCache = ["/", "/static/css/main.css", "/static/js/main.js"];
 ```
 
 #### **Performance Monitoring**
+
 ```typescript
 // Web Vitals tracking
-import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
+import { getCLS, getFID, getFCP, getLCP, getTTFB } from "web-vitals";
 
 getCLS(console.log);
 getFID(console.log);
@@ -641,12 +683,14 @@ getTTFB(console.log);
 ## ♿ Accessibility
 
 ### **WCAG 2.1 AA Compliance**
+
 - Color contrast ratios meet AA standards
 - All interactive elements are keyboard accessible
 - Screen reader friendly with proper ARIA labels
 - Focus indicators for keyboard navigation
 
 ### **Features**
+
 - **Keyboard Navigation** - Full keyboard support for all interactions
 - **Voice Commands** - Navigate using voice instructions
 - **Screen Reader Support** - Comprehensive ARIA labels and semantic HTML
@@ -656,6 +700,7 @@ getTTFB(console.log);
 - **Alternative Text** - Descriptive alt text for all images
 
 ### **Testing Tools**
+
 - **axe-core** - Automated accessibility testing
 - **WAVE** - Web accessibility evaluation
 - **Lighthouse** - Accessibility audit
@@ -664,21 +709,24 @@ getTTFB(console.log);
 ## 🔒 Security
 
 ### **Security Headers**
+
 ```typescript
 // vite.config.ts - Security headers
 export default defineConfig({
   server: {
     headers: {
-      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'",
-      'X-Frame-Options': 'DENY',
-      'X-Content-Type-Options': 'nosniff',
-      'Referrer-Policy': 'strict-origin-when-cross-origin'
-    }
-  }
+      "Content-Security-Policy":
+        "default-src 'self'; script-src 'self' 'unsafe-inline'",
+      "X-Frame-Options": "DENY",
+      "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+    },
+  },
 });
 ```
 
 ### **Best Practices**
+
 - Input validation and sanitization
 - XSS protection
 - CSRF protection for forms
@@ -688,12 +736,14 @@ export default defineConfig({
 ## 🧪 Testing
 
 ### **Testing Stack**
+
 - **Vitest** - Unit testing framework
 - **React Testing Library** - Component testing
 - **Playwright** - End-to-end testing
 - **MSW** - API mocking for tests
 
 ### **Running Tests**
+
 ```bash
 # Run unit tests
 npm run test
@@ -709,21 +759,22 @@ npm run test:coverage
 ```
 
 ### **Example Test**
+
 ```typescript
 // src/components/__tests__/Button.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
-import { Button } from '../ui/Button';
+import { render, screen, fireEvent } from "@testing-library/react";
+import { Button } from "../ui/Button";
 
-describe('Button', () => {
-  it('renders with correct text', () => {
+describe("Button", () => {
+  it("renders with correct text", () => {
     render(<Button>Click me</Button>);
-    expect(screen.getByText('Click me')).toBeInTheDocument();
+    expect(screen.getByText("Click me")).toBeInTheDocument();
   });
 
-  it('calls onClick when clicked', () => {
+  it("calls onClick when clicked", () => {
     const handleClick = vi.fn();
     render(<Button onClick={handleClick}>Click me</Button>);
-    fireEvent.click(screen.getByText('Click me'));
+    fireEvent.click(screen.getByText("Click me"));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 });
@@ -732,12 +783,14 @@ describe('Button', () => {
 ## 📱 PWA Features
 
 ### **Progressive Web App**
+
 - **Offline Support** - Service worker for offline functionality
 - **Install Prompt** - Add to home screen capability
 - **App-like Experience** - Native app feel on mobile devices
 - **Background Sync** - Sync data when connection is restored
 
 ### **Manifest Configuration**
+
 ```json
 {
   "name": "Ilias Ahmed - Portfolio",
@@ -755,16 +808,27 @@ describe('Button', () => {
 ## 🔍 SEO Optimization
 
 ### **Meta Tags**
+
 ```html
-<meta name="description" content="Full-Stack Developer specializing in React, Node.js, and modern web technologies">
-<meta name="keywords" content="Full Stack Developer, React, Node.js, TypeScript, Web Development">
-<meta property="og:title" content="Ilias Ahmed - Full Stack Developer">
-<meta property="og:description" content="Modern portfolio showcasing full-stack development expertise">
-<meta property="og:image" content="/images/og-image.jpg">
-<meta name="twitter:card" content="summary_large_image">
+<meta
+  name="description"
+  content="Full-Stack Developer specializing in React, Node.js, and modern web technologies"
+/>
+<meta
+  name="keywords"
+  content="Full Stack Developer, React, Node.js, TypeScript, Web Development"
+/>
+<meta property="og:title" content="Ilias Ahmed - Full Stack Developer" />
+<meta
+  property="og:description"
+  content="Modern portfolio showcasing full-stack development expertise"
+/>
+<meta property="og:image" content="/images/og-image.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
 ```
 
 ### **Structured Data**
+
 ```json
 {
   "@context": "https://schema.org",
@@ -784,6 +848,7 @@ describe('Button', () => {
 We welcome contributions to improve this portfolio! Here's how you can help:
 
 ### **Getting Started**
+
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
@@ -791,6 +856,7 @@ We welcome contributions to improve this portfolio! Here's how you can help:
 5. Open a Pull Request
 
 ### **Development Guidelines**
+
 - Follow the existing code style and conventions
 - Write clear, concise commit messages
 - Add tests for new features
@@ -798,6 +864,7 @@ We welcome contributions to improve this portfolio! Here's how you can help:
 - Ensure all tests pass before submitting
 
 ### **Types of Contributions**
+
 - 🐛 Bug fixes
 - ✨ New features
 - 📚 Documentation improvements
@@ -806,7 +873,9 @@ We welcome contributions to improve this portfolio! Here's how you can help:
 - ♿ Accessibility improvements
 
 ### **Reporting Issues**
+
 If you find a bug or have a suggestion, please [open an issue](https://github.com/iliasahmed/portfolio/issues) with:
+
 - Clear description of the problem
 - Steps to reproduce (for bugs)
 - Expected vs actual behavior
@@ -846,33 +915,39 @@ SOFTWARE.
 Special thanks to the amazing open-source community and the following projects:
 
 ### **Core Technologies**
+
 - [React](https://reactjs.org/) - A JavaScript library for building user interfaces
 - [TypeScript](https://www.typescriptlang.org/) - Typed JavaScript at any scale
 - [Vite](https://vitejs.dev/) - Next generation frontend tooling
 - [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework
 
 ### **Animation & Graphics**
+
 - [Framer Motion](https://www.framer.com/motion/) - A production-ready motion library for React
 - [Three.js](https://threejs.org/) - JavaScript 3D library
 - [GSAP](https://greensock.com/gsap/) - Professional-grade animation library
 - [React Spring](https://react-spring.dev/) - Spring-physics based animations
 
 ### **UI Components & Icons**
+
 - [Lucide React](https://lucide.dev/) - Beautiful & consistent icon library
 - [Recharts](https://recharts.org/) - Redefined chart library built with React
 - [Sonner](https://sonner.emilkowal.ski/) - An opinionated toast component
 
 ### **Development Tools**
+
 - [ESLint](https://eslint.org/) - Pluggable JavaScript linter
 - [Prettier](https://prettier.io/) - Opinionated code formatter
 - [Husky](https://typicode.github.io/husky/) - Modern native Git hooks
 
 ### **Deployment & Hosting**
+
 - [Vercel](https://vercel.com/) - Platform for frontend frameworks and static sites
 - [Netlify](https://netlify.com/) - Platform for modern web projects
 - [GitHub Actions](https://github.com/features/actions) - Automate workflows
 
 ### **Inspiration**
+
 - Various portfolio designs from the developer community
 - Modern web design trends and best practices
 - Accessibility guidelines from W3C and WebAIM
@@ -888,6 +963,7 @@ Special thanks to the amazing open-source community and the following projects:
 - 🐦 **Twitter**: [@iliasahmed_dev](https://twitter.com/iliasahmed_dev)
 
 ### **Let's Connect!**
+
 I'm always open to discussing new opportunities, interesting projects, or just having a chat about technology and development. Feel free to reach out!
 
 ---
@@ -901,6 +977,6 @@ I'm always open to discussing new opportunities, interesting projects, or just h
 
 **Made with ❤️ and ☕ by [Ilias Ahmed](https://github.com/iliasahmed)**
 
-*Last updated: January 2024*
+_Last updated: January 2024_
 
 </div>

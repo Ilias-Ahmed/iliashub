@@ -25,9 +25,9 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Dock, DockIcon, DockItem, DockLabel } from "./MacDock";
+import { Dock, DockIcon, DockItem, DockLabel } from "./Dock";
 
-interface DockNavigationProps {
+interface EnhancedDockNavigationProps {
   className?: string;
   showThemeControls?: boolean;
   showCommandPalette?: boolean;
@@ -61,7 +61,7 @@ const ACCENT_COLORS = [
   { name: "orange", color: "bg-orange-500", label: "Orange" },
 ] as const;
 
-const DockNavigation: React.FC<DockNavigationProps> = ({
+const EnhancedDockNavigation: React.FC<EnhancedDockNavigationProps> = ({
   className = "",
   showThemeControls = true,
   showCommandPalette = true,
@@ -177,10 +177,9 @@ const DockNavigation: React.FC<DockNavigationProps> = ({
         left-1/2 transform -translate-x-1/2 z-[9999] ${className}`}
     >
       <Dock
-        className={`backdrop-blur-xl shadow-2xl`}
-        magnification={90}
-        distance={100}
-        panelHeight={80}
+        className="bg-background/80 backdrop-blur-xl border border-border/50 shadow-2xl"
+        magnification={60}
+        distance={120}
       >
         {/* Navigation Items */}
         {availableSections.map(({ id, name, icon: IconComponent }) => (
@@ -188,16 +187,18 @@ const DockNavigation: React.FC<DockNavigationProps> = ({
             <DockLabel>{name}</DockLabel>
             <DockIcon>
               <div
-                className={`flex h-full w-full items-center justify-center rounded-xl transition-all duration-300 relative overflow-hidden`}
+                className={`flex h-full w-full items-center justify-center rounded-full transition-all duration-200 ${
+                  activeSection === id
+                    ? "bg-primary/20 text-primary border-2 border-primary/30 shadow-lg"
+                    : isDark
+                    ? "bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-white border-2 border-transparent hover:border-neutral-600"
+                    : "bg-neutral-200 text-neutral-700 hover:bg-neutral-300 hover:text-neutral-900 border-2 border-transparent hover:border-neutral-400"
+                }`}
               >
-                <IconComponent className="h-6 w-6 relative z-10" />
+                <IconComponent className="h-5 w-5" />
                 {/* Active indicator dot */}
                 {activeSection === id && (
-                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-white rounded-full shadow-sm" />
-                )}
-                {/* Glow effect for active state */}
-                {activeSection === id && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/30 to-blue-600/30 rounded-xl" />
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary rounded-full" />
                 )}
               </div>
             </DockIcon>
@@ -212,23 +213,17 @@ const DockNavigation: React.FC<DockNavigationProps> = ({
             </DockLabel>
             <DockIcon>
               <div
-                className={`flex h-full w-full items-center justify-center rounded-xl transition-all duration-300 relative overflow-hidden ${
-                  isSystemTrayOpen
-                    ? "bg-gradient-to-br from-gray-500 to-gray-600 text-white shadow-lg scale-105 border-2 border-gray-400/50"
-                    : isDark
-                    ? "bg-gradient-to-br from-neutral-700 to-neutral-800 text-neutral-300 hover:from-neutral-600 hover:to-neutral-700 hover:text-white border-2 border-transparent hover:border-neutral-500/50 hover:scale-110 hover:shadow-lg"
-                    : "bg-gradient-to-br from-gray-100 to-gray-200 text-gray-700 hover:from-gray-200 hover:to-gray-300 hover:text-gray-900 border-2 border-transparent hover:border-gray-400/50 hover:scale-110 hover:shadow-lg"
+                className={`flex h-full w-full items-center justify-center rounded-full transition-all duration-200 ${
+                  isDark
+                    ? "bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-white border-2 border-transparent hover:border-neutral-600"
+                    : "bg-neutral-200 text-neutral-700 hover:bg-neutral-300 hover:text-neutral-900 border-2 border-transparent hover:border-neutral-400"
                 }`}
               >
                 <ChevronUp
-                  className={`h-6 w-6 transition-transform duration-300 relative z-10 ${
+                  className={`h-5 w-5 transition-transform duration-300 ${
                     isSystemTrayOpen ? "rotate-180" : ""
                   }`}
                 />
-                {/* Glow effect for active state */}
-                {isSystemTrayOpen && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-400/30 to-gray-600/30 rounded-xl" />
-                )}
               </div>
             </DockIcon>
           </DockItem>
@@ -370,4 +365,4 @@ const DockNavigation: React.FC<DockNavigationProps> = ({
   );
 };
 
-export default React.memo(DockNavigation);
+export default React.memo(EnhancedDockNavigation);

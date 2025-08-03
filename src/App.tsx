@@ -6,7 +6,6 @@ import { AudioProvider } from "@/contexts/AudioContext";
 import { BackgroundProvider } from "@/contexts/BackgroundContext";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import GlobalBackground from "@/components/ui/GlobalBackground";
-import BackgroundPerformanceMonitor from "@/components/ui/BackgroundPerformanceMonitor";
 import Index from "@/pages/index";
 import NotFound from "@/pages/NotFound";
 
@@ -19,11 +18,6 @@ function App() {
             <Router>
               {/* Global Background */}
               <GlobalBackground />
-
-              <BackgroundPerformanceMonitor
-                position="bottom-left"
-                showDetails={process.env.NODE_ENV === 'development'}
-              />
 
               <Suspense
                 fallback={

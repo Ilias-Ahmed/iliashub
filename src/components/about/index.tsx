@@ -1,14 +1,14 @@
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTheme } from "@/contexts/ThemeContext";
+import { triggerHapticFeedback } from "@/utils/haptics";
+import { animated, useSpring } from "@react-spring/web";
+import { AnimatePresence, motion, useInView } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { certifications, timelineData } from "./aboutData";
 import CertificationsGallery from "./CertificationsGallery";
 import ExperienceTimeline from "./ExperienceTimeline";
 import ProfileCard from "./ProfileCard";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useTheme } from "@/contexts/ThemeContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
-import { useSpring, animated } from "@react-spring/web";
-import { AnimatePresence, motion, useInView } from "framer-motion";
-import { useEffect, useRef, useState, useCallback } from "react";
-import { toast } from "sonner";
 
 const AboutSection = () => {
   const ref = useRef(null);
@@ -63,7 +63,7 @@ const AboutSection = () => {
     visible: {
       y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 100 },
+      transition: { type: "spring" as const, stiffness: 100 },
     },
   };
 
@@ -230,9 +230,6 @@ const AboutSection = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <span className="text-lg" aria-hidden="true">
-                  👤
-                </span>
                 <span className="font-medium">Profile</span>
               </motion.span>
             </TabsTrigger>
@@ -269,9 +266,6 @@ const AboutSection = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <span className="text-lg" aria-hidden="true">
-                  🚀
-                </span>
                 <span className="font-medium">Experience</span>
               </motion.span>
             </TabsTrigger>
@@ -568,4 +562,3 @@ const AboutSection = () => {
 };
 
 export default AboutSection;
-

@@ -1,13 +1,13 @@
+import { useIsMobile } from "@/hooks/use-mobile";
 import React, {
   createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
   ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 export type BackgroundMode =
   | "adaptive"
@@ -46,16 +46,16 @@ export interface BackgroundContextType {
 }
 
 const DEFAULT_CONFIG: BackgroundConfig = {
-  mode: "adaptive",
-  intensity: "medium",
+  mode: "minimal", // Changed from adaptive for better performance
+  intensity: "low", // Default to low intensity
   performanceMode: "auto",
-  enableInteractivity: true,
-  enableAudioVisualization: true,
-  enableParallax: true,
-  adaptToSection: true,
-  opacity: 0.8,
-  particleCount: 100,
-  animationSpeed: 1,
+  enableInteractivity: false, // Disabled by default
+  enableAudioVisualization: false, // Disabled by default
+  enableParallax: false, // Disabled by default
+  adaptToSection: false, // Disabled by default
+  opacity: 0.6, // Reduced opacity
+  particleCount: 25, // Reduced count
+  animationSpeed: 0.7, // Slower animations
 };
 
 const MOBILE_CONFIG: Partial<BackgroundConfig> = {
@@ -65,8 +65,8 @@ const MOBILE_CONFIG: Partial<BackgroundConfig> = {
   enableInteractivity: false,
   enableAudioVisualization: false,
   enableParallax: false,
-  particleCount: 30,
-  animationSpeed: 0.5,
+  particleCount: 10, // Even fewer particles on mobile
+  animationSpeed: 0.3, // Much slower on mobile
 };
 
 const LOW_PERFORMANCE_CONFIG: Partial<BackgroundConfig> = {
@@ -74,8 +74,8 @@ const LOW_PERFORMANCE_CONFIG: Partial<BackgroundConfig> = {
   enableInteractivity: false,
   enableAudioVisualization: false,
   enableParallax: false,
-  particleCount: 50,
-  animationSpeed: 0.7,
+  particleCount: 15, // Reduced from 50
+  animationSpeed: 0.5, // Slower animation
 };
 
 const BackgroundContext = createContext<BackgroundContextType | undefined>(

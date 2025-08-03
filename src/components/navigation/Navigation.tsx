@@ -1,13 +1,13 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useNavigation } from "@/contexts/NavigationContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import DotsNavigation from "./DotsNavigation";
-import VoiceNavigation from "./VoiceNavigation";
-import DockNavigation from "./DockNavigation";
-import NavigationMenu from "./NavigationMenu";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import BackToTop from "../ui/BackToTop";
 import CommandPalette from "../ui/CommandPalette";
+import DockNavigation from "./DockNavigation";
+import DotsNavigation from "./DotsNavigation";
+import NavigationMenu from "./NavigationMenu";
+import VoiceNavigation from "./VoiceNavigation";
 
 // Enhanced interfaces
 interface NavigationProps {

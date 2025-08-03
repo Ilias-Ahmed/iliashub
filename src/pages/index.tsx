@@ -4,9 +4,9 @@ import ScrollProgressBar from "@/components/ui/ScrollProgressBar";
 import { NavigationProvider } from "@/contexts/NavigationContext";
 import { useBackground } from "@/contexts/BackgroundContext";
 import Navigation from "@/components/navigation/Navigation";
-import CustomCursor from "@/components/ui/CustomCursor";
-import { useIsMobile } from "@/hooks/use-mobile";
+ import { useIsMobile } from "@/hooks/use-mobile";
 import { useLocation, useNavigate } from "react-router-dom";
+import { SmoothCursor } from "@/components/ui/SmoothCursor";
 
 const Toaster = React.lazy(() =>
   import("@/components/ui/sonner").then((mod) => ({ default: mod.Toaster }))
@@ -174,7 +174,7 @@ const Index = () => {
   return (
     <>
       {/* Add CustomCursor component */}
-      {!isMobile && <CustomCursor />}
+      {!isMobile && <SmoothCursor />}
 
       <Suspense fallback={null}>{isLoading && <LoadingScreen />}</Suspense>
 
