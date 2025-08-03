@@ -162,21 +162,19 @@ const Index = () => {
     };
   }, [navSections, navigate, location.pathname, setCurrentSection]);
 
-  // Simulate loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
+  // Handle loading completion from LoadingScreen component
+  const handleLoadingComplete = () => {
+    setIsLoading(false);
+  };
 
   return (
     <>
       {/* Add CustomCursor component */}
       {!isMobile && <SmoothCursor />}
 
-      <Suspense fallback={null}>{isLoading && <LoadingScreen />}</Suspense>
+      <Suspense fallback={null}>
+        {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
+      </Suspense>
 
       <NavigationProvider customSections={navSections}>
         <div

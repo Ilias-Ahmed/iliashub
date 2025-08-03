@@ -1,182 +1,454 @@
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface LoadingScreenProps {
   onLoadingComplete?: () => void;
   duration?: number;
-  quotes?: string[];
 }
 
 /**
- * Simplified, performance-optimized loading screen
+ * Award-winning loading screen with sophisticated animations
  */
 const LoadingScreen = ({
   onLoadingComplete,
-  duration = 3000, // Reduced duration
-  quotes = [
-    "Crafting digital experiences...",
-    "Building tomorrow's interfaces...",
-    "Where innovation meets design...",
-  ],
+  duration = 6000, // Industry standard: 4-8 seconds
 }: LoadingScreenProps) => {
   const { accent } = useTheme();
-  const isMobile = useIsMobile();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [progress, setProgress] = useState(0);
-  const [loadingComplete, setLoadingComplete] = useState(false);
-  const [exitAnimation, setExitAnimation] = useState(false);
-  const [activeQuoteIndex, setActiveQuoteIndex] = useState(0);
+  const [currentStage, setCurrentStage] = useState(0);
+  const [showExit, setShowExit] = useState(false);
+  const [loadingText, setLoadingText] = useState("");
+  const [minTimeComplete, setMinTimeComplete] = useState(false);
 
-  // Simplified progress animation
-  useEffect(() => {
-    const startTime = Date.now();
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const newProgress = Math.min((elapsed / duration) * 100, 100);
-      setProgress(newProgress);
+  // Mouse tracking for subtle parallax
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const springX = useSpring(mouseX, { stiffness: 300, damping: 50 });
+  const springY = useSpring(mouseY, { stiffness: 300, damping: 50 });
 
-      if (newProgress >= 100) {
-        clearInterval(interval);
-        setLoadingComplete(true);
-        
-        // Start exit animation
-        setTimeout(() => {
-          setExitAnimation(true);
-        }, 500);
+  const stages = useMemo(
+    () => [
+      {
+        label: "Initializing System",
+        end: 15,
+        assets: ["core.js", "main.css"],
+      },
+      {
+        label: "Loading Core Assets",
+        end: 35,
+        assets: ["components.js", "icons.svg", "fonts.woff"],
+      },
+      {
+        label: "Processing Components",
+        end: 55,
+        assets: ["animations.js", "effects.css"],
+      },
+      {
+        label: "Preparing Interface",
+        end: 75,
+        assets: ["layout.css", "responsive.css"],
+      },
+      {
+        label: "Optimizing Performance",
+        end: 90,
+        assets: ["chunks.js", "lazy.js"],
+      },
+      {
+        label: "Finalizing Experience",
+        end: 100,
+        assets: ["analytics.js", "sw.js"],
+      },
+    ],
+    []
+  );
 
-        // Complete loading
-        setTimeout(() => {
-          onLoadingComplete?.();
-        }, 1000);
-      }
-    }, 50); // Update every 50ms instead of every frame
-
-    return () => clearInterval(interval);
-  }, [duration, onLoadingComplete]);
-
-  // Simplified quote rotation
-  useEffect(() => {
-    if (loadingComplete) return;
-    
-    const interval = setInterval(() => {
-      setActiveQuoteIndex((prev) => (prev + 1) % quotes.length);
-    }, 1500);
-
-    return () => clearInterval(interval);
-  }, [quotes.length, loadingComplete]);
-
-  const getAccentColor = () => {
-    const colors = {
-      purple: "147, 51, 234",
-      blue: "59, 130, 246", 
-      pink: "236, 72, 153",
-      green: "34, 197, 94",
-      orange: "249, 115, 22",
+  const getAccentColors = () => {
+    const colorMap = {
+      purple: { rgb: "147, 51, 234", hex: "#9333EA" },
+      blue: { rgb: "59, 130, 246", hex: "#3B82F6" },
+      pink: { rgb: "236, 72, 153", hex: "#EC4899" },
+      green: { rgb: "34, 197, 94", hex: "#22C55E" },
+      orange: { rgb: "249, 115, 22", hex: "#F97316" },
     };
-    return colors[accent] || colors.purple;
+    return colorMap[accent] || colorMap.purple;
   };
 
-  if (exitAnimation) {
-    return null;
-  }
+  // Enhanced progress animation with realistic timing
+  useEffect(() => {
+    const startTime = Date.now();
+    let animationFrame: number;
+
+    const updateProgress = () => {
+      const elapsed = Date.now() - startTime;
+      const rawProgress = Math.min((elapsed / duration) * 100, 100);
+
+      // Realistic loading curve - slower at start, faster in middle, slower at end
+      let easedProgress;
+      if (rawProgress < 10) {
+        // Very slow start (0-10%)
+        easedProgress = rawProgress * 0.3;
+      } else if (rawProgress < 80) {
+        // Normal speed (10-80%)
+        const normalizedProgress = (rawProgress - 10) / 70;
+        easedProgress = 3 + normalizedProgress * 77;
+      } else {
+        // Slow down near end (80-100%)
+        const normalizedProgress = (rawProgress - 80) / 20;
+        const slowEnd = 1 - Math.pow(1 - normalizedProgress, 2);
+        easedProgress = 80 + slowEnd * 20;
+      }
+
+      setProgress(easedProgress);
+
+      // Update stage based on progress
+      const activeStage = stages.findIndex(
+        (stage) => easedProgress <= stage.end
+      );
+      const newStage = activeStage >= 0 ? activeStage : stages.length - 1;
+      setCurrentStage(newStage);
+
+      // Update loading text with current asset
+      const currentStageData = stages[newStage];
+      if (currentStageData?.assets) {
+        const assetIndex = Math.floor(
+          ((easedProgress - (newStage > 0 ? stages[newStage - 1].end : 0)) /
+            (currentStageData.end -
+              (newStage > 0 ? stages[newStage - 1].end : 0))) *
+            currentStageData.assets.length
+        );
+        const asset =
+          currentStageData.assets[
+            Math.min(assetIndex, currentStageData.assets.length - 1)
+          ];
+        setLoadingText(asset);
+      }
+
+      if (rawProgress >= 100) {
+        // Ensure minimum loading time of 3 seconds for UX
+        if (!minTimeComplete) {
+          setTimeout(
+            () => setMinTimeComplete(true),
+            Math.max(0, 3000 - elapsed)
+          );
+        }
+
+        // Only exit when both progress is complete AND minimum time has passed
+        if (minTimeComplete || elapsed >= 3000) {
+          setTimeout(() => setShowExit(true), 1200);
+          setTimeout(() => onLoadingComplete?.(), 2000);
+        } else {
+          animationFrame = requestAnimationFrame(updateProgress);
+        }
+      } else {
+        animationFrame = requestAnimationFrame(updateProgress);
+      }
+    };
+
+    // Start the animation
+    animationFrame = requestAnimationFrame(updateProgress);
+
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, [duration, onLoadingComplete, stages, minTimeComplete]);
+
+  // Ensure minimum loading time (industry standard UX practice)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinTimeComplete(true);
+    }, 3000); // Minimum 3 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Mouse tracking
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        mouseX.set((e.clientX - centerX) * 0.01);
+        mouseY.set((e.clientY - centerY) * 0.01);
+      }
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [mouseX, mouseY]);
+
+  const colors = getAccentColors();
 
   return (
     <AnimatePresence>
-      <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center"
-        style={{
-          background: `linear-gradient(135deg, 
-            rgba(0, 0, 0, 0.95) 0%, 
-            rgba(${getAccentColor()}, 0.1) 50%, 
-            rgba(0, 0, 0, 0.95) 100%)`
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ 
-          opacity: 0,
-          scale: 1.1,
-          transition: { duration: 0.8, ease: "easeInOut" }
-        }}
-      >
-        {/* Main content */}
-        <div className="flex flex-col items-center space-y-8 max-w-lg mx-auto px-6">
-          {/* Logo/Brand */}
-          <motion.div
-            className="text-center"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          >
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-              Portfolio
-            </h1>
-            <p className="text-gray-400 mt-2">Crafting Digital Excellence</p>
-          </motion.div>
-
-          {/* Progress bar */}
-          <div className="w-full max-w-md">
-            <div className="flex justify-between text-sm text-gray-400 mb-2">
-              <span>Loading</span>
-              <span>{Math.round(progress)}%</span>
-            </div>
-            <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full rounded-full"
-                style={{
-                  background: `linear-gradient(90deg, 
-                    rgba(${getAccentColor()}, 0.8) 0%, 
-                    rgba(${getAccentColor()}, 1) 100%)`
-                }}
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-              />
-            </div>
+      {!showExit && (
+        <motion.div
+          ref={containerRef}
+          className="fixed inset-0 z-99 overflow-hidden"
+          style={{
+            background: `radial-gradient(ellipse at center,
+              rgba(${colors.rgb}, 0.08) 0%,
+              rgba(0, 0, 0, 0.95) 40%,
+              rgba(0, 0, 0, 1) 100%)`,
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{
+            opacity: 0,
+            scale: 1.1,
+            transition: { duration: 1.2, ease: [0.4, 0, 0.2, 1] },
+          }}
+        >
+          {/* Animated Grid Background */}
+          <div className="absolute inset-0 opacity-20">
+            <motion.div
+              className="w-full h-full"
+              style={{
+                backgroundImage: `
+                  linear-gradient(rgba(${colors.rgb}, 0.1) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(${colors.rgb}, 0.1) 1px, transparent 1px)
+                `,
+                backgroundSize: "50px 50px",
+                x: springX,
+                y: springY,
+              }}
+              animate={{
+                backgroundPosition: ["0px 0px", "50px 50px"],
+              }}
+              transition={{
+                duration: 20,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            />
           </div>
 
-          {/* Quote */}
+          {/* Main Content */}
           <motion.div
-            className="text-center min-h-[3rem] flex items-center"
-            key={activeQuoteIndex}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
+            className="relative z-10 h-full flex flex-col items-center justify-center px-6"
+            style={{ x: springX, y: springY }}
           >
-            <p className="text-gray-300 italic text-lg max-w-md">
-              "{quotes[activeQuoteIndex]}"
-            </p>
-          </motion.div>
+            {/* Logo Section */}
+            <motion.div
+              className="text-center mb-16"
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+              <motion.h1
+                className="text-7xl md:text-9xl font-black"
+                style={{
+                  background: `linear-gradient(45deg,
+                    #ffffff 0%,
+                    ${colors.hex} 50%,
+                    #ffffff 100%)`,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundSize: "300% 300%",
+                }}
+                animate={{
+                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                PORTFOLIO
+              </motion.h1>
 
-          {/* Simplified particles - only on desktop */}
-          {!isMobile && (
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              {[...Array(20)].map((_, i) => (
+              <motion.div
+                className="mt-4 text-xl text-gray-400 font-light tracking-[0.3em]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+              >
+                DIGITAL ARTISTRY
+              </motion.div>
+            </motion.div>
+
+            {/* Progress Section */}
+            <motion.div
+              className="w-full max-w-md"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+            >
+              {/* Progress Ring */}
+              <div className="relative w-40 h-40 mx-auto mb-8">
+                <svg
+                  className="w-full h-full transform -rotate-90"
+                  viewBox="0 0 120 120"
+                >
+                  {/* Background ring */}
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="54"
+                    stroke="rgba(255,255,255,0.05)"
+                    strokeWidth="2"
+                    fill="transparent"
+                  />
+
+                  {/* Progress ring */}
+                  <motion.circle
+                    cx="60"
+                    cy="60"
+                    r="54"
+                    stroke={colors.hex}
+                    strokeWidth="2"
+                    fill="transparent"
+                    strokeLinecap="round"
+                    strokeDasharray={339.292} // 2 * PI * 54
+                    initial={{ strokeDashoffset: 339.292 }}
+                    animate={{
+                      strokeDashoffset: 339.292 - (progress / 100) * 339.292,
+                    }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    style={{
+                      filter: `drop-shadow(0 0 8px ${colors.hex})`,
+                    }}
+                  />
+
+                  {/* Animated dot */}
+                  <motion.circle
+                    cx={
+                      60 +
+                      54 *
+                        Math.cos((progress / 100) * 2 * Math.PI - Math.PI / 2)
+                    }
+                    cy={
+                      60 +
+                      54 *
+                        Math.sin((progress / 100) * 2 * Math.PI - Math.PI / 2)
+                    }
+                    r="4"
+                    fill={colors.hex}
+                    style={{
+                      filter: `drop-shadow(0 0 12px ${colors.hex})`,
+                    }}
+                  >
+                    <animate
+                      attributeName="r"
+                      values="4;6;4"
+                      dur="2s"
+                      repeatCount="indefinite"
+                    />
+                  </motion.circle>
+                </svg>
+
+                {/* Center percentage */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <motion.div
+                    className="text-center"
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <div className="text-3xl font-bold text-white">
+                      {Math.round(progress)}%
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* Stage indicator */}
+              <motion.div
+                className="text-center"
+                key={currentStage}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="text-gray-400 text-sm font-medium tracking-widest uppercase mb-2">
+                  {stages[currentStage]?.label}
+                </div>
+                {loadingText && (
+                  <motion.div
+                    className="text-gray-500 text-xs font-mono"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Loading: {loadingText}
+                  </motion.div>
+                )}
+              </motion.div>
+            </motion.div>
+
+            {/* Floating Elements */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              {[...Array(12)].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="absolute w-1 h-1 rounded-full"
+                  className="absolute"
                   style={{
-                    background: `rgba(${getAccentColor()}, 0.6)`,
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
+                    left: `${10 + i * 7}%`,
+                    top: `${20 + Math.sin(i) * 60}%`,
                   }}
                   animate={{
-                    y: [0, -20, 0],
-                    opacity: [0.3, 1, 0.3],
+                    y: [0, -30, 0],
+                    opacity: [0.2, 0.8, 0.2],
+                    scale: [0.8, 1.2, 0.8],
                   }}
                   transition={{
-                    duration: 3 + Math.random() * 2,
+                    duration: 4 + Math.sin(i) * 2,
                     repeat: Infinity,
-                    delay: Math.random() * 2,
+                    delay: i * 0.5,
+                    ease: "easeInOut",
                   }}
-                />
+                >
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{
+                      background: `radial-gradient(circle, ${colors.hex} 0%, transparent 70%)`,
+                      boxShadow: `0 0 20px ${colors.hex}`,
+                    }}
+                  />
+                </motion.div>
               ))}
             </div>
+          </motion.div>
+
+          {/* Completion animation */}
+          {progress >= 100 && (
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <motion.div
+                className="absolute inset-0"
+                style={{
+                  background: `radial-gradient(circle,
+                    ${colors.hex}20 0%,
+                    transparent 50%)`,
+                }}
+                animate={{
+                  scale: [0, 3],
+                  opacity: [0, 0.6, 0],
+                }}
+                transition={{
+                  duration: 1.5,
+                  ease: "easeOut",
+                }}
+              />
+            </motion.div>
           )}
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 };

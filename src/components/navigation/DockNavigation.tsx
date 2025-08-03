@@ -174,7 +174,7 @@ const DockNavigation: React.FC<DockNavigationProps> = ({
   return (
     <div
       className={`fixed ${position === "bottom" ? "bottom-4" : "top-4"}
-        left-1/2 transform -translate-x-1/2 z-[9999] ${className}`}
+        left-1/2 transform -translate-x-1/2 z-[50] ${className}`}
     >
       <Dock
         className={`backdrop-blur-xl shadow-2xl`}
