@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { triggerHapticFeedback } from "@/utils/haptics";
 import { useTheme } from "@/contexts/ThemeContext";
+import { CoolMode } from "@/components/ui/CoolMode";
 
 interface Particle {
   id: string;
@@ -577,6 +578,12 @@ const NotFound: React.FC = () => {
             transition={{ duration: 0.5, delay: 1.4 }}
           >
             <Link to="/">
+              <CoolMode
+                      options={{
+                        particle:
+                          "https://pbs.twimg.com/profile_images/1782811051504885763/YR5-kWOI_400x400.jpg",
+                      }}
+                    >
               <motion.button
                 className="px-8 py-3 rounded-lg font-medium border-2 relative overflow-hidden group"
                 style={{
@@ -629,6 +636,7 @@ const NotFound: React.FC = () => {
                   }}
                 />
               </motion.button>
+              </CoolMode>
             </Link>
 
             <motion.button
