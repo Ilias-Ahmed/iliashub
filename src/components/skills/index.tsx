@@ -105,7 +105,7 @@ const SkillsSection = () => {
   return (
     <section
       ref={ref}
-      className=" px-6 relative overflow-hidden skills-section"
+      className="px-4 sm:px-6 relative overflow-hidden skills-section"
       id="skills"
     >
       {/* Background Elements */}
@@ -160,7 +160,7 @@ const SkillsSection = () => {
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
             transition={{ duration: 0.6 }}
-            className="mb-8"
+            className="mb-8 px-2 sm:px-4 md:px-0"
           >
             <Suspense fallback={<LoadingFallback height="300px" />}>
               <VisxSkillsVisualization skills={skills.slice(0, 8)} />

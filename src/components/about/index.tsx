@@ -160,128 +160,146 @@ const AboutSection = () => {
           onValueChange={setActiveTab}
           className="mb-20"
         >
-            <motion.div
+          <motion.div
             className="flex justify-center mb-16"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            >
+          >
             <TabsList
               className="relative inline-flex items-center p-1 rounded-xl border backdrop-blur-xl shadow-lg theme-transition"
               style={{
-              backgroundColor: isDark
-                ? "rgba(255,255,255,0.05)"
-                : "rgba(255,255,255,0.8)",
-              borderColor: isDark
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(0,0,0,0.1)",
-              backdropFilter: "blur(10px)",
+                backgroundColor: isDark
+                  ? "rgba(255,255,255,0.05)"
+                  : "rgba(255,255,255,0.8)",
+                borderColor: isDark
+                  ? "rgba(255,255,255,0.1)"
+                  : "rgba(0,0,0,0.1)",
+                backdropFilter: "blur(10px)",
               }}
             >
               {[
-              {
-                value: "profile",
-                label: "Profile",
-                icon: (
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <circle cx="12" cy="8" r="4" />
-                  <path d="M4 20c0-3.314 3.134-6 7-6s7 2.686 7 6" />
-                </svg>
-                ),
-                description: "Personal details and skills",
-              },
-              {
-                value: "experience",
-                label: "Experience",
-                icon: (
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <rect x="3" y="7" width="18" height="13" rx="2" />
-                  <path d="M16 3v4M8 3v4" />
-                </svg>
-                ),
-                description: "Work history and timeline",
-              },
+                {
+                  value: "profile",
+                  label: "Profile",
+                  icon: (
+                    <svg
+                      width="18"
+                      height="18"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle cx="12" cy="8" r="4" />
+                      <path d="M4 20c0-3.314 3.134-6 7-6s7 2.686 7 6" />
+                    </svg>
+                  ),
+                  description: "Personal details and skills",
+                },
+                {
+                  value: "experience",
+                  label: "Experience",
+                  icon: (
+                    <svg
+                      width="18"
+                      height="18"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <rect x="3" y="7" width="18" height="13" rx="2" />
+                      <path d="M16 3v4M8 3v4" />
+                    </svg>
+                  ),
+                  description: "Work history and timeline",
+                },
               ].map((tab) => (
-              <motion.button
-                key={tab.value}
-                type="button"
-                className="relative px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 overflow-visible"
-                style={{
-                color:
-                  activeTab === tab.value
-                  ? "white"
-                  : isDark
-                  ? "rgba(255,255,255,0.7)"
-                  : "rgba(0,0,0,0.7)",
-                }}
-                onClick={() => {
-                triggerHapticFeedback();
-                setActiveTab(tab.value);
-                }}
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.98 }}
-                aria-label={tab.label}
-              >
-                {/* Active background */}
-                {activeTab === tab.value && (
-                <motion.div
-                  layoutId="activeTabBackground"
-                  className="absolute inset-0 rounded-lg"
+                <motion.button
+                  key={tab.value}
+                  type="button"
+                  className="relative px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 overflow-visible"
                   style={{
-                  background: `linear-gradient(135deg, ${accentColors.primary} 0%, ${accentColors.secondary} 100%)`,
-                  boxShadow: `0 4px 12px ${accentColors.shadow}`,
+                    color:
+                      activeTab === tab.value
+                        ? "white"
+                        : isDark
+                        ? "rgba(255,255,255,0.7)"
+                        : "rgba(0,0,0,0.7)",
                   }}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
-                )}
-
-                {/* Content */}
-                <span className="relative z-10 flex items-center gap-2">
-                <motion.span
-                  className="text-lg"
-                  animate={{
-                  scale: activeTab === tab.value ? 1.15 : 1,
-                  rotate: activeTab === tab.value ? 5 : 0,
+                  onClick={() => {
+                    triggerHapticFeedback();
+                    setActiveTab(tab.value);
                   }}
-                  transition={{ duration: 0.2 }}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.98 }}
+                  aria-label={tab.label}
                 >
-                  {tab.icon}
-                </motion.span>
-                <span>{tab.label}</span>
-                </span>
+                  {/* Active background */}
+                  {activeTab === tab.value && (
+                    <motion.div
+                      layoutId="activeTabBackground"
+                      className="absolute inset-0 rounded-lg"
+                      style={{
+                        background: `linear-gradient(135deg, ${accentColors.primary} 0%, ${accentColors.secondary} 100%)`,
+                        boxShadow: `0 4px 12px ${accentColors.shadow}`,
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 30,
+                      }}
+                    />
+                  )}
 
-                {/* Tooltip */}
-                <motion.div
-                className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-lg text-xs whitespace-nowrap opacity-0 pointer-events-none"
-                style={{
-                  backgroundColor: isDark
-                  ? "rgba(0,0,0,0.8)"
-                  : "rgba(255,255,255,0.9)",
-                  color: isDark ? "white" : "black",
-                  border: `1px solid ${
-                  isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"
-                  }`,
-                  zIndex: 20,
-                }}
-                whileHover={{ opacity: 1 }}
-                transition={{ duration: 0.2 }}
-                >
-                {tab.description}
-                <div
-                  className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0"
-                  style={{
-                  borderLeft: "4px solid transparent",
-                  borderRight: "4px solid transparent",
-                  borderBottom: `4px solid ${
-                    isDark ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.9)"
-                  }`,
-                  }}
-                />
-                </motion.div>
-              </motion.button>
+                  {/* Content */}
+                  <span className="relative z-10 flex items-center gap-2">
+                    <motion.span
+                      className="text-lg"
+                      animate={{
+                        scale: activeTab === tab.value ? 1.15 : 1,
+                        rotate: activeTab === tab.value ? 5 : 0,
+                      }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {tab.icon}
+                    </motion.span>
+                    <span>{tab.label}</span>
+                  </span>
+
+                  {/* Tooltip */}
+                  <motion.div
+                    className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-lg text-xs whitespace-nowrap opacity-0 pointer-events-none"
+                    style={{
+                      backgroundColor: isDark
+                        ? "rgba(0,0,0,0.8)"
+                        : "rgba(255,255,255,0.9)",
+                      color: isDark ? "white" : "black",
+                      border: `1px solid ${
+                        isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"
+                      }`,
+                      zIndex: 20,
+                    }}
+                    whileHover={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {tab.description}
+                    <div
+                      className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0"
+                      style={{
+                        borderLeft: "4px solid transparent",
+                        borderRight: "4px solid transparent",
+                        borderBottom: `4px solid ${
+                          isDark ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.9)"
+                        }`,
+                      }}
+                    />
+                  </motion.div>
+                </motion.button>
               ))}
             </TabsList>
-            </motion.div>
+          </motion.div>
 
           {/* Enhanced Tab Content with Sliding Animations */}
           <div className="relative overflow-hidden">
