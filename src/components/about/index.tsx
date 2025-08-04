@@ -4,7 +4,6 @@ import { triggerHapticFeedback } from "@/utils/haptics";
 import { animated, useSpring } from "@react-spring/web";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import { certifications, timelineData } from "./aboutData";
 import CertificationsGallery from "./CertificationsGallery";
 import ExperienceTimeline from "./ExperienceTimeline";
@@ -66,23 +65,6 @@ const AboutSection = () => {
       transition: { type: "spring" as const, stiffness: 100 },
     },
   };
-
-  // Handle Easter egg click with error handling
-  const handleEasterEggClick = useCallback(() => {
-    try {
-      toast("Easter Egg Found!", {
-        description: "You've discovered a hidden feature!",
-        action: {
-          label: "Explore",
-          onClick: () =>
-            window.open("https://github.com/Ilias-Ahmed", "_blank"),
-        },
-        icon: "🎉",
-      });
-    } catch (error) {
-      console.error("Toast notification failed:", error);
-    }
-  }, []);
 
   return (
     <section
@@ -169,132 +151,229 @@ const AboutSection = () => {
               My Journey & Expertise
             </span>
           </h2>
-
-          <motion.p
-            className="text-base sm:text-lg opacity-70 max-w-2xl mx-auto"
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            The story behind my work, skills, and professional journey
-          </motion.p>
         </motion.div>
 
-        {/* Interactive Tabs - Enhanced with proper theming */}
+        {/* Interactive Tabs with Enhanced Animations */}
         <Tabs
           defaultValue="profile"
           value={activeTab}
           onValueChange={setActiveTab}
           className="mb-20"
         >
-          <TabsList
-            className="flex gap-4 max-w-md mx-auto mb-16 p-1 backdrop-blur-lg rounded-xl border shadow-xl theme-transition"
-            style={{
+            <motion.div
+            className="flex justify-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            >
+            <TabsList
+              className="relative inline-flex items-center p-1 rounded-xl  backdrop-blur-xl shadow-lg theme-transition"
+              style={{
               backgroundColor: isDark
-                ? "rgba(17, 24, 39, 0.4)"
-                : "rgba(255, 255, 255, 0.4)",
+                ? "rgba(255,255,255,0.05)"
+                : "rgba(255,255,255,0.8)",
               borderColor: isDark
-                ? "rgba(255, 255, 255, 0.1)"
-                : "rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <TabsTrigger
-              value="profile"
-              className="flex-1 px-6 py-3 rounded-lg transition-all duration-300 border theme-transition"
-              style={{
-                backgroundColor:
-                  activeTab === "profile"
-                    ? `linear-gradient(135deg, ${accentColors.primary}80, ${accentColors.secondary}80)`
-                    : "transparent",
-                borderColor:
-                  activeTab === "profile"
-                    ? accentColors.primary
-                    : isDark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.1)",
-                color:
-                  activeTab === "profile"
-                    ? "white"
-                    : isDark
-                    ? "rgba(255,255,255,0.8)"
-                    : "rgba(0,0,0,0.8)",
-                boxShadow:
-                  activeTab === "profile"
-                    ? `0 4px 14px ${accentColors.shadow}`
-                    : "none",
+                ? "rgba(255,255,255,0.1)"
+                : "rgba(0,0,0,0.1)",
+              backdropFilter: "blur(10px)",
               }}
-              onClick={() => triggerHapticFeedback()}
             >
-              <motion.span
-                className="flex items-center justify-center gap-3"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="font-medium">Profile</span>
-              </motion.span>
-            </TabsTrigger>
-
-            <TabsTrigger
-              value="experience"
-              className="flex-1 px-6 py-3 rounded-lg transition-all duration-300 border theme-transition"
-              style={{
-                backgroundColor:
-                  activeTab === "experience"
-                    ? `linear-gradient(135deg, ${accentColors.primary}80, ${accentColors.secondary}80)`
-                    : "transparent",
-                borderColor:
-                  activeTab === "experience"
-                    ? accentColors.primary
-                    : isDark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.1)",
+              {[
+              {
+                value: "profile",
+                label: "Profile",
+                icon: (
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 20c0-3.314 3.134-6 7-6s7 2.686 7 6" />
+                </svg>
+                ),
+                description: "Personal details and skills",
+              },
+              {
+                value: "experience",
+                label: "Experience",
+                icon: (
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <rect x="3" y="7" width="18" height="13" rx="2" />
+                  <path d="M16 3v4M8 3v4" />
+                </svg>
+                ),
+                description: "Work history and timeline",
+              },
+              ].map((tab) => (
+              <motion.button
+                key={tab.value}
+                type="button"
+                className="relative px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 overflow-visible"
+                style={{
                 color:
-                  activeTab === "experience"
-                    ? "white"
-                    : isDark
-                    ? "rgba(255,255,255,0.8)"
-                    : "rgba(0,0,0,0.8)",
-                boxShadow:
-                  activeTab === "experience"
-                    ? `0 4px 14px ${accentColors.shadow}`
-                    : "none",
-              }}
-              onClick={() => triggerHapticFeedback()}
-            >
-              <motion.span
-                className="flex items-center justify-center gap-3"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                  activeTab === tab.value
+                  ? "white"
+                  : isDark
+                  ? "rgba(255,255,255,0.7)"
+                  : "rgba(0,0,0,0.7)",
+                }}
+                onClick={() => {
+                triggerHapticFeedback();
+                setActiveTab(tab.value);
+                }}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.98 }}
+                aria-label={tab.label}
               >
-                <span className="font-medium">Experience</span>
-              </motion.span>
-            </TabsTrigger>
-          </TabsList>
+                {/* Active background */}
+                {activeTab === tab.value && (
+                <motion.div
+                  layoutId="activeTabBackground"
+                  className="absolute inset-0 rounded-lg"
+                  style={{
+                  background: `linear-gradient(135deg, ${accentColors.primary} 0%, ${accentColors.secondary} 100%)`,
+                  boxShadow: `0 4px 12px ${accentColors.shadow}`,
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+                )}
 
-          <AnimatePresence mode="wait">
-            {activeTab === "profile" && (
-              <motion.div
-                key="profile"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-              >
-                <ProfileCard />
-              </motion.div>
-            )}
-            {activeTab === "experience" && (
-              <motion.div
-                key="experience"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-              >
-                <ExperienceTimeline timelineData={timelineData} />
-              </motion.div>
-            )}
-          </AnimatePresence>
+                {/* Content */}
+                <span className="relative z-10 flex items-center gap-2">
+                <motion.span
+                  className="text-lg"
+                  animate={{
+                  scale: activeTab === tab.value ? 1.15 : 1,
+                  rotate: activeTab === tab.value ? 5 : 0,
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {tab.icon}
+                </motion.span>
+                <span>{tab.label}</span>
+                </span>
+
+                {/* Tooltip */}
+                <motion.div
+                className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-lg text-xs whitespace-nowrap opacity-0 pointer-events-none"
+                style={{
+                  backgroundColor: isDark
+                  ? "rgba(0,0,0,0.8)"
+                  : "rgba(255,255,255,0.9)",
+                  color: isDark ? "white" : "black",
+                  border: `1px solid ${
+                  isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"
+                  }`,
+                  zIndex: 20,
+                }}
+                whileHover={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+                >
+                {tab.description}
+                <div
+                  className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0"
+                  style={{
+                  borderLeft: "4px solid transparent",
+                  borderRight: "4px solid transparent",
+                  borderBottom: `4px solid ${
+                    isDark ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.9)"
+                  }`,
+                  }}
+                />
+                </motion.div>
+              </motion.button>
+              ))}
+            </TabsList>
+            </motion.div>
+
+          {/* Enhanced Tab Content with Sliding Animations */}
+          <div className="relative overflow-hidden">
+            <AnimatePresence mode="wait">
+              {activeTab === "profile" && (
+                <motion.div
+                  key="profile"
+                  initial={{
+                    opacity: 0,
+                    y: 60,
+                    rotateX: -15,
+                    scale: 0.95,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    rotateX: 0,
+                    scale: 1,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: -60,
+                    rotateX: 15,
+                    scale: 0.95,
+                  }}
+                  transition={{
+                    duration: 0.6,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 20,
+                    opacity: { duration: 0.4 },
+                  }}
+                  style={{
+                    perspective: "1000px",
+                    transformStyle: "preserve-3d",
+                  }}
+                  className="relative"
+                >
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.4 }}
+                  >
+                    <ProfileCard />
+                  </motion.div>
+                </motion.div>
+              )}
+              {activeTab === "experience" && (
+                <motion.div
+                  key="experience"
+                  initial={{
+                    opacity: 0,
+                    y: 60,
+                    rotateX: -15,
+                    scale: 0.95,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    rotateX: 0,
+                    scale: 1,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: -60,
+                    rotateX: 15,
+                    scale: 0.95,
+                  }}
+                  transition={{
+                    duration: 0.6,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 20,
+                    opacity: { duration: 0.4 },
+                  }}
+                  style={{
+                    perspective: "1000px",
+                    transformStyle: "preserve-3d",
+                  }}
+                  className="relative"
+                >
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.4 }}
+                  >
+                    <ExperienceTimeline timelineData={timelineData} />
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </Tabs>
 
         {/* Certifications Section */}
