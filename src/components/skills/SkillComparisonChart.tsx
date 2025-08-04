@@ -85,7 +85,7 @@ const SkillComparisonChart: React.FC<SkillComparisonChartProps> = ({
 
       <svg width={width} height={height}>
         <defs>
-          {comparisonData.map((skill, index) => (
+          {comparisonData.map((skill) => (
             <linearGradient
               key={skill.id}
               id={`gradient-${skill.id}`}

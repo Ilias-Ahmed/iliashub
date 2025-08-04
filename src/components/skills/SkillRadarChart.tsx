@@ -86,7 +86,7 @@ const SkillRadarChart: React.FC<SkillRadarChartProps> = ({
           ))}
 
           {/* Grid lines */}
-          {topSkills.map((skill, i) => {
+          {topSkills.map((_, i) => {
             const angle = (i / topSkills.length) * 2 * Math.PI - Math.PI / 2;
             const lineEnd = new Point({
               x: Math.cos(angle) * radius,

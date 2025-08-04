@@ -322,7 +322,7 @@ const Navigation: React.FC<NavigationProps> = ({
       opacity: 0,
       x: "100%",
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 400,
         damping: 40,
       },
@@ -331,7 +331,7 @@ const Navigation: React.FC<NavigationProps> = ({
       opacity: 1,
       x: "0%",
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 400,
         damping: 40,
         staggerChildren: 0.05,
@@ -404,11 +404,7 @@ const Navigation: React.FC<NavigationProps> = ({
 
       {/* Enhanced Navigation Menu Component */}
       {navigationFlags.showHamburgerMenu && enableMenu && (
-        <NavigationMenu
-          showQuickActions={true}
-          showDeviceStatus={true}
-          compactMode={false}
-        />
+        <NavigationMenu />
       )}
 
       {/* Fallback Traditional Menu */}

@@ -1,4 +1,4 @@
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList } from "@/components/ui/tabs";
 import { useTheme } from "@/contexts/ThemeContext";
 import { triggerHapticFeedback } from "@/utils/haptics";
 import { animated, useSpring } from "@react-spring/web";
@@ -167,7 +167,7 @@ const AboutSection = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             >
             <TabsList
-              className="relative inline-flex items-center p-1 rounded-xl  backdrop-blur-xl shadow-lg theme-transition"
+              className="relative inline-flex items-center p-1 rounded-xl border backdrop-blur-xl shadow-lg theme-transition"
               style={{
               backgroundColor: isDark
                 ? "rgba(255,255,255,0.05)"

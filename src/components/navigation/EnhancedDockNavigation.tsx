@@ -25,7 +25,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Dock, DockIcon, DockItem, DockLabel } from "./Dock";
+import { Dock, DockIcon, DockItem, DockLabel } from "./MacDock";
 
 interface EnhancedDockNavigationProps {
   className?: string;

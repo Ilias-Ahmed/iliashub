@@ -1,6 +1,5 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion, useInView } from "framer-motion";
-import { Sparkles } from "lucide-react";
 import { useMemo, useRef } from "react";
 
 import AvailabilityBadges from "@/components/contact/AvailabilityBadges";
@@ -8,7 +7,6 @@ import ContactForm from "@/components/contact/ContactForm";
 import ContactInfo from "@/components/contact/ContactInfo";
 import InteractiveMap from "@/components/contact/InteractiveMap";
 import SocialLinks from "@/components/contact/SocialLinks";
-import TextGlitch from "@/components/contact/TextGlitch";
 
 const ContactSection = () => {
   const sectionRef = useRef(null);

@@ -1,7 +1,7 @@
 import { ShiftCard } from "@/components/ui/ShiftCard";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion, useInView } from "framer-motion";
-import { Award, Rocket, Star, TrendingUp, Users, Zap } from "lucide-react";
+import { Rocket, TrendingUp, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { StatItem } from "./types";
 
