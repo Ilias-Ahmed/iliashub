@@ -432,7 +432,7 @@ const ProjectsSection = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-16"
+            className="text-center py-10"
           >
             <div
               className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center"

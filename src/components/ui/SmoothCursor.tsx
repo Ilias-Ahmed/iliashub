@@ -171,11 +171,35 @@ export function SmoothCursor({
     };
 
     document.body.style.cursor = "none";
+    document.documentElement.style.cursor = "none";
+
+    // Add CSS to force hide cursor on all elements
+    const style = document.createElement("style");
+    style.id = "custom-cursor-override";
+    style.textContent = `
+      *, *:hover, *:focus, *:active {
+        cursor: none !important;
+      }
+    `;
+
+    // Only add if not already present
+    if (!document.getElementById("custom-cursor-override")) {
+      document.head.appendChild(style);
+    }
+
     window.addEventListener("mousemove", throttledMouseMove);
 
     return () => {
       window.removeEventListener("mousemove", throttledMouseMove);
       document.body.style.cursor = "auto";
+      document.documentElement.style.cursor = "auto";
+
+      // Remove the custom cursor override
+      const existingStyle = document.getElementById("custom-cursor-override");
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, [cursorX, cursorY, rotation, scale]);

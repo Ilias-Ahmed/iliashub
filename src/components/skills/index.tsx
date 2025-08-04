@@ -105,7 +105,7 @@ const SkillsSection = () => {
   return (
     <section
       ref={ref}
-      className="py-16 px-6 relative overflow-hidden skills-section"
+      className=" px-6 relative overflow-hidden skills-section"
       id="skills"
     >
       {/* Background Elements */}

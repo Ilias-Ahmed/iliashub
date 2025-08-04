@@ -86,7 +86,7 @@ const AboutSection = () => {
 
   return (
     <section
-      className="py-16 md:py-32 relative overflow-hidden theme-transition"
+      className="py-16  relative overflow-hidden theme-transition"
       id="about"
       onMouseMove={handleMouseMove}
       aria-label="About Section"
@@ -399,69 +399,6 @@ const AboutSection = () => {
               </motion.div>
             ))}
           </motion.div>
-        </motion.div>
-
-        {/* Interactive Easter Egg - Enhanced with accessibility and theming */}
-        <motion.div
-          whileHover={{
-            scale: 1.05,
-            backgroundColor: `${accentColors.primary}10`,
-            borderColor: `${accentColors.primary}30`,
-          }}
-          whileTap={{ scale: 0.98 }}
-          className="text-center  p-6 mt-20 opacity-60 hover:opacity-100 transition-all duration-300 rounded-lg"
-          onClick={() => {
-            handleEasterEggClick();
-            triggerHapticFeedback();
-          }}
-          role="button"
-          tabIndex={0}
-          aria-label="Discover Easter Egg"
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              handleEasterEggClick();
-            }
-          }}
-          style={{
-            background: `linear-gradient(135deg, ${accentColors.primary}05, ${accentColors.secondary}05)`,
-            border: `1px solid ${accentColors.primary}20`,
-          }}
-        >
-          <p className="text-sm flex items-center justify-center gap-2">
-            <motion.span
-              className="animate-pulse"
-              aria-hidden="true"
-              animate={{
-                scale: [1, 1.2, 1],
-                rotate: [0, 10, -10, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatType: "reverse",
-              }}
-            >
-              ✨
-            </motion.span>
-            <span>There's more than meets the eye...</span>
-            <motion.span
-              className="animate-pulse"
-              aria-hidden="true"
-              animate={{
-                scale: [1, 1.2, 1],
-                rotate: [0, -10, 10, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatType: "reverse",
-                delay: 0.5,
-              }}
-            >
-              ✨
-            </motion.span>
-          </p>
         </motion.div>
       </div>
     </section>

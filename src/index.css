@@ -181,6 +181,50 @@
     background-color: var(--accent-alpha-30);
     color: var(--foreground);
   }
+
+  /* Custom cursor - hide all default cursors */
+  * {
+    cursor: none !important;
+  }
+
+  /* Force cursor none on all interactive elements */
+  button,
+  a,
+  input,
+  textarea,
+  select,
+  [role="button"],
+  [tabindex],
+  .cursor-pointer,
+  div[onclick],
+  span[onclick],
+  img[onclick] {
+    cursor: none !important;
+  }
+
+  /* Hide cursor on hover states */
+  *:hover,
+  *:focus,
+  *:active,
+  *:focus-visible {
+    cursor: none !important;
+  }
+
+  /* Specific interactive elements */
+  [data-interactive="true"],
+  .interactive,
+  .clickable,
+  .card,
+  .project-card,
+  motion-div,
+  .motion-div {
+    cursor: none !important;
+  }
+
+  /* Framer Motion elements */
+  [data-framer-component-type] {
+    cursor: none !important;
+  }
 }
 
 @layer components {
@@ -317,7 +361,6 @@
   .smooth-theme-transition {
     transition: all var(--animation-duration-normal) var(--animation-ease);
   }
-
 
   .interactive-card:hover {
     transform: translateY(-4px);

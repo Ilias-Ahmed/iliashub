@@ -1,12 +1,13 @@
-import React, { useState, useRef, useEffect, Suspense, useMemo } from "react";
-import Hero from "@/pages/Hero";
-import ScrollProgressBar from "@/components/ui/ScrollProgressBar";
-import { NavigationProvider } from "@/contexts/NavigationContext";
-import { useBackground } from "@/contexts/BackgroundContext";
 import Navigation from "@/components/navigation/Navigation";
- import { useIsMobile } from "@/hooks/use-mobile";
-import { useLocation, useNavigate } from "react-router-dom";
+import ScrollProgressBar from "@/components/ui/ScrollProgressBar";
 import { SmoothCursor } from "@/components/ui/SmoothCursor";
+import { useBackground } from "@/contexts/BackgroundContext";
+import { NavigationProvider } from "@/contexts/NavigationContext";
+import { useIsMobile } from "@/hooks/use-mobile";
+import Hero from "@/pages/Hero";
+import { enforceCustomCursor } from "@/utils/cursorUtils";
+import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Toaster = React.lazy(() =>
   import("@/components/ui/sonner").then((mod) => ({ default: mod.Toaster }))
@@ -167,13 +168,31 @@ const Index = () => {
     setIsLoading(false);
   };
 
+  // Enforce custom cursor throughout the app
+  useEffect(() => {
+    enforceCustomCursor();
+
+    // Re-enforce after page loads
+    const timeouts = [
+      setTimeout(() => enforceCustomCursor(), 100),
+      setTimeout(() => enforceCustomCursor(), 500),
+      setTimeout(() => enforceCustomCursor(), 1000),
+    ];
+
+    return () => {
+      timeouts.forEach((timeout) => clearTimeout(timeout));
+    };
+  }, []);
+
   return (
     <>
       {/* Add CustomCursor component */}
       {!isMobile && <SmoothCursor />}
 
       <Suspense fallback={null}>
-        {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
+        {isLoading && (
+          <LoadingScreen onLoadingComplete={handleLoadingComplete} />
+        )}
       </Suspense>
 
       <NavigationProvider customSections={navSections}>
@@ -259,4 +278,3 @@ const Index = () => {
 };
 
 export default React.memo(Index);
-
