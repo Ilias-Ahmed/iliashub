@@ -167,16 +167,7 @@ const AboutSection = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
           >
             <TabsList
-              className="relative inline-flex items-center p-1 rounded-xl border backdrop-blur-xl shadow-lg theme-transition"
-              style={{
-                backgroundColor: isDark
-                  ? "rgba(255,255,255,0.05)"
-                  : "rgba(255,255,255,0.8)",
-                borderColor: isDark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(0,0,0,0.1)",
-                backdropFilter: "blur(10px)",
-              }}
+              className="relative inline-flex items-center p-1 theme-transition"
             >
               {[
                 {
