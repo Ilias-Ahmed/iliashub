@@ -409,7 +409,7 @@ const AboutSection = () => {
             borderColor: `${accentColors.primary}30`,
           }}
           whileTap={{ scale: 0.98 }}
-          className="text-center cursor-pointer p-6 mt-20 opacity-60 hover:opacity-100 transition-all duration-300 rounded-lg"
+          className="text-center  p-6 mt-20 opacity-60 hover:opacity-100 transition-all duration-300 rounded-lg"
           onClick={() => {
             handleEasterEggClick();
             triggerHapticFeedback();

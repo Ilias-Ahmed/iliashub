@@ -143,7 +143,7 @@ const SkillTrendChart: React.FC<SkillTrendChartProps> = ({
                 stroke="white"
                 strokeWidth={2}
                 filter="url(#trend-glow)"
-                className="cursor-pointer"
+                className=""
               />
 
               {/* Category label */}

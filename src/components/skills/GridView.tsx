@@ -42,7 +42,7 @@ const SkillCard = memo(
     return (
       <motion.div
         className={cn(
-          "relative cursor-pointer overflow-hidden rounded-xl border group mb-4 skill-card",
+          "relative  overflow-hidden rounded-xl border group mb-4 skill-card",
           "transition-all duration-300 backdrop-blur-sm skill-card-glow",
           isExpanded ? "w-80 h-96" : "w-64 h-40"
         )}
@@ -93,7 +93,6 @@ const SkillCard = memo(
             isExpanded && "overflow-hidden"
           )}
         >
-          {/* Header */}
           <div className="flex items-start justify-between mb-2 flex-shrink-0 relative z-10">
             <div className="flex items-center min-w-0 flex-1">
               <motion.div

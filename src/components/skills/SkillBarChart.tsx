@@ -128,7 +128,7 @@ const SkillBarChart: React.FC<SkillBarChartProps> = ({
                   strokeWidth={1}
                   filter="url(#glow)"
                   rx={4}
-                  className="cursor-pointer transition-all duration-300 hover:brightness-110"
+                  className=" transition-all duration-300 hover:brightness-110"
                 />
 
                 {/* Value labels */}

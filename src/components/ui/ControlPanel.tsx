@@ -1,47 +1,47 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-  useMemo,
-} from "react";
+import { useAudio } from "@/contexts/AudioContext";
 import {
-  motion,
+  BackgroundMode,
+  IntensityLevel,
+  useBackground,
+} from "@/contexts/BackgroundContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
   AnimatePresence,
+  motion,
   useMotionValue,
   useSpring,
 } from "framer-motion";
 import {
-  Music,
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  Monitor,
-  Zap,
-  Palette,
-  RotateCcw,
-  BarChart3,
   Activity,
+  BarChart3,
   Circle,
-  Sparkles,
-  Waves,
-  X,
-  Maximize2,
-  GripVertical,
-  Headphones,
-  Settings2,
   Cpu,
   Eye,
+  GripVertical,
+  Headphones,
+  Maximize2,
+  Monitor,
+  Music,
+  Palette,
+  Pause,
+  Play,
+  RotateCcw,
+  Settings2,
+  Sparkles,
+  Volume2,
+  VolumeX,
+  Waves,
+  X,
+  Zap,
 } from "lucide-react";
-import {
-  useBackground,
-  BackgroundMode,
-  IntensityLevel,
-} from "@/contexts/BackgroundContext";
-import { useAudio } from "@/contexts/AudioContext";
-import { useTheme } from "@/contexts/ThemeContext";
-import { useIsMobile } from "@/hooks/use-mobile";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 interface ControlPanelProps {
   className?: string;
@@ -312,8 +312,12 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                   <div className="flex items-center gap-2">
                     <motion.button
                       onClick={() => {
-                        setPanelMode(panelMode === "audio" ? "background" : "audio");
-                        setActiveTab(panelMode === "audio" ? "modes" : "player");
+                        setPanelMode(
+                          panelMode === "audio" ? "background" : "audio"
+                        );
+                        setActiveTab(
+                          panelMode === "audio" ? "modes" : "player"
+                        );
                       }}
                       className="p-2 rounded-lg transition-colors"
                       style={{ color: accentColors.primary }}
@@ -352,7 +356,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                           <span>{formatTime(duration)}</span>
                         </div>
                         <div
-                          className="w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full cursor-pointer overflow-hidden"
+                          className="w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full  overflow-hidden"
                           onClick={handleSeek}
                         >
                           <motion.div
@@ -406,7 +410,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                         </div>
                         <div className="flex items-center gap-4">
                           <motion.button
-                                                      onClick={toggleMute}
+                            onClick={toggleMute}
                             className="p-3 rounded-lg transition-colors"
                             style={{ color: accentColors.primary }}
                             whileHover={{
@@ -430,7 +434,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                               onChange={(e) =>
                                 setVolume(parseFloat(e.target.value))
                               }
-                              className="w-full h-3 rounded-lg appearance-none cursor-pointer"
+                              className="w-full h-3 rounded-lg appearance-none "
                               style={{
                                 background: `linear-gradient(to right, ${
                                   accentColors.primary
@@ -485,7 +489,9 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                     <div className="space-y-6">
                       {/* Background Modes */}
                       <div>
-                        <h4 className="text-sm font-medium mb-3">Background Mode</h4>
+                        <h4 className="text-sm font-medium mb-3">
+                          Background Mode
+                        </h4>
                         <div className="grid grid-cols-3 gap-2">
                           {backgroundModes.map((mode) => (
                             <motion.button
@@ -519,7 +525,9 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
 
                       {/* Intensity Level */}
                       <div>
-                        <h4 className="text-sm font-medium mb-3">Intensity Level</h4>
+                        <h4 className="text-sm font-medium mb-3">
+                          Intensity Level
+                        </h4>
                         <div className="flex gap-2">
                           {intensityLevels.map((level) => (
                             <motion.button
@@ -563,7 +571,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                                 particleCount: parseInt(e.target.value),
                               })
                             }
-                            className="w-full h-3 rounded-lg appearance-none cursor-pointer"
+                            className="w-full h-3 rounded-lg appearance-none "
                             style={{
                               background: `linear-gradient(to right, ${
                                 accentColors.primary
@@ -591,7 +599,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                                 animationSpeed: parseFloat(e.target.value),
                               })
                             }
-                            className="w-full h-3 rounded-lg appearance-none cursor-pointer"
+                            className="w-full h-3 rounded-lg appearance-none "
                             style={{
                               background: `linear-gradient(to right, ${
                                 accentColors.primary
@@ -606,7 +614,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
 
                         <div>
                           <label className="block text-sm font-medium mb-2">
-                            Background Opacity: {Math.round(config.opacity * 100)}%
+                            Background Opacity:{" "}
+                            {Math.round(config.opacity * 100)}%
                           </label>
                           <input
                             type="range"
@@ -619,7 +628,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                                 opacity: parseFloat(e.target.value),
                               })
                             }
-                            className="w-full h-3 rounded-lg appearance-none cursor-pointer"
+                            className="w-full h-3 rounded-lg appearance-none "
                             style={{
                               background: `linear-gradient(to right, ${
                                 accentColors.primary
@@ -687,7 +696,9 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                               }}
                               whileTap={{ scale: 0.95 }}
                             >
-                              {config[key as keyof typeof config] ? "ON" : "OFF"}
+                              {config[key as keyof typeof config]
+                                ? "ON"
+                                : "OFF"}
                             </motion.button>
                           </div>
                         ))}
@@ -813,7 +824,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                 backgroundColor: `${accentColors.primary}15`,
               }}
               whileTap={{ scale: 0.95 }}
-                            title={
+              title={
                 panelMode === "audio"
                   ? "Toggle Playback"
                   : "Open Audio Controls"
@@ -1024,7 +1035,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                           <span>{formatTime(duration)}</span>
                         </div>
                         <div
-                          className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full cursor-pointer overflow-hidden"
+                          className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full  overflow-hidden"
                           onClick={handleSeek}
                         >
                           <motion.div
@@ -1095,7 +1106,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                             onChange={(e) =>
                               setVolume(parseFloat(e.target.value))
                             }
-                            className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                            className="w-full h-2 rounded-lg appearance-none "
                             style={{
                               background: `linear-gradient(to right, ${
                                 accentColors.primary
@@ -1214,7 +1225,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                     </div>
                   )}
 
-                                    {/* Performance Tab */}
+                  {/* Performance Tab */}
                   {activeTab === "performance" && (
                     <div className="space-y-4">
                       <div>
@@ -1231,7 +1242,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                               particleCount: parseInt(e.target.value),
                             })
                           }
-                          className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                          className="w-full h-2 rounded-lg appearance-none "
                           style={{
                             background: `linear-gradient(to right, ${
                               accentColors.primary
@@ -1259,7 +1270,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                               animationSpeed: parseFloat(e.target.value),
                             })
                           }
-                          className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                          className="w-full h-2 rounded-lg appearance-none "
                           style={{
                             background: `linear-gradient(to right, ${
                               accentColors.primary
@@ -1297,7 +1308,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium mb-2">
-                          Background Opacity: {Math.round(config.opacity * 100)}%
+                          Background Opacity: {Math.round(config.opacity * 100)}
+                          %
                         </label>
                         <input
                           type="range"
@@ -1310,7 +1322,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                               opacity: parseFloat(e.target.value),
                             })
                           }
-                          className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                          className="w-full h-2 rounded-lg appearance-none "
                           style={{
                             background: `linear-gradient(to right, ${
                               accentColors.primary
@@ -1374,7 +1386,9 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
                               }}
                               whileTap={{ scale: 0.95 }}
                             >
-                              {config[key as keyof typeof config] ? "ON" : "OFF"}
+                              {config[key as keyof typeof config]
+                                ? "ON"
+                                : "OFF"}
                             </motion.button>
                           </div>
                         ))}
@@ -1417,7 +1431,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
           -webkit-appearance: none;
           appearance: none;
           background: transparent;
-          cursor: pointer;
         }
 
         input[type="range"]::-webkit-slider-track {
@@ -1433,7 +1446,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
           width: 20px;
           border-radius: 50%;
           background: ${accentColors.primary};
-          cursor: pointer;
           border: 2px solid white;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
           transition: all 0.2s ease;
@@ -1456,7 +1468,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
           width: 20px;
           border-radius: 50%;
           background: ${accentColors.primary};
-          cursor: pointer;
           border: 2px solid white;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
           transition: all 0.2s ease;
@@ -1488,9 +1499,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
         /* Backdrop blur fallback */
         @supports not (backdrop-filter: blur(12px)) {
           .backdrop-blur-xl {
-            background-color: ${isDark
-              ? "rgba(17, 24, 39, 0.95)"
-              : "rgba(255, 255, 255, 0.95)"
+            background-color: ${
+              isDark ? "rgba(17, 24, 39, 0.95)" : "rgba(255, 255, 255, 0.95)"
             } !important;
           }
         }
@@ -1500,5 +1510,3 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
 };
 
 export default ControlPanel;
-
-

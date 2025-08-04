@@ -86,7 +86,7 @@ const TextGlitch: React.FC<TextGlitchProps> = ({
   return (
     <h2
       ref={textRef}
-      className={`cursor-pointer transition-all duration-300 hover:scale-105 ${className}`}
+      className={` transition-all duration-300 hover:scale-105 ${className}`}
       style={defaultStyle}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

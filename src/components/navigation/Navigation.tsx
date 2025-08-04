@@ -431,10 +431,7 @@ const Navigation: React.FC<NavigationProps> = ({
                 }
               }}
             >
-              <div className="h-full flex flex-col justify-center max-w-screen-lg mx-auto px-6 py-20">
-                <h2 id="navigation-title" className="sr-only">
-                  Navigation Menu
-                </h2>
+              <div className="h-full flex flex-col justify-center max-w-screen-lg mx-auto px-6 py-10">
 
                 {/* Navigation Links */}
                 <nav

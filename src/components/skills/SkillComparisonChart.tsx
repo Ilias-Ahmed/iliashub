@@ -151,7 +151,7 @@ const SkillComparisonChart: React.FC<SkillComparisonChartProps> = ({
                   strokeWidth={2}
                   filter="url(#comparison-glow)"
                   rx={6}
-                  className="cursor-pointer transition-all duration-300 hover:brightness-110"
+                  className=" transition-all duration-300 hover:brightness-110"
                 />
 
                 {/* Proficiency label */}

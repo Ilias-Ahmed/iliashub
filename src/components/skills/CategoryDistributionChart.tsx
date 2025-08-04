@@ -121,7 +121,7 @@ const CategoryDistributionChart: React.FC<CategoryDistributionChartProps> = ({
                       fill={`url(#gradient-${arc.data.category})`}
                       stroke={colorScale(arc.data.category)}
                       strokeWidth={2}
-                      className="cursor-pointer transition-all duration-300 hover:brightness-110"
+                      className=" transition-all duration-300 hover:brightness-110"
                       style={{
                         filter: `drop-shadow(0 4px 8px ${colorScale(
                           arc.data.category

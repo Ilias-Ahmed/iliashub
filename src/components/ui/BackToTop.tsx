@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUp } from "lucide-react";
-import { triggerHapticFeedback } from "@/utils/haptics";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { triggerHapticFeedback } from "@/utils/haptics";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUp } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
 interface BackToTopProps {
   threshold?: number;
@@ -51,11 +51,13 @@ const BackToTop: React.FC<BackToTopProps> = ({
     triggerHapticFeedback();
   };
 
-  // Position classes
+  // Position classes - mobile gets closer to bottom/right edge
   const positionClasses = {
-    "bottom-right": "bottom-8 right-8",
-    "bottom-left": "bottom-8 left-8",
-    "bottom-center": "bottom-8 left-1/2 -translate-x-1/2",
+    "bottom-right": isMobile ? "bottom-4 right-4" : "bottom-8 right-8",
+    "bottom-left": isMobile ? "bottom-4 left-4" : "bottom-8 left-8",
+    "bottom-center": isMobile
+      ? "bottom-4 left-1/2 -translate-x-1/2"
+      : "bottom-8 left-1/2 -translate-x-1/2",
   };
 
   // Get CSS custom properties that are already set by ThemeContext
@@ -68,7 +70,7 @@ const BackToTop: React.FC<BackToTopProps> = ({
       {isVisible && (
         <motion.button
           onClick={scrollToTop}
-          className={`fixed z-50 ${
+          className={`fixed z-40 ${
             isMobile ? "p-4 min-w-[56px] min-h-[56px]" : "p-3"
           } rounded-full border-2 shadow-2xl transition-all duration-300 ${
             isDark

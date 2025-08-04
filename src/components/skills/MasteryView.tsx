@@ -148,7 +148,7 @@ const MasteryView = ({ skills, setSelectedSkill }: MasteryViewProps) => {
                       duration: 0.4,
                       delay: levelIndex * 0.1 + skillIndex * 0.05,
                     }}
-                    className="group cursor-pointer"
+                    className="group "
                     onClick={() => {
                       setSelectedSkill(skill);
                       triggerHapticFeedback();

@@ -1,16 +1,16 @@
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { motion } from "framer-motion";
 import {
   Brain,
-  Heart,
-  Target,
-  Coffee,
   Code,
-  Palette,
-  Zap,
+  Coffee,
   Globe,
+  Heart,
+  Palette,
+  Target,
+  Zap,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import profileImage from "/images/profile.png?url";
 
 const ProfileCard = () => {
@@ -92,9 +92,7 @@ const ProfileCard = () => {
       {/* Main Profile Section with Integrated Background */}
       <div className="relative overflow-hidden">
         {/* Background with Profile Image Integration */}
-        <motion.div
-          className="absolute inset-0"
-        />
+        <motion.div className="absolute inset-0" />
 
         <motion.div
           className="absolute top-0 right-0 w-1/2 h-full opacity-5 md:opacity-10"
@@ -245,7 +243,7 @@ const ProfileCard = () => {
               {personalityCards.map((card, index) => (
                 <motion.div
                   key={index}
-                  className="p-3 md:p-4 rounded-lg md:rounded-xl cursor-pointer transition-all duration-300 border"
+                  className="p-3 md:p-4 rounded-lg md:rounded-xl  transition-all duration-300 border"
                   style={{
                     backgroundColor:
                       activeCard === index

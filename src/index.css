@@ -318,11 +318,6 @@
     transition: all var(--animation-duration-normal) var(--animation-ease);
   }
 
-  /* Interactive elements */
-  .interactive-card {
-    transition: all var(--animation-duration-normal) var(--animation-ease);
-    cursor: pointer;
-  }
 
   .interactive-card:hover {
     transform: translateY(-4px);

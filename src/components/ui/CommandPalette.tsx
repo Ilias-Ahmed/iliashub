@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useNavigation } from "@/contexts/NavigationContext";
+import { triggerHapticFeedback } from "@/utils/haptics";
 import { Command } from "cmdk";
 import { AnimatePresence, motion } from "framer-motion";
-import { Search, HelpCircle, ArrowUp } from "lucide-react";
-import { useNavigation } from "@/contexts/NavigationContext";
+import { ArrowUp, HelpCircle, Search } from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
 import Help from "./Help";
-import { triggerHapticFeedback } from "@/utils/haptics";
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -63,7 +63,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => {
-              onOpenChange(false)
+              onOpenChange(false);
               triggerHapticFeedback();
             }}
           />
@@ -93,7 +93,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => {
-                        setActiveView("help")
+                        setActiveView("help");
                         triggerHapticFeedback();
                       }}
                       className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white"
@@ -127,7 +127,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
                         <Command.Item
                           key={section.id}
                           onSelect={() => navigate(section.id)}
-                          className="px-4 py-2 mx-2 my-1 rounded-md text-white hover:bg-white/10 cursor-pointer data-[selected=true]:bg-white/10"
+                          className="px-4 py-2 mx-2 my-1 rounded-md text-white hover:bg-white/10  data-[selected=true]:bg-white/10"
                         >
                           <div className="flex items-center">
                             <span className="font-medium">{section.name}</span>
@@ -139,7 +139,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
                   <Command.Group heading="Actions">
                     <Command.Item
                       onSelect={() => setActiveView("help")}
-                      className="px-4 py-2 mx-2 my-1 rounded-md text-white hover:bg-white/10 cursor-pointer data-[selected=true]:bg-white/10"
+                      className="px-4 py-2 mx-2 my-1 rounded-md text-white hover:bg-white/10  data-[selected=true]:bg-white/10"
                     >
                       <div className="flex items-center">
                         <HelpCircle className="w-4 h-4 mr-2 text-cyberpunk-blue" />
@@ -151,7 +151,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
                         window.scrollTo({ top: 0, behavior: "smooth" });
                         onOpenChange(false);
                       }}
-                      className="px-4 py-2 mx-2 my-1 rounded-md text-white hover:bg-white/10 cursor-pointer data-[selected=true]:bg-white/10"
+                      className="px-4 py-2 mx-2 my-1 rounded-md text-white hover:bg-white/10  data-[selected=true]:bg-white/10"
                     >
                       <div className="flex items-center">
                         <ArrowUp className="w-4 h-4 mr-2 text-cyberpunk-blue" />
@@ -185,4 +185,3 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
 };
 
 export default CommandPalette;
-

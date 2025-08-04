@@ -1,9 +1,15 @@
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Code, ExternalLink, Github, ChevronDown } from "lucide-react";
-import { Project } from "./types";
 import { useTheme } from "@/contexts/ThemeContext";
 import { triggerHapticFeedback } from "@/utils/haptics";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Calendar,
+  ChevronDown,
+  Code,
+  ExternalLink,
+  Github,
+} from "lucide-react";
+import { useMemo, useState } from "react";
+import { Project } from "./types";
 
 interface ProjectTimelineProps {
   projects: Project[];
@@ -106,7 +112,7 @@ const ProjectTimeline = ({ projects }: ProjectTimelineProps) => {
 
                   {/* Project card */}
                   <motion.div
-                    className="rounded-xl overflow-hidden border cursor-pointer"
+                    className="rounded-xl overflow-hidden border "
                     style={{
                       backgroundColor: isDark
                         ? "rgba(255,255,255,0.05)"
@@ -400,4 +406,3 @@ const ProjectTimeline = ({ projects }: ProjectTimelineProps) => {
 };
 
 export default ProjectTimeline;
-
