@@ -281,7 +281,6 @@ const ProjectStats = () => {
         "Reliable, high-performance applications with enterprise-grade stability",
       color: "#10b981",
     },
-
   ];
 
   return (
@@ -304,7 +303,6 @@ const ProjectStats = () => {
       )}
 
       <div className="max-w-7xl mx-auto px-6">
-
         {/* Stats Grid */}
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center"

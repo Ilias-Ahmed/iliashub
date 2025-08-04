@@ -42,9 +42,9 @@ const SkillCard = memo(
     return (
       <motion.div
         className={cn(
-          "relative  overflow-hidden rounded-xl border group mb-4 skill-card",
+          "relative overflow-hidden rounded-xl border group skill-card",
           "transition-all duration-300 backdrop-blur-sm skill-card-glow",
-          isExpanded ? "w-80 h-96" : "w-64 h-40"
+          isExpanded ? "w-80 h-96" : "w-full max-w-64 h-40 sm:h-40 md:h-42"
         )}
         style={{
           backgroundColor: isDark
@@ -89,7 +89,7 @@ const SkillCard = memo(
 
         <div
           className={cn(
-            "p-3 h-full flex flex-col",
+            "p-3 sm:p-4 h-full flex flex-col",
             isExpanded && "overflow-hidden"
           )}
         >
@@ -386,11 +386,10 @@ const GridView = ({
   };
 
   return (
-    <div className="max-w-full mx-auto h-screen overflow-hidden p-4">
-
+    <div className="max-w-full mx-auto h-screen overflow-hidden p-2 sm:p-3 md:p-4">
       {/* 6-Category Optimized Grid Layout */}
-      <div className="h-[calc(100vh-180px)] overflow-hidden">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 h-full skills-grid-6">
+      <div className="h-[calc(100vh-120px)] sm:h-[calc(100vh-140px)] md:h-[calc(100vh-180px)] overflow-hidden">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-2 sm:gap-3 md:gap-4 h-full skills-grid-6">
           {skillsByCategory.map(
             ([categoryName, categorySkills], categoryIndex) => {
               const categoryColor =
@@ -409,10 +408,10 @@ const GridView = ({
                   className="relative h-full min-h-0 flex flex-col"
                 >
                   {/* Category Header with Stats */}
-                  <div className="flex items-center justify-between mb-3 px-2 py-2 rounded-lg bg-card/50 backdrop-blur-sm border border-border/30 category-header">
+                  <div className="flex items-center justify-between mb-2 md:mb-3 px-2 py-2 rounded-lg bg-card/50 backdrop-blur-sm border border-border/30 category-header">
                     <div className="flex items-center">
                       <h4
-                        className="text-sm font-bold mr-3 category-badge"
+                        className="text-sm font-bold mr-2 md:mr-3 category-badge"
                         style={{ color: categoryColor }}
                       >
                         {categoryName}
@@ -439,7 +438,7 @@ const GridView = ({
                       vertical
                       className={cn(
                         "[--duration:25s] h-full",
-                        expandedSkill && "marquee-paused" // Pause marquee when a card is expanded
+                        expandedSkill && "marquee-paused"
                       )}
                       reverse={categoryIndex % 2 === 1}
                     >

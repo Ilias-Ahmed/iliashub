@@ -118,8 +118,12 @@ const VisxSkillsVisualization: React.FC<VisxSkillsVisualizationProps> = ({
   ];
 
   const renderVisualization = () => {
-    const chartWidth = 600;
-    const chartHeight = 400;
+    // Responsive chart dimensions
+    const isMobile = window.innerWidth < 768;
+    const isTablet = window.innerWidth < 1024;
+    
+    const chartWidth = isMobile ? Math.min(350, window.innerWidth - 80) : isTablet ? 500 : 600;
+    const chartHeight = isMobile ? 280 : isTablet ? 350 : 400;
 
     switch (activeViz) {
       case "radar":
@@ -171,7 +175,7 @@ const VisxSkillsVisualization: React.FC<VisxSkillsVisualizationProps> = ({
         {/* Visualization Selector */}
         <div className="flex justify-center mb-8">
           <div
-            className="flex rounded-xl p-1 backdrop-blur-sm border"
+            className="flex flex-wrap sm:flex-nowrap rounded-xl p-1 backdrop-blur-sm border max-w-full overflow-hidden"
             style={{
               backgroundColor: isDark
                 ? "rgba(0,0,0,0.5)"
@@ -188,7 +192,7 @@ const VisxSkillsVisualization: React.FC<VisxSkillsVisualizationProps> = ({
                   key={viz.id}
                   onClick={() => setActiveViz(viz.id)}
                   className={`
-                    relative px-6 py-3 rounded-lg transition-all duration-300 flex items-center gap-3
+                    relative px-3 sm:px-6 py-2 sm:py-3 rounded-lg transition-all duration-300 flex items-center gap-2 sm:gap-3 min-w-0 flex-1 sm:flex-auto
                     ${
                       isActive
                         ? "text-white shadow-lg"
@@ -218,10 +222,10 @@ const VisxSkillsVisualization: React.FC<VisxSkillsVisualizationProps> = ({
                     />
                   )}
 
-                  <Icon className="w-5 h-5 relative z-10" />
-                  <div className="relative z-10">
-                    <div className="font-medium">{viz.name}</div>
-                    <div className="text-xs opacity-75">{viz.description}</div>
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 flex-shrink-0" />
+                  <div className="relative z-10 min-w-0 text-left">
+                    <div className="font-medium text-xs sm:text-sm truncate">{viz.name}</div>
+                    <div className="text-xs opacity-75 hidden sm:block truncate">{viz.description}</div>
                   </div>
                 </button>
               );
@@ -235,10 +239,10 @@ const VisxSkillsVisualization: React.FC<VisxSkillsVisualizationProps> = ({
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="flex justify-center"
+          className="flex justify-center w-full"
         >
           <div
-            className="p-8 rounded-2xl border backdrop-blur-sm shadow-2xl relative overflow-hidden"
+            className="p-4 md:p-8 rounded-2xl border backdrop-blur-sm shadow-2xl relative overflow-hidden w-full max-w-full"
             style={{
               backgroundColor: isDark
                 ? "rgba(0,0,0,0.3)"
@@ -255,7 +259,7 @@ const VisxSkillsVisualization: React.FC<VisxSkillsVisualizationProps> = ({
               }}
             />
 
-            <div className="relative z-10">{renderVisualization()}</div>
+            <div className="relative z-10 w-full overflow-x-auto flex justify-center">{renderVisualization()}</div>
 
             {/* Decorative elements */}
             <div
@@ -274,7 +278,7 @@ const VisxSkillsVisualization: React.FC<VisxSkillsVisualizationProps> = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8"
         >
           {[
             {
