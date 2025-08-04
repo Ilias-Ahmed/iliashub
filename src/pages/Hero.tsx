@@ -1,34 +1,34 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-} from "react";
+import styles from "@/components/ui/bubble.module.css";
+import ControlPanel from "@/components/ui/ControlPanel";
+import { useBackground } from "@/contexts/BackgroundContext";
+import { useNavigation } from "@/contexts/NavigationContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
+  AnimatePresence,
   motion,
   useMotionValue,
   useSpring,
-  AnimatePresence,
 } from "framer-motion";
 import {
   ChevronDown,
+  Code2,
   Download,
+  ExternalLink,
   Github,
   Linkedin,
   Mail,
-  Code2,
   Sparkles,
   Terminal,
   Zap,
-  ExternalLink,
 } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
-import { useBackground } from "@/contexts/BackgroundContext";
-import { useNavigation } from "@/contexts/NavigationContext";
-import { useIsMobile } from "@/hooks/use-mobile";
-import ControlPanel from "@/components/ui/ControlPanel";
-
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 interface SocialLink {
   icon: React.ComponentType<{ size?: number; className?: string }>;
@@ -38,18 +38,14 @@ interface SocialLink {
   description: string;
 }
 
-// Constants
+// Constants - optimized for performance
 const ROTATING_ROLES = [
   "Full Stack Developer",
-  "UI/UX Designer",
-  "Cloud Architect",
-  "Tech Innovator",
   "Problem Solver",
-  "Digital Creator",
-];
+  "Tech Innovator",
+]; // Reduced array size
 
-const ROLE_ROTATION_INTERVAL = 3000;
-const PULSE_ANIMATION_DURATION = 2000;
+const ROLE_ROTATION_INTERVAL = 4000; // Slower rotation to reduce CPU usage
 const FLOATING_ANIMATION_DURATION = 4000;
 const MOUSE_MOVE_MULTIPLIER = 0.05;
 
@@ -72,7 +68,7 @@ const itemVariants = {
     y: 0,
     opacity: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 100,
       damping: 10,
     },
@@ -86,7 +82,7 @@ const titleVariants = {
     scale: 1,
     transition: {
       duration: 1,
-      ease: "easeOut",
+      ease: "easeOut" as const,
     },
   },
 };
@@ -97,62 +93,6 @@ interface AccentColors {
   border: string;
   glow: string;
 }
-
-// Status Badge Component
-const StatusBadge: React.FC<{ accentColors: AccentColors; isDark: boolean }> = ({
-  accentColors,
-  isDark,
-}) => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatTime = useCallback((date: Date) => {
-    return date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }, []);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="fixed top-4 left-4 z-50"
-    >
-      <div
-        className="inline-flex items-center gap-3 px-4 py-2 rounded-full text-sm
-          backdrop-blur-lg border shadow-lg transition-all duration-300"
-        style={{
-          backgroundColor: isDark
-            ? "rgba(17, 24, 39, 0.8)"
-            : "rgba(255, 255, 255, 0.8)",
-          borderColor: accentColors.border,
-          backdropFilter: "blur(20px)",
-        }}
-      >
-        <motion.div
-          className="w-2 h-2 rounded-full"
-          style={{ backgroundColor: accentColors.primary }}
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [1, 0.7, 1],
-          }}
-          transition={{
-            duration: PULSE_ANIMATION_DURATION / 1000,
-            repeat: Infinity,
-          }}
-        />
-        <Sparkles size={14} style={{ color: accentColors.primary }} />
-        <span className="font-medium">Available for hire</span>
-        <span className="text-xs opacity-70">{formatTime(currentTime)}</span>
-      </div>
-    </motion.div>
-  );
-};
 
 // Floating Icon Component
 const FloatingIcon: React.FC<{
@@ -200,7 +140,8 @@ const Hero: React.FC = () => {
   const heroRef = useRef<HTMLDivElement>(null);
 
   const { isDark, getAccentColors } = useTheme();
-  const accentColors: AccentColors = getAccentColors() as unknown as AccentColors;
+  const accentColors: AccentColors =
+    getAccentColors() as unknown as AccentColors;
   const { setCurrentSection } = useBackground();
   const { navigateToSection } = useNavigation();
   const isMobile = useIsMobile();
@@ -285,15 +226,6 @@ const Hero: React.FC = () => {
     []
   );
 
-  // Handle navigation
-  const handleViewWork = useCallback(() => {
-    navigateToSection("projects");
-  }, [navigateToSection]);
-
-  const handleGetInTouch = useCallback(() => {
-    navigateToSection("contact");
-  }, [navigateToSection]);
-
   const handleScrollDown = useCallback(() => {
     navigateToSection("about");
   }, [navigateToSection]);
@@ -341,9 +273,6 @@ const Hero: React.FC = () => {
       id="hero"
       style={backgroundStyles}
     >
-      {/* Status Badge */}
-      <StatusBadge accentColors={accentColors} isDark={isDark} />
-
       {/* Control Panel */}
       <ControlPanel />
 
@@ -372,7 +301,11 @@ const Hero: React.FC = () => {
             <motion.div variants={titleVariants} className="space-y-4">
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
                 <span className="block" style={{ color: accentColors.primary }}>
-                  Ilias Ahmed
+                  {"Ilias Ahmed".split("").map((char, index) => (
+                    <span key={index} className={styles.hoverText}>
+                      {char === " " ? "\u00A0" : char}
+                    </span>
+                  ))}
                 </span>
               </h1>
 
@@ -394,56 +327,38 @@ const Hero: React.FC = () => {
             </motion.div>
 
             {/* Description */}
-            <motion.p
+            <motion.div
               variants={itemVariants}
               className="text-lg md:text-xl opacity-80 max-w-2xl leading-relaxed"
             >
-              Crafting exceptional digital experiences with modern technologies.
-              I transform ideas into powerful, scalable solutions that make a
-              real impact.
-            </motion.p>
-
-            {/* Action buttons */}
-            <motion.div
-              variants={itemVariants}
-              className="flex flex-wrap gap-4"
-            >
-              <motion.button
-                className="group px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 font-medium text-white"
-                style={{
-                  backgroundColor: accentColors.primary,
-                  boxShadow: `0 4px 14px ${accentColors.glow}`,
-                }}
-                onClick={handleViewWork}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <span className="flex items-center gap-2">
-                  <Code2 size={18} />
-                  View My Work
-                  <Zap
-                    size={16}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+              <span>Crafting exceptional </span>
+              <span className="relative">
+                digital experiences
+                <svg
+                  viewBox="0 0 286 73"
+                  fill="none"
+                  className="absolute -left-2 -right-2 -top-2 bottom-0 translate-y-1"
+                >
+                  <motion.path
+                    initial={{ pathLength: 0 }}
+                    whileInView={{ pathLength: 1 }}
+                    transition={{
+                      duration: 1.25,
+                      ease: "easeInOut",
+                      delay: 0.5,
+                    }}
+                    d="M142.293 1C106.854 16.8908 6.08202 7.17705 1.23654 43.3756C-2.10604 68.3466 29.5633 73.2652 122.688 71.7518C215.814 70.2384 316.298 70.689 275.761 38.0785C230.14 1.37835 97.0503 24.4575 52.9384 1"
+                    stroke={accentColors.primary}
+                    strokeWidth="3"
+                    fill="none"
                   />
-                </span>
-              </motion.button>
-
-              <motion.button
-                className="group px-6 py-3 rounded-lg transition-all duration-300 font-medium border-2"
-                style={{
-                  borderColor: accentColors.border,
-                  backgroundColor: `${accentColors.primary}10`,
-                }}
-                onClick={handleGetInTouch}
-                whileHover={{
-                  scale: 1.02,
-                  y: -2,
-                  backgroundColor: `${accentColors.primary}20`,
-                }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Get In Touch
-              </motion.button>
+                </svg>
+              </span>
+              <span>
+                {" "}
+                with modern technologies. I transform ideas into powerful,
+                scalable solutions that make a real impact.
+              </span>
             </motion.div>
 
             {/* Social links */}

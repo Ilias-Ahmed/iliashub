@@ -50,18 +50,6 @@ export const skills: Skill[] = [
     projects: 30,
     yearsExperience: 3,
   },
-  {
-    id: "vue",
-    name: "Vue.js",
-    level: 75,
-    category: "Frontend",
-    icon: "💚",
-    color: "#4fc08d",
-    description:
-      "Progressive JavaScript framework for building user interfaces and single-page applications.",
-    projects: 8,
-    yearsExperience: 2,
-  },
 
   // Backend Technologies
   {
@@ -88,30 +76,6 @@ export const skills: Skill[] = [
     projects: 15,
     yearsExperience: 3,
   },
-  {
-    id: "python",
-    name: "Python",
-    level: 78,
-    category: "Backend",
-    icon: "🐍",
-    color: "#3776ab",
-    description:
-      "Versatile programming language for web development, automation, and data science.",
-    projects: 12,
-    yearsExperience: 2,
-  },
-  {
-    id: "django",
-    name: "Django",
-    level: 70,
-    category: "Backend",
-    icon: "🎯",
-    color: "#092e20",
-    description:
-      "High-level Python web framework for rapid development and clean design.",
-    projects: 6,
-    yearsExperience: 1,
-  },
 
   // Database Technologies
   {
@@ -126,18 +90,7 @@ export const skills: Skill[] = [
     projects: 14,
     yearsExperience: 3,
   },
-  {
-    id: "postgresql",
-    name: "PostgreSQL",
-    level: 75,
-    category: "Database",
-    icon: "🐘",
-    color: "#336791",
-    description:
-      "Advanced open-source relational database with powerful features and reliability.",
-    projects: 10,
-    yearsExperience: 2,
-  },
+
   {
     id: "redis",
     name: "Redis",
@@ -176,18 +129,6 @@ export const skills: Skill[] = [
     projects: 15,
     yearsExperience: 2,
   },
-  {
-    id: "kubernetes",
-    name: "Kubernetes",
-    level: 60,
-    category: "DevOps",
-    icon: "⚙️",
-    color: "#326ce5",
-    description:
-      "Container orchestration platform for automating deployment and scaling.",
-    projects: 5,
-    yearsExperience: 1,
-  },
 
   // Tools & Others
   {
@@ -203,27 +144,65 @@ export const skills: Skill[] = [
     yearsExperience: 4,
   },
   {
+    id: "vscode",
+    name: "VS Code",
+    level: 95,
+    category: "Tools",
+    icon: "🔧",
+    color: "#007acc",
+    description:
+      "Advanced code editor with extensions, debugging, and integrated development environment.",
+    projects: 40,
+    yearsExperience: 4,
+  },
+  {
     id: "figma",
     name: "Figma",
-    level: 85,
-    category: "Design",
+    level: 75,
+    category: "Tools",
     icon: "🎨",
     color: "#f24e1e",
     description:
-      "Collaborative design tool for creating user interfaces and prototypes.",
-    projects: 20,
-    yearsExperience: 3,
+      "Collaborative design tool for UI/UX design, prototyping, and design systems.",
+    projects: 18,
+    yearsExperience: 2,
+  },
+
+  // Mobile Development
+  {
+    id: "react-native",
+    name: "React Native",
+    level: 82,
+    category: "Mobile",
+    icon: "📱",
+    color: "#61dafb",
+    description:
+      "Cross-platform mobile app development with React Native and Expo framework.",
+    projects: 8,
+    yearsExperience: 2,
   },
   {
-    id: "graphql",
-    name: "GraphQL",
-    level: 68,
-    category: "Backend",
-    icon: "📊",
-    color: "#e10098",
+    id: "flutter",
+    name: "Flutter",
+    level: 70,
+    category: "Mobile",
+    icon: "🦋",
+    color: "#02569b",
     description:
-      "Query language and runtime for APIs with efficient data fetching.",
-    projects: 7,
+      "Google's UI toolkit for building natively compiled mobile, web, and desktop applications.",
+    projects: 5,
     yearsExperience: 1,
+  },
+  {
+    id: "expo",
+    name: "Expo",
+    level: 85,
+    category: "Mobile",
+    icon: "🚀",
+    color: "#000020",
+    description:
+      "Platform for universal React applications with tools and services for mobile development.",
+    projects: 10,
+    yearsExperience: 2,
   },
 ];

@@ -1,19 +1,20 @@
 import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  useMemo,
-  ReactNode,
-} from "react";
-import {
-  scrollToSection,
   getCurrentSection,
   initSmoothScrolling,
   ScrollOptions,
+  scrollToSection,
 } from "@/utils/scroll";
 import Lenis from "lenis";
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export interface NavSection {
   id: string;
@@ -56,35 +57,35 @@ const defaultSections: NavSection[] = [
   {
     id: "home",
     name: "Home",
-    href: "#home",
+    href: "/",
     keywords: ["start", "landing", "main", "top"],
     description: "Welcome section",
   },
   {
     id: "about",
     name: "About",
-    href: "#about",
+    href: "/about",
     keywords: ["me", "bio", "profile", "story"],
     description: "About me section",
   },
   {
     id: "skills",
     name: "Skills",
-    href: "#skills",
+    href: "/skills",
     keywords: ["abilities", "expertise", "tech", "stack", "technologies"],
     description: "Technical skills and expertise",
   },
   {
     id: "projects",
     name: "Projects",
-    href: "#projects",
+    href: "/projects",
     keywords: ["work", "portfolio", "showcase", "demos"],
     description: "Project portfolio",
   },
   {
     id: "contact",
     name: "Contact",
-    href: "#contact",
+    href: "/contact",
     keywords: ["message", "touch", "email", "reach"],
     description: "Get in touch section",
   },
@@ -116,6 +117,10 @@ export function NavigationProvider({
     [customSections]
   );
 
+  // React Router hooks
+  const navigate = useNavigate();
+  const location = useLocation();
+
   // Core state
   const [activeSection, setActiveSection] = useState<string>(
     sections[0]?.id || "home"
@@ -124,6 +129,16 @@ export function NavigationProvider({
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isScrolling, setIsScrolling] = useState<boolean>(false);
   const [scrollProgress, setScrollProgress] = useState<number>(0);
+
+  // Initialize active section from URL on mount
+  useEffect(() => {
+    const path = location.pathname.slice(1); // Remove leading slash
+    if (path && sections.find((s) => s.id === path)) {
+      setActiveSection(path);
+    } else if (path === "") {
+      setActiveSection("home");
+    }
+  }, [location.pathname, sections]);
 
   // Initialize smooth scrolling
   useEffect(() => {
@@ -135,7 +150,7 @@ export function NavigationProvider({
         lenisInstance.destroy();
         // Fixed: Remove any type
         if (typeof window !== "undefined") {
-          delete ((window as unknown) as Record<string, unknown>).__lenis;
+          delete (window as unknown as Record<string, unknown>).__lenis;
         }
       }
     };
@@ -162,6 +177,12 @@ export function NavigationProvider({
       const currentSection = getCurrentSection(sectionIds);
       if (currentSection && currentSection !== activeSection) {
         setActiveSection(currentSection);
+
+        // Update URL to match current section
+        const newPath = currentSection === "home" ? "/" : `/${currentSection}`;
+        if (location.pathname !== newPath) {
+          navigate(newPath, { replace: true });
+        }
       }
     };
 
@@ -172,7 +193,7 @@ export function NavigationProvider({
       window.removeEventListener("scroll", handleScroll);
       clearTimeout(scrollTimer);
     };
-  }, [sections, activeSection]);
+  }, [sections, activeSection, navigate, location.pathname]);
 
   // Handle menu body scroll lock
   useEffect(() => {
@@ -203,6 +224,13 @@ export function NavigationProvider({
       }
 
       try {
+        // Update URL first
+        const newPath = sectionId === "home" ? "/" : `/${sectionId}`;
+        if (location.pathname !== newPath) {
+          navigate(newPath, { replace: true });
+        }
+
+        // Then scroll to section
         await scrollToSection(sectionId, options);
         setActiveSection(sectionId);
 
@@ -213,7 +241,7 @@ export function NavigationProvider({
         console.error(`Failed to navigate to section "${sectionId}":`, error);
       }
     },
-    [sections, isMenuOpen]
+    [sections, isMenuOpen, navigate, location.pathname]
   );
 
   const setActiveSectionCallback = useCallback(

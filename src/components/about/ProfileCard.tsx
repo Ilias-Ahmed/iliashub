@@ -1,16 +1,13 @@
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { VelocityScroll } from "@/components/ui/VelocityScroll";
 import { useTheme } from "@/contexts/ThemeContext";
+import { motion } from "framer-motion";
 import {
   Brain,
   Heart,
   Target,
-  Coffee,
-  Code,
-  Palette,
   Zap,
-  Globe,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import profileImage from "/images/profile.png?url";
 
 const ProfileCard = () => {
@@ -47,32 +44,6 @@ const ProfileCard = () => {
     },
   ];
 
-  const lifeMetrics = [
-    {
-      label: "Lines of Code",
-      value: "500k+",
-      icon: Code,
-      description: "Written with passion",
-    },
-    {
-      label: "Coffee Cups",
-      value: "2,847",
-      icon: Coffee,
-      description: "This year alone",
-    },
-    {
-      label: "Design Hours",
-      value: "3.2k",
-      icon: Palette,
-      description: "Perfecting interfaces",
-    },
-    {
-      label: "Countries Reached",
-      value: "25+",
-      icon: Globe,
-      description: "Through my work",
-    },
-  ];
 
   useEffect(() => {
     setIsVisible(true);
@@ -92,9 +63,7 @@ const ProfileCard = () => {
       {/* Main Profile Section with Integrated Background */}
       <div className="relative overflow-hidden">
         {/* Background with Profile Image Integration */}
-        <motion.div
-          className="absolute inset-0"
-        />
+        <motion.div className="absolute inset-0" />
 
         <motion.div
           className="absolute top-0 right-0 w-1/2 h-full opacity-5 md:opacity-10"
@@ -245,7 +214,7 @@ const ProfileCard = () => {
               {personalityCards.map((card, index) => (
                 <motion.div
                   key={index}
-                  className="p-3 md:p-4 rounded-lg md:rounded-xl cursor-pointer transition-all duration-300 border"
+                  className="p-3 md:p-4 rounded-lg md:rounded-xl  transition-all duration-300 border"
                   style={{
                     backgroundColor:
                       activeCard === index
@@ -323,84 +292,45 @@ const ProfileCard = () => {
         </div>
       </div>
 
-      {/* Life Metrics - Better mobile grid */}
-      <motion.div
-        className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7, duration: 0.8 }}
-      >
-        {lifeMetrics.map((metric, index) => (
-          <motion.div
-            key={metric.label}
-            className="p-4 md:p-6 rounded-xl md:rounded-2xl backdrop-blur-sm border text-center group"
-            style={{
-              backgroundColor: isDark
-                ? "rgba(255,255,255,0.03)"
-                : "rgba(255,255,255,0.8)",
-              borderColor: isDark
-                ? "rgba(255,255,255,0.05)"
-                : "rgba(0,0,0,0.1)",
-            }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 + index * 0.1 }}
-            whileHover={{
-              y: -4,
-              backgroundColor: `${accentColors.primary}08`,
-              borderColor: `${accentColors.primary}30`,
-            }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <motion.div
-              className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3 rounded-lg md:rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: `${accentColors.primary}20` }}
-              whileHover={{ scale: 1.1, rotate: 5 }}
-            >
-              <metric.icon
-                size={20}
-                className="md:w-6 md:h-6"
-                style={{ color: accentColors.primary }}
-              />
-            </motion.div>
 
-            <motion.div
-              className="text-lg md:text-2xl font-bold mb-1"
-              style={{ color: accentColors.primary }}
-              whileHover={{ scale: 1.05 }}
-            >
-              {metric.value}
-            </motion.div>
-
-            <div className="text-xs md:text-sm font-medium mb-1">
-              {metric.label}
-            </div>
-            <div className="text-xs opacity-60 hidden md:block">
-              {metric.description}
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      {/* Quote Section - Responsive text */}
+      {/* Quote Section with VelocityScroll - Responsive text */}
       <motion.div
         className="text-center py-6 md:py-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 0.8 }}
       >
-        <motion.blockquote
-          className="text-lg md:text-xl lg:text-2xl font-medium italic max-w-3xl mx-auto px-4"
-          style={{ color: accentColors.primary }}
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 1.2, duration: 0.6 }}
-        >
-          "The best code is not just functional—it's an expression of empathy,
-          crafted with the user's journey in mind."
-        </motion.blockquote>
+        <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
+          <VelocityScroll
+            defaultVelocity={2}
+            className="text-lg md:text-xl lg:text-2xl font-medium italic"
+            style={{ color: accentColors.primary }}
+          >
+            "The best code is not just functional—it's an expression of empathy,
+            crafted with the user's journey in mind."
+          </VelocityScroll>
+
+          {/* Gradient overlays for smooth fade effect */}
+          <div
+            className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r"
+            style={{
+              background: `linear-gradient(to right, ${
+                isDark ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)"
+              }, transparent)`,
+            }}
+          ></div>
+          <div
+            className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l"
+            style={{
+              background: `linear-gradient(to left, ${
+                isDark ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)"
+              }, transparent)`,
+            }}
+          ></div>
+        </div>
+
         <motion.p
-          className="mt-3 md:mt-4 opacity-70 text-sm md:text-base"
+          className="mt-6 md:mt-8 opacity-70 text-sm md:text-base"
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.7 }}
           transition={{ delay: 1.4 }}

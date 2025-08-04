@@ -1,8 +1,9 @@
-import { useMemo } from "react";
-import { motion } from "framer-motion";
-import { Skill, MasteryLevel } from "./types";
-import { triggerHapticFeedback } from "@/utils/haptics";
 import { useTheme } from "@/contexts/ThemeContext";
+import { triggerHapticFeedback } from "@/utils/haptics";
+import { motion } from "framer-motion";
+import { useMemo } from "react";
+import SkillRadarChart from "./SkillRadarChart";
+import { MasteryLevel, Skill } from "./types";
 
 interface MasteryViewProps {
   skills: Skill[];
@@ -54,25 +55,43 @@ const MasteryView = ({ skills, setSelectedSkill }: MasteryViewProps) => {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="text-center mb-12">
-        <h3
-          className="text-2xl sm:text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r"
-          style={{
-            backgroundImage: `linear-gradient(to right, ${accentColors.primary}, ${accentColors.secondary})`,
-          }}
+      {/* Radar Chart Visualization */}
+      {skills.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="mb-12 flex justify-center"
         >
-          Skills by Mastery Level
-        </h3>
-        <p
-          className="max-w-2xl mx-auto"
-          style={{
-            color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)",
-          }}
-        >
-          Skills organized by proficiency levels, showcasing depth of expertise
-          across different technologies and domains.
-        </p>
-      </div>
+          <div
+            className="p-8 rounded-2xl border backdrop-blur-sm shadow-xl"
+            style={{
+              backgroundColor: isDark
+                ? "rgba(0,0,0,0.3)"
+                : "rgba(255,255,255,0.9)",
+              borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+            }}
+          >
+            <div className="text-center mb-6">
+              <h4
+                className="text-lg font-bold mb-2"
+                style={{ color: isDark ? "#ffffff" : "#1f2937" }}
+              >
+                Skills Radar Overview
+              </h4>
+              <p
+                className="text-sm"
+                style={{
+                  color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)",
+                }}
+              >
+                Interactive visualization of top skills by proficiency
+              </p>
+            </div>
+            <SkillRadarChart skills={skills} width={500} height={400} />
+          </div>
+        </motion.div>
+      )}
 
       <div className="space-y-8">
         {masteryLevels.map((level, levelIndex) => {
@@ -129,7 +148,7 @@ const MasteryView = ({ skills, setSelectedSkill }: MasteryViewProps) => {
                       duration: 0.4,
                       delay: levelIndex * 0.1 + skillIndex * 0.05,
                     }}
-                    className="group cursor-pointer"
+                    className="group "
                     onClick={() => {
                       setSelectedSkill(skill);
                       triggerHapticFeedback();

@@ -1,7 +1,7 @@
 import { useNavigation } from "@/contexts/NavigationContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useCallback, useState } from "react";
-import { useTheme } from "@/contexts/ThemeContext";
 
 interface DotsNavigationProps {
   position?: "left" | "right";
@@ -189,7 +189,7 @@ const DotsNavigation: React.FC<DotsNavigationProps> = ({
 
               {/* Navigation Dot */}
               <motion.button
-                className={`relative rounded-full border-2 transition-all duration-300 cursor-pointer
+                className={`relative rounded-full border-2 transition-all duration-300
                   focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75
                   focus-visible:ring-offset-2 focus-visible:ring-offset-background
                   backdrop-blur-sm ${

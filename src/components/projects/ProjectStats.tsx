@@ -1,292 +1,324 @@
-import React, { useState, useEffect } from "react";
-import { motion, useInView } from "framer-motion";
-import { Code, Users, Award, Zap, TrendingUp, Star } from "lucide-react";
-import { StatItem } from "./types";
+import { ShiftCard } from "@/components/ui/ShiftCard";
 import { useTheme } from "@/contexts/ThemeContext";
+import { motion, useInView } from "framer-motion";
+import { Rocket, TrendingUp, Zap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { StatItem } from "./types";
 
-const ProjectStats = () => {
-  const [animatedValues, setAnimatedValues] = useState<Record<string, number>>(
-    {}
-  );
-  const { isDark, getAccentColors } = useTheme();
-  const accentColors = getAccentColors();
+// Compact Glitch Counter for ShiftCard
+const GlitchCounter = ({
+  value,
+  suffix,
+  color,
+  size = "text-3xl",
+}: {
+  value: number;
+  suffix: string;
+  color: string;
+  size?: string;
+}) => {
+  const [displayValue, setDisplayValue] = useState(0);
+  const [isGlitching, setIsGlitching] = useState(false);
 
-  const stats: StatItem[] = React.useMemo(
-    () => [
-      {
-        value: "50+",
-        label: "Projects Completed",
-        icon: <Code size={24} />,
-        description: "Successfully delivered projects across various domains",
-        color: accentColors.primary,
-      },
-      {
-        value: "100k+",
-        label: "Users Reached",
-        icon: <Users size={24} />,
-        description: "Total users across all deployed applications",
-        color: accentColors.secondary,
-      },
-      {
-        value: "15+",
-        label: "Technologies Mastered",
-        icon: <Zap size={24} />,
-        description: "Modern frameworks and tools in my tech stack",
-        color: accentColors.tertiary,
-      },
-      {
-        value: "99.9%",
-        label: "Uptime Achieved",
-        icon: <TrendingUp size={24} />,
-        description: "Average uptime across production applications",
-        color: "#10b981",
-      },
-      {
-        value: "25+",
-        label: "Happy Clients",
-        icon: <Award size={24} />,
-        description: "Satisfied clients and successful collaborations",
-        color: "#f59e0b",
-      },
-      {
-        value: "4.9/5",
-        label: "Average Rating",
-        icon: <Star size={24} />,
-        description: "Client satisfaction and project quality rating",
-        color: "#ec4899",
-      },
-    ],
-    [accentColors]
-  );
-
-  const ref = React.useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
-
-  // Animate numbers when component comes into view
   useEffect(() => {
-    if (isInView) {
-      stats.forEach((stat, index) => {
-        const numericValue = parseFloat(stat.value.replace(/[^0-9.]/g, ""));
-        let current = 0;
-        const increment = numericValue / 50; // 50 steps for smooth animation
-        const timer = setInterval(() => {
-          current += increment;
-          if (current >= numericValue) {
-            current = numericValue;
-            clearInterval(timer);
-          }
+    if (value === 0) return;
 
-          setAnimatedValues((prev) => ({
-            ...prev,
-            [stat.label]: current,
-          }));
-        }, 30 + index * 10); // Stagger the animations
-      });
-    }
-  }, [isInView, stats]);
+    const duration = 2000;
+    const startTime = Date.now();
+    const target = parseFloat(value.toString().replace(/[^0-9.]/g, ""));
 
-  const formatValue = (stat: StatItem, animatedValue: number) => {
-    const originalValue = stat.value;
-    if (originalValue.includes("k")) {
-      return `${Math.floor(animatedValue / 1000)}k+`;
-    } else if (originalValue.includes("%")) {
-      return `${animatedValue.toFixed(1)}%`;
-    } else if (originalValue.includes("/")) {
-      return `${animatedValue.toFixed(1)}/5`;
-    } else if (originalValue.includes("+")) {
-      return `${Math.floor(animatedValue)}+`;
-    }
-    return Math.floor(animatedValue).toString();
-  };
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
+      if (progress < 0.8) {
+        setIsGlitching(Math.random() > 0.8);
+        const current =
+          target * progress + (Math.random() - 0.5) * target * 0.1;
+        setDisplayValue(Math.max(0, current));
+      } else {
+        setIsGlitching(false);
+        setDisplayValue(target * progress);
+      }
 
-  const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 12,
-      },
-    },
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [value]);
+
+  const formatValue = () => {
+    if (suffix === "k+") return `${Math.floor(displayValue / 1000)}k+`;
+    if (suffix === "%") return `${displayValue.toFixed(1)}%`;
+    if (suffix === "/5") return `${displayValue.toFixed(1)}/5`;
+    if (suffix === "+") return `${Math.floor(displayValue)}+`;
+    return Math.floor(displayValue).toString();
   };
 
   return (
-    <section className="py-16 mt-20" ref={ref}>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-        transition={{ duration: 0.6 }}
-        className="text-center mb-12"
-      >
-        <h2
-          className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent"
-          style={{
-            backgroundImage: `linear-gradient(90deg, ${accentColors.primary}, ${accentColors.tertiary}, ${accentColors.secondary})`,
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          Project Impact & Achievements
-        </h2>
-        <p className="text-gray-400 max-w-2xl mx-auto">
-          Numbers that reflect the quality, reach, and impact of my work across
-          various projects and collaborations.
-        </p>
-      </motion.div>
+    <motion.div
+      className={`${size} font-bold font-mono tabular-nums`}
+      style={{
+        color,
+        filter: isGlitching ? "hue-rotate(90deg) brightness(1.2)" : "none",
+        textShadow: isGlitching ? `0 0 10px ${color}` : `0 0 5px ${color}40`,
+      }}
+      animate={{
+        scale: isGlitching ? [1, 1.05, 1] : 1,
+      }}
+      transition={{ duration: 0.1 }}
+    >
+      {formatValue()}
+    </motion.div>
+  );
+};
 
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-      >
-        {stats.map((stat, index) => (
-          <motion.div
-            key={stat.label}
-            variants={itemVariants}
-            className="relative group"
+// Individual Stat Card using ShiftCard
+const StatShiftCard = ({ stat, delay }: { stat: StatItem; delay: number }) => {
+  const [animValue, setAnimValue] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimValue(parseFloat(stat.value.replace(/[^0-9.]/g, "")));
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [stat.value, delay]);
+
+  const getSuffix = () => {
+    if (stat.value.includes("k+")) return "k+";
+    if (stat.value.includes("%")) return "%";
+    if (stat.value.includes("/5")) return "/5";
+    if (stat.value.includes("+")) return "+";
+    return "";
+  };
+
+  // Top content - compact header with icon and title
+  const topContent = (
+    <div
+      className="rounded-lg text-primary shadow-lg p-3"
+      style={{
+        backgroundColor: `${stat.color}15`,
+        border: `1px solid ${stat.color}30`,
+      }}
+    >
+      <div className="flex items-center gap-3">
+        <motion.div
+          className="w-8 h-8 flex items-center justify-center rounded-lg"
+          style={{ backgroundColor: `${stat.color}25` }}
+          whileHover={{ rotate: 360 }}
+          transition={{ duration: 0.6 }}
+        >
+          {" "}
+          <div
+            style={{ color: stat.color }}
+            className="[&>svg]:w-4 [&>svg]:h-4"
           >
-            <motion.div
-              className="p-8 rounded-2xl border transition-all duration-300 h-full"
-              style={{
-                backgroundColor: isDark
-                  ? "rgba(255,255,255,0.05)"
-                  : "rgba(255,255,255,0.8)",
-                borderColor: isDark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(0,0,0,0.1)",
-              }}
-              whileHover={{
-                y: -5,
-                borderColor: stat.color,
-                boxShadow: `0 20px 40px ${stat.color}20`,
-              }}
-            >
-              {/* Icon */}
-              <motion.div
-                className="w-16 h-16 rounded-xl flex items-center justify-center mb-6 mx-auto"
-                style={{
-                  backgroundColor: `${stat.color}20`,
-                  color: stat.color,
-                }}
-                whileHover={{
-                  scale: 1.1,
-                  rotate: 5,
-                }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                {stat.icon}
-              </motion.div>
+            {stat.icon}
+          </div>
+        </motion.div>
+        <h3 className="text-sm font-semibold text-foreground">{stat.label}</h3>
+      </div>
+    </div>
+  );
 
-              {/* Animated Value */}
-              <motion.div
-                className="text-center mb-4"
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={
-                  isInView
-                    ? { scale: 1, opacity: 1 }
-                    : { scale: 0.5, opacity: 0 }
-                }
-                transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-              >
-                <div
-                  className="text-4xl md:text-5xl font-bold mb-2"
-                  style={{ color: stat.color }}
-                >
-                  {animatedValues[stat.label]
-                    ? formatValue(stat, animatedValues[stat.label])
-                    : stat.value}
-                </div>
-                <h3 className="text-lg font-semibold opacity-90">
-                  {stat.label}
-                </h3>
-              </motion.div>
-
-              {/* Description */}
-              <p className="text-sm opacity-70 text-center leading-relaxed">
-                {stat.description}
-              </p>
-
-              {/* Hover effect overlay */}
-              <motion.div
-                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                style={{
-                  background: `linear-gradient(135deg, ${stat.color}10 0%, ${stat.color}05 100%)`,
-                }}
-              />
-
-              {/* Animated border */}
-              <motion.div
-                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100"
-                style={{
-                  background: `linear-gradient(45deg, ${stat.color}, transparent, ${stat.color})`,
-                  backgroundSize: "200% 200%",
-                  padding: "2px",
-                  mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                  maskComposite: "exclude",
-                }}
-                animate={{
-                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              />
-            </motion.div>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      {/* Additional metrics */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-        transition={{ delay: 0.8, duration: 0.6 }}
-        className="mt-16 text-center"
+  // Animated content that appears on hover
+  const topAnimateContent = (
+    <motion.div
+      className="absolute top-2 right-2"
+      initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+        rotate: 0,
+        transition: { delay: 0.2, duration: 0.3 },
+      }}
+      exit={{
+        opacity: 0,
+        scale: 0.8,
+        rotate: 10,
+        transition: { duration: 0.2 },
+      }}
+    >
+      <div
+        className="px-2 py-1 rounded-md text-xs font-medium"
+        style={{
+          backgroundColor: `${stat.color}20`,
+          color: stat.color,
+          border: `1px solid ${stat.color}40`,
+        }}
       >
-        <div
-          className="inline-flex items-center gap-4 px-8 py-4 rounded-full border"
-          style={{
-            backgroundColor: isDark
-              ? "rgba(255,255,255,0.05)"
-              : "rgba(255,255,255,0.8)",
-            borderColor: `${accentColors.primary}30`,
-          }}
-        >
-          <div className="flex items-center gap-2">
+        Live
+      </div>
+    </motion.div>
+  );
+
+  // Middle content - large counter display
+  const middleContent = (
+    <motion.div
+      className="flex flex-col items-center justify-center"
+      layoutId={`counter-${stat.label}`}
+    >
+      <GlitchCounter
+        value={animValue}
+        suffix={getSuffix()}
+        color={stat.color || "#ffffff"}
+        size="text-4xl"
+      />
+      <motion.div
+        className="w-16 h-1 rounded-full mt-2"
+        style={{ backgroundColor: `${stat.color}40` }}
+        animate={{ width: ["0%", "100%"] }}
+        transition={{ delay: delay / 1000 + 0.5, duration: 0.8 }}
+      />
+    </motion.div>
+  );
+
+  // Bottom content - detailed info
+  const bottomContent = (
+    <div className="pb-4">
+      <div
+        className="flex w-full flex-col gap-3 border-t rounded-t-lg px-4 pb-4"
+        style={{
+          backgroundColor: `${stat.color}10`,
+          borderColor: `${stat.color}30`,
+        }}
+      >
+        <div className="pt-3">
+          <div className="flex items-center gap-2 mb-2">
             <div
-              className="w-3 h-3 rounded-full animate-pulse"
-              style={{ backgroundColor: "#10b981" }}
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: stat.color }}
             />
-            <span className="text-sm font-medium">
-              Currently Available for New Projects
+            <span className="text-sm font-medium text-foreground">
+              Performance Metrics
             </span>
           </div>
-          <div className="w-px h-6 bg-gray-300 opacity-30" />
-          <div className="text-sm opacity-70">
-            Response time: <span className="font-medium">Within 24 hours</span>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {stat.description}
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-xs text-muted-foreground">Growth Rate</span>
+            <span className="text-xs font-medium" style={{ color: stat.color }}>
+              +23%
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-xs text-muted-foreground">Last Updated</span>
+            <span className="text-xs font-medium text-foreground">
+              2 min ago
+            </span>
           </div>
         </div>
-      </motion.div>
+
+        <motion.div
+          className="w-full h-1 rounded-full bg-muted"
+          initial={{ width: 0 }}
+          animate={{ width: "100%" }}
+          transition={{ delay: 0.5, duration: 1 }}
+        >
+          <motion.div
+            className="h-full rounded-full"
+            style={{ backgroundColor: stat.color }}
+            initial={{ width: 0 }}
+            animate={{ width: "85%" }}
+            transition={{ delay: 0.8, duration: 1.2 }}
+          />
+        </motion.div>
+      </div>
+    </div>
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: delay / 1000, duration: 0.5 }}
+    >
+      <ShiftCard
+        className="bg-card/50 backdrop-blur-sm border-muted/50 hover:border-muted"
+        topContent={topContent}
+        topAnimateContent={topAnimateContent}
+        middleContent={middleContent}
+        bottomContent={bottomContent}
+      />
+    </motion.div>
+  );
+};
+
+const ProjectStats = () => {
+  const { getAccentColors } = useTheme();
+  const accentColors = getAccentColors();
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
+
+  const stats: StatItem[] = [
+    {
+      value: "50+",
+      label: "Projects",
+      icon: <Rocket size={24} />,
+      description:
+        "Full-stack applications deployed to production with modern tech stacks",
+      color: accentColors.primary,
+    },
+    {
+      value: "15+",
+      label: "Technologies",
+      icon: <Zap size={24} />,
+      description:
+        "Modern frameworks, libraries, and cutting-edge development tools",
+      color: accentColors.tertiary,
+    },
+    {
+      value: "99.9%",
+      label: "Uptime",
+      icon: <TrendingUp size={24} />,
+      description:
+        "Reliable, high-performance applications with enterprise-grade stability",
+      color: "#10b981",
+    },
+
+  ];
+
+  return (
+    <section className="pt-20 relative overflow-hidden" ref={ref}>
+      {/* Background Effect */}
+      {isInView && (
+        <div className="absolute inset-0 -z-10">
+          <motion.div
+            className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full opacity-5 blur-3xl"
+            style={{ backgroundColor: accentColors.primary }}
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 360],
+              x: [0, 50, 0],
+              y: [0, -30, 0],
+            }}
+            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          />
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto px-6">
+
+        {/* Stats Grid */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          {stats.map((stat, index) => (
+            <StatShiftCard key={stat.label} stat={stat} delay={index * 200} />
+          ))}
+        </motion.div>
+      </div>
     </section>
   );
 };
 
 export default ProjectStats;
-
-

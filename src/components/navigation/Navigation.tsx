@@ -1,13 +1,13 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useNavigation } from "@/contexts/NavigationContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import DotsNavigation from "./DotsNavigation";
-import VoiceNavigation from "./VoiceNavigation";
-import DockNavigation from "./DockNavigation";
-import NavigationMenu from "./NavigationMenu";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import BackToTop from "../ui/BackToTop";
 import CommandPalette from "../ui/CommandPalette";
+import DockNavigation from "./DockNavigation";
+import DotsNavigation from "./DotsNavigation";
+import NavigationMenu from "./NavigationMenu";
+import VoiceNavigation from "./VoiceNavigation";
 
 // Enhanced interfaces
 interface NavigationProps {
@@ -322,7 +322,7 @@ const Navigation: React.FC<NavigationProps> = ({
       opacity: 0,
       x: "100%",
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 400,
         damping: 40,
       },
@@ -331,7 +331,7 @@ const Navigation: React.FC<NavigationProps> = ({
       opacity: 1,
       x: "0%",
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 400,
         damping: 40,
         staggerChildren: 0.05,
@@ -404,11 +404,7 @@ const Navigation: React.FC<NavigationProps> = ({
 
       {/* Enhanced Navigation Menu Component */}
       {navigationFlags.showHamburgerMenu && enableMenu && (
-        <NavigationMenu
-          showQuickActions={true}
-          showDeviceStatus={true}
-          compactMode={false}
-        />
+        <NavigationMenu />
       )}
 
       {/* Fallback Traditional Menu */}
@@ -431,10 +427,7 @@ const Navigation: React.FC<NavigationProps> = ({
                 }
               }}
             >
-              <div className="h-full flex flex-col justify-center max-w-screen-lg mx-auto px-6 py-20">
-                <h2 id="navigation-title" className="sr-only">
-                  Navigation Menu
-                </h2>
+              <div className="h-full flex flex-col justify-center max-w-screen-lg mx-auto px-6 py-10">
 
                 {/* Navigation Links */}
                 <nav

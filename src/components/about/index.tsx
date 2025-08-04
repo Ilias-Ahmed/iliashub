@@ -1,14 +1,13 @@
+import { Tabs, TabsList } from "@/components/ui/tabs";
+import { useTheme } from "@/contexts/ThemeContext";
+import { triggerHapticFeedback } from "@/utils/haptics";
+import { animated, useSpring } from "@react-spring/web";
+import { AnimatePresence, motion, useInView } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { certifications, timelineData } from "./aboutData";
 import CertificationsGallery from "./CertificationsGallery";
 import ExperienceTimeline from "./ExperienceTimeline";
 import ProfileCard from "./ProfileCard";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useTheme } from "@/contexts/ThemeContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
-import { useSpring, animated } from "@react-spring/web";
-import { AnimatePresence, motion, useInView } from "framer-motion";
-import { useEffect, useRef, useState, useCallback } from "react";
-import { toast } from "sonner";
 
 const AboutSection = () => {
   const ref = useRef(null);
@@ -63,30 +62,13 @@ const AboutSection = () => {
     visible: {
       y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 100 },
+      transition: { type: "spring" as const, stiffness: 100 },
     },
   };
 
-  // Handle Easter egg click with error handling
-  const handleEasterEggClick = useCallback(() => {
-    try {
-      toast("Easter Egg Found!", {
-        description: "You've discovered a hidden feature!",
-        action: {
-          label: "Explore",
-          onClick: () =>
-            window.open("https://github.com/Ilias-Ahmed", "_blank"),
-        },
-        icon: "🎉",
-      });
-    } catch (error) {
-      console.error("Toast notification failed:", error);
-    }
-  }, []);
-
   return (
     <section
-      className="py-16 md:py-32 relative overflow-hidden theme-transition"
+      className="py-16  relative overflow-hidden theme-transition"
       id="about"
       onMouseMove={handleMouseMove}
       aria-label="About Section"
@@ -169,138 +151,229 @@ const AboutSection = () => {
               My Journey & Expertise
             </span>
           </h2>
-
-          <motion.p
-            className="text-base sm:text-lg opacity-70 max-w-2xl mx-auto"
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            The story behind my work, skills, and professional journey
-          </motion.p>
         </motion.div>
 
-        {/* Interactive Tabs - Enhanced with proper theming */}
+        {/* Interactive Tabs with Enhanced Animations */}
         <Tabs
           defaultValue="profile"
           value={activeTab}
           onValueChange={setActiveTab}
           className="mb-20"
         >
-          <TabsList
-            className="flex gap-4 max-w-md mx-auto mb-16 p-1 backdrop-blur-lg rounded-xl border shadow-xl theme-transition"
-            style={{
+            <motion.div
+            className="flex justify-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            >
+            <TabsList
+              className="relative inline-flex items-center p-1 rounded-xl border backdrop-blur-xl shadow-lg theme-transition"
+              style={{
               backgroundColor: isDark
-                ? "rgba(17, 24, 39, 0.4)"
-                : "rgba(255, 255, 255, 0.4)",
+                ? "rgba(255,255,255,0.05)"
+                : "rgba(255,255,255,0.8)",
               borderColor: isDark
-                ? "rgba(255, 255, 255, 0.1)"
-                : "rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <TabsTrigger
-              value="profile"
-              className="flex-1 px-6 py-3 rounded-lg transition-all duration-300 border theme-transition"
-              style={{
-                backgroundColor:
-                  activeTab === "profile"
-                    ? `linear-gradient(135deg, ${accentColors.primary}80, ${accentColors.secondary}80)`
-                    : "transparent",
-                borderColor:
-                  activeTab === "profile"
-                    ? accentColors.primary
-                    : isDark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.1)",
-                color:
-                  activeTab === "profile"
-                    ? "white"
-                    : isDark
-                    ? "rgba(255,255,255,0.8)"
-                    : "rgba(0,0,0,0.8)",
-                boxShadow:
-                  activeTab === "profile"
-                    ? `0 4px 14px ${accentColors.shadow}`
-                    : "none",
+                ? "rgba(255,255,255,0.1)"
+                : "rgba(0,0,0,0.1)",
+              backdropFilter: "blur(10px)",
               }}
-              onClick={() => triggerHapticFeedback()}
             >
-              <motion.span
-                className="flex items-center justify-center gap-3"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="text-lg" aria-hidden="true">
-                  👤
-                </span>
-                <span className="font-medium">Profile</span>
-              </motion.span>
-            </TabsTrigger>
-
-            <TabsTrigger
-              value="experience"
-              className="flex-1 px-6 py-3 rounded-lg transition-all duration-300 border theme-transition"
-              style={{
-                backgroundColor:
-                  activeTab === "experience"
-                    ? `linear-gradient(135deg, ${accentColors.primary}80, ${accentColors.secondary}80)`
-                    : "transparent",
-                borderColor:
-                  activeTab === "experience"
-                    ? accentColors.primary
-                    : isDark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.1)",
+              {[
+              {
+                value: "profile",
+                label: "Profile",
+                icon: (
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 20c0-3.314 3.134-6 7-6s7 2.686 7 6" />
+                </svg>
+                ),
+                description: "Personal details and skills",
+              },
+              {
+                value: "experience",
+                label: "Experience",
+                icon: (
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <rect x="3" y="7" width="18" height="13" rx="2" />
+                  <path d="M16 3v4M8 3v4" />
+                </svg>
+                ),
+                description: "Work history and timeline",
+              },
+              ].map((tab) => (
+              <motion.button
+                key={tab.value}
+                type="button"
+                className="relative px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 overflow-visible"
+                style={{
                 color:
-                  activeTab === "experience"
-                    ? "white"
-                    : isDark
-                    ? "rgba(255,255,255,0.8)"
-                    : "rgba(0,0,0,0.8)",
-                boxShadow:
-                  activeTab === "experience"
-                    ? `0 4px 14px ${accentColors.shadow}`
-                    : "none",
-              }}
-              onClick={() => triggerHapticFeedback()}
-            >
-              <motion.span
-                className="flex items-center justify-center gap-3"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                  activeTab === tab.value
+                  ? "white"
+                  : isDark
+                  ? "rgba(255,255,255,0.7)"
+                  : "rgba(0,0,0,0.7)",
+                }}
+                onClick={() => {
+                triggerHapticFeedback();
+                setActiveTab(tab.value);
+                }}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.98 }}
+                aria-label={tab.label}
               >
-                <span className="text-lg" aria-hidden="true">
-                  🚀
-                </span>
-                <span className="font-medium">Experience</span>
-              </motion.span>
-            </TabsTrigger>
-          </TabsList>
+                {/* Active background */}
+                {activeTab === tab.value && (
+                <motion.div
+                  layoutId="activeTabBackground"
+                  className="absolute inset-0 rounded-lg"
+                  style={{
+                  background: `linear-gradient(135deg, ${accentColors.primary} 0%, ${accentColors.secondary} 100%)`,
+                  boxShadow: `0 4px 12px ${accentColors.shadow}`,
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+                )}
 
-          <AnimatePresence mode="wait">
-            {activeTab === "profile" && (
-              <motion.div
-                key="profile"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-              >
-                <ProfileCard />
-              </motion.div>
-            )}
-            {activeTab === "experience" && (
-              <motion.div
-                key="experience"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-              >
-                <ExperienceTimeline timelineData={timelineData} />
-              </motion.div>
-            )}
-          </AnimatePresence>
+                {/* Content */}
+                <span className="relative z-10 flex items-center gap-2">
+                <motion.span
+                  className="text-lg"
+                  animate={{
+                  scale: activeTab === tab.value ? 1.15 : 1,
+                  rotate: activeTab === tab.value ? 5 : 0,
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {tab.icon}
+                </motion.span>
+                <span>{tab.label}</span>
+                </span>
+
+                {/* Tooltip */}
+                <motion.div
+                className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-lg text-xs whitespace-nowrap opacity-0 pointer-events-none"
+                style={{
+                  backgroundColor: isDark
+                  ? "rgba(0,0,0,0.8)"
+                  : "rgba(255,255,255,0.9)",
+                  color: isDark ? "white" : "black",
+                  border: `1px solid ${
+                  isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"
+                  }`,
+                  zIndex: 20,
+                }}
+                whileHover={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+                >
+                {tab.description}
+                <div
+                  className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0"
+                  style={{
+                  borderLeft: "4px solid transparent",
+                  borderRight: "4px solid transparent",
+                  borderBottom: `4px solid ${
+                    isDark ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.9)"
+                  }`,
+                  }}
+                />
+                </motion.div>
+              </motion.button>
+              ))}
+            </TabsList>
+            </motion.div>
+
+          {/* Enhanced Tab Content with Sliding Animations */}
+          <div className="relative overflow-hidden">
+            <AnimatePresence mode="wait">
+              {activeTab === "profile" && (
+                <motion.div
+                  key="profile"
+                  initial={{
+                    opacity: 0,
+                    y: 60,
+                    rotateX: -15,
+                    scale: 0.95,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    rotateX: 0,
+                    scale: 1,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: -60,
+                    rotateX: 15,
+                    scale: 0.95,
+                  }}
+                  transition={{
+                    duration: 0.6,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 20,
+                    opacity: { duration: 0.4 },
+                  }}
+                  style={{
+                    perspective: "1000px",
+                    transformStyle: "preserve-3d",
+                  }}
+                  className="relative"
+                >
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.4 }}
+                  >
+                    <ProfileCard />
+                  </motion.div>
+                </motion.div>
+              )}
+              {activeTab === "experience" && (
+                <motion.div
+                  key="experience"
+                  initial={{
+                    opacity: 0,
+                    y: 60,
+                    rotateX: -15,
+                    scale: 0.95,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    rotateX: 0,
+                    scale: 1,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: -60,
+                    rotateX: 15,
+                    scale: 0.95,
+                  }}
+                  transition={{
+                    duration: 0.6,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 20,
+                    opacity: { duration: 0.4 },
+                  }}
+                  style={{
+                    perspective: "1000px",
+                    transformStyle: "preserve-3d",
+                  }}
+                  className="relative"
+                >
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.4 }}
+                  >
+                    <ExperienceTimeline timelineData={timelineData} />
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </Tabs>
 
         {/* Certifications Section */}
@@ -312,99 +385,6 @@ const AboutSection = () => {
         >
           <motion.div variants={itemVariants}>
             <CertificationsGallery certifications={certifications} />
-          </motion.div>
-        </motion.div>
-
-        {/* Skills Showcase Section */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="mt-24"
-        >
-          <motion.div variants={itemVariants} className="text-center mb-12">
-            <h3 className="text-3xl font-bold mb-4">
-              <span
-                className="bg-clip-text text-transparent"
-                style={{
-                  backgroundImage: `linear-gradient(135deg, ${accentColors.primary} 0%, ${accentColors.secondary} 100%)`,
-                }}
-              >
-                Core Technologies
-              </span>
-            </h3>
-            <p className="opacity-70 max-w-2xl mx-auto">
-              The tools and technologies I use to bring ideas to life
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6"
-          >
-            {[
-              { name: "React", icon: "⚛️", level: 95 },
-              { name: "TypeScript", icon: "📘", level: 90 },
-              { name: "Node.js", icon: "🟢", level: 88 },
-              { name: "Python", icon: "🐍", level: 85 },
-              { name: "AWS", icon: "☁️", level: 82 },
-              { name: "Docker", icon: "🐳", level: 80 },
-              { name: "GraphQL", icon: "🔗", level: 78 },
-              { name: "MongoDB", icon: "🍃", level: 85 },
-              { name: "PostgreSQL", icon: "🐘", level: 83 },
-              { name: "Redis", icon: "🔴", level: 75 },
-              { name: "Kubernetes", icon: "⚙️", level: 70 },
-              { name: "Next.js", icon: "▲", level: 92 },
-            ].map((skill, index) => (
-              <motion.div
-                key={skill.name}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 * index }}
-                className="group relative p-6 rounded-xl backdrop-blur-sm border transition-all duration-300 hover:scale-105"
-                style={{
-                  backgroundColor: isDark
-                    ? "rgba(255,255,255,0.05)"
-                    : "rgba(0,0,0,0.05)",
-                  borderColor: isDark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.1)",
-                }}
-                whileHover={{
-                  backgroundColor: `${accentColors.primary}10`,
-                  borderColor: `${accentColors.primary}30`,
-                  boxShadow: `0 8px 25px ${accentColors.shadow}`,
-                }}
-              >
-                <div className="text-center">
-                  <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">
-                    {skill.icon}
-                  </div>
-                  <h4 className="font-medium mb-2">{skill.name}</h4>
-
-                  {/* Skill Level Bar */}
-                  <div
-                    className="w-full h-2 rounded-full mb-2"
-                    style={{
-                      backgroundColor: isDark
-                        ? "rgba(255,255,255,0.1)"
-                        : "rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    <motion.div
-                      className="h-full rounded-full"
-                      style={{
-                        background: `linear-gradient(90deg, ${accentColors.primary}, ${accentColors.secondary})`,
-                      }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${skill.level}%` }}
-                      transition={{ delay: 0.2 + index * 0.1, duration: 1 }}
-                    />
-                  </div>
-                  <span className="text-xs opacity-70">{skill.level}%</span>
-                </div>
-              </motion.div>
-            ))}
           </motion.div>
         </motion.div>
 
@@ -499,73 +479,9 @@ const AboutSection = () => {
             ))}
           </motion.div>
         </motion.div>
-
-        {/* Interactive Easter Egg - Enhanced with accessibility and theming */}
-        <motion.div
-          whileHover={{
-            scale: 1.05,
-            backgroundColor: `${accentColors.primary}10`,
-            borderColor: `${accentColors.primary}30`,
-          }}
-          whileTap={{ scale: 0.98 }}
-          className="text-center cursor-pointer p-6 mt-20 opacity-60 hover:opacity-100 transition-all duration-300 rounded-lg"
-          onClick={() => {
-            handleEasterEggClick();
-            triggerHapticFeedback();
-          }}
-          role="button"
-          tabIndex={0}
-          aria-label="Discover Easter Egg"
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              handleEasterEggClick();
-            }
-          }}
-          style={{
-            background: `linear-gradient(135deg, ${accentColors.primary}05, ${accentColors.secondary}05)`,
-            border: `1px solid ${accentColors.primary}20`,
-          }}
-        >
-          <p className="text-sm flex items-center justify-center gap-2">
-            <motion.span
-              className="animate-pulse"
-              aria-hidden="true"
-              animate={{
-                scale: [1, 1.2, 1],
-                rotate: [0, 10, -10, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatType: "reverse",
-              }}
-            >
-              ✨
-            </motion.span>
-            <span>There's more than meets the eye...</span>
-            <motion.span
-              className="animate-pulse"
-              aria-hidden="true"
-              animate={{
-                scale: [1, 1.2, 1],
-                rotate: [0, -10, 10, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatType: "reverse",
-                delay: 0.5,
-              }}
-            >
-              ✨
-            </motion.span>
-          </p>
-        </motion.div>
       </div>
     </section>
   );
 };
 
 export default AboutSection;
-

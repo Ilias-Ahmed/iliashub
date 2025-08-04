@@ -1,6 +1,6 @@
 import { useRef, useState, useMemo } from "react";
 import { motion, useInView } from "framer-motion";
-import { Sparkles, Filter, Search, X } from "lucide-react";
+import { Filter, Search, X } from "lucide-react";
 import ProjectGrid from "@/components/projects/ProjectGrid";
 import { projectsData } from "@/components/projects/projectsData";
 import ProjectShowcase from "@/components/projects/ProjectShowcase";
@@ -151,7 +151,7 @@ const ProjectsSection = () => {
 
   return (
     <section
-      className="py-16 md:py-32 px-6 relative overflow-hidden"
+      className="px-6 relative overflow-hidden"
       id="projects"
       ref={ref}
     >
@@ -176,7 +176,6 @@ const ProjectsSection = () => {
           className="text-center mb-16"
         >
           <div className="inline-flex items-center justify-center mb-6">
-            <Sparkles className="w-6 h-6 text-primary mr-3 animate-pulse" />
             <h2
               className="text-4xl sm:text-5xl md:text-6xl font-bold bg-clip-text text-transparent"
               style={{
@@ -187,14 +186,7 @@ const ProjectsSection = () => {
             >
               Featured Projects
             </h2>
-            <Sparkles className="w-6 h-6 text-primary ml-3 animate-pulse" />
           </div>
-
-          <p className="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Explore my portfolio of projects that showcase my passion for
-            creating beautiful, functional, and user-centered digital
-            experiences across various domains.
-          </p>
         </motion.div>
 
         {/* Search and Filters */}
@@ -440,7 +432,7 @@ const ProjectsSection = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-16"
+            className="text-center py-10"
           >
             <div
               className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center"

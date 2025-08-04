@@ -1,21 +1,21 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useAudio } from "@/contexts/AudioContext";
+import { useDeviceDetection, useIsMobile } from "@/hooks/use-mobile";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  Play,
+  Activity,
+  BarChart3,
+  Circle,
+  Music,
   Pause,
+  Play,
+  Settings,
+  Sparkles,
   Volume2,
   VolumeX,
-  Music,
   Waves,
-  Settings,
   X,
-  BarChart3,
-  Activity,
-  Circle,
-  Sparkles,
 } from "lucide-react";
-import { useAudio } from "@/contexts/AudioContext";
-import { useIsMobile, useDeviceDetection } from "@/hooks/use-mobile";
+import React, { useState } from "react";
 
 interface AudioControlsProps {
   accentColors: {
@@ -57,8 +57,12 @@ const AudioControls: React.FC<AudioControlsProps> = ({
   const [previousVolume, setPreviousVolume] = useState(volume);
 
   // Determine if we should use mobile-optimized layout
-  const shouldUseMobileLayout = isMobile || deviceDetection.isMobile || deviceDetection.isTablet ||
-    deviceDetection.screenSize === "xs" || deviceDetection.screenSize === "sm";
+  const shouldUseMobileLayout =
+    isMobile ||
+    deviceDetection.isMobile ||
+    deviceDetection.isTablet ||
+    deviceDetection.screenSize === "xs" ||
+    deviceDetection.screenSize === "sm";
 
   const togglePlay = async () => {
     if (isPlaying) {
@@ -104,7 +108,7 @@ const AudioControls: React.FC<AudioControlsProps> = ({
       className={`fixed z-[100] ${
         shouldUseMobileLayout
           ? "bottom-4 left-4" // Bottom right on mobile for better thumb access
-          : "top-4 right-4"    // Top right on desktop
+          : "top-4 right-4" // Top right on desktop
       }`}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
@@ -116,18 +120,28 @@ const AudioControls: React.FC<AudioControlsProps> = ({
       }}
       style={{
         // Ensure it's always visible
-        pointerEvents: 'auto',
-        touchAction: 'manipulation',
+        pointerEvents: "auto",
+        touchAction: "manipulation",
       }}
     >
       <AnimatePresence>
         {isExpanded && (
           <motion.div
-            initial={{ opacity: 0, y: shouldUseMobileLayout ? 20 : 20, scale: 0.9 }}
+            initial={{
+              opacity: 0,
+              y: shouldUseMobileLayout ? 20 : 20,
+              scale: 0.9,
+            }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: shouldUseMobileLayout ? 20 : 20, scale: 0.9 }}
+            exit={{
+              opacity: 0,
+              y: shouldUseMobileLayout ? 20 : 20,
+              scale: 0.9,
+            }}
             transition={{ duration: 0.3 }}
-            className={`${shouldUseMobileLayout ? 'mb-4' : 'mb-4'} p-4 md:p-6 rounded-2xl border shadow-2xl relative ${
+            className={`${
+              shouldUseMobileLayout ? "mb-4" : "mb-4"
+            } p-4 md:p-6 rounded-2xl border shadow-2xl relative ${
               isDark
                 ? "bg-gray-900/95 border-white/10"
                 : "bg-white/95 border-black/10"
@@ -141,7 +155,9 @@ const AudioControls: React.FC<AudioControlsProps> = ({
                 ? "translateX(calc(-100% + 60px))"
                 : "translateX(calc(-100% + 60px))",
               // Fallback for browsers that don't support backdrop-blur
-              backgroundColor: isDark ? "rgba(17, 24, 39, 0.95)" : "rgba(255, 255, 255, 0.95)",
+              backgroundColor: isDark
+                ? "rgba(17, 24, 39, 0.95)"
+                : "rgba(255, 255, 255, 0.95)",
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)", // Safari support
             }}
@@ -155,9 +171,9 @@ const AudioControls: React.FC<AudioControlsProps> = ({
               <button
                 onClick={() => setIsExpanded(false)}
                 className={`p-2 rounded-lg transition-colors ${
-                  shouldUseMobileLayout ? 'min-w-[44px] min-h-[44px]' : 'p-1'
+                  shouldUseMobileLayout ? "min-w-[44px] min-h-[44px]" : "p-1"
                 } hover:bg-gray-500/20`}
-                style={{ touchAction: 'manipulation' }}
+                style={{ touchAction: "manipulation" }}
               >
                 <X size={16} />
               </button>
@@ -177,14 +193,16 @@ const AudioControls: React.FC<AudioControlsProps> = ({
                 <span>{formatTime(duration)}</span>
               </div>
               <div
-                className={`w-full ${shouldUseMobileLayout ? 'h-3' : 'h-2'} bg-gray-700 rounded-full cursor-pointer relative overflow-hidden`}
+                className={`w-full ${
+                  shouldUseMobileLayout ? "h-3" : "h-2"
+                } bg-gray-700 rounded-full  relative overflow-hidden`}
                 onClick={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   const clickX = e.clientX - rect.left;
                   const newTime = (clickX / rect.width) * duration;
                   seek(newTime);
                 }}
-                style={{ touchAction: 'manipulation' }}
+                style={{ touchAction: "manipulation" }}
               >
                 <motion.div
                   className="h-full rounded-full"
@@ -210,9 +228,11 @@ const AudioControls: React.FC<AudioControlsProps> = ({
                 <button
                   onClick={toggleMute}
                   className={`${
-                    shouldUseMobileLayout ? 'p-3 min-w-[44px] min-h-[44px]' : 'p-2'
+                    shouldUseMobileLayout
+                      ? "p-3 min-w-[44px] min-h-[44px]"
+                      : "p-2"
                   } rounded-lg hover:bg-gray-500/20 transition-colors flex items-center justify-center`}
-                  style={{ touchAction: 'manipulation' }}
+                  style={{ touchAction: "manipulation" }}
                 >
                   {isMuted || volume === 0 ? (
                     <VolumeX size={16} />
@@ -230,8 +250,10 @@ const AudioControls: React.FC<AudioControlsProps> = ({
                     onChange={(e) =>
                       handleVolumeChange(parseFloat(e.target.value))
                     }
-                    className={`w-full ${shouldUseMobileLayout ? 'h-3' : 'h-2'} bg-gray-700 rounded-lg appearance-none cursor-pointer audio-slider`}
-                    style={{ touchAction: 'manipulation' }}
+                    className={`w-full ${
+                      shouldUseMobileLayout ? "h-3" : "h-2"
+                    } bg-gray-700 rounded-lg appearance-none  audio-slider`}
+                    style={{ touchAction: "manipulation" }}
                   />
                 </div>
                 <span className="text-xs text-gray-400 min-w-[3ch]">
@@ -252,7 +274,7 @@ const AudioControls: React.FC<AudioControlsProps> = ({
                     key={viz.id}
                     onClick={() => onVisualizerChange?.(viz.id)}
                     className={`${
-                      shouldUseMobileLayout ? 'p-4 min-h-[60px]' : 'p-3'
+                      shouldUseMobileLayout ? "p-4 min-h-[60px]" : "p-3"
                     } rounded-lg transition-all duration-200 text-sm border-2 ${
                       currentVisualizer === viz.id
                         ? "text-white"
@@ -267,7 +289,7 @@ const AudioControls: React.FC<AudioControlsProps> = ({
                         currentVisualizer === viz.id
                           ? accentColors.primary
                           : "transparent",
-                      touchAction: 'manipulation',
+                      touchAction: "manipulation",
                     }}
                   >
                     <div className="flex flex-col items-center gap-1">
@@ -287,8 +309,8 @@ const AudioControls: React.FC<AudioControlsProps> = ({
         onClick={isExpanded ? togglePlay : () => setIsExpanded(true)}
         className={`relative ${
           shouldUseMobileLayout
-            ? 'p-4 min-w-[56px] min-h-[56px]' // Larger touch target on mobile
-            : 'p-3'
+            ? "p-4 min-w-[56px] min-h-[56px]" // Larger touch target on mobile
+            : "p-3"
         } rounded-full border-2 shadow-2xl transition-all duration-300 ${
           isDark
             ? "bg-gray-900/90 hover:bg-gray-800/90"
@@ -298,11 +320,13 @@ const AudioControls: React.FC<AudioControlsProps> = ({
           borderColor: accentColors.border,
           boxShadow: `0 4px 20px ${accentColors.glow}`,
           // Fallback for browsers that don't support backdrop-blur
-          backgroundColor: isDark ? "rgba(17, 24, 39, 0.9)" : "rgba(255, 255, 255, 0.9)",
+          backgroundColor: isDark
+            ? "rgba(17, 24, 39, 0.9)"
+            : "rgba(255, 255, 255, 0.9)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)", // Safari support
-          touchAction: 'manipulation',
-          WebkitTapHighlightColor: 'transparent', // Remove tap highlight on iOS
+          touchAction: "manipulation",
+          WebkitTapHighlightColor: "transparent", // Remove tap highlight on iOS
         }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -313,12 +337,21 @@ const AudioControls: React.FC<AudioControlsProps> = ({
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           >
-            <Settings size={shouldUseMobileLayout ? 24 : 20} style={{ color: accentColors.primary }} />
+            <Settings
+              size={shouldUseMobileLayout ? 24 : 20}
+              style={{ color: accentColors.primary }}
+            />
           </motion.div>
         ) : isPlaying ? (
-          <Pause size={shouldUseMobileLayout ? 24 : 20} style={{ color: accentColors.primary }} />
+          <Pause
+            size={shouldUseMobileLayout ? 24 : 20}
+            style={{ color: accentColors.primary }}
+          />
         ) : (
-          <Play size={shouldUseMobileLayout ? 24 : 20} style={{ color: accentColors.primary }} />
+          <Play
+            size={shouldUseMobileLayout ? 24 : 20}
+            style={{ color: accentColors.primary }}
+          />
         )}
 
         {/* Audio Level Indicator */}
@@ -353,20 +386,18 @@ const AudioControls: React.FC<AudioControlsProps> = ({
 
         .audio-slider::-webkit-slider-thumb {
           appearance: none;
-          height: ${shouldUseMobileLayout ? '20px' : '16px'};
-          width: ${shouldUseMobileLayout ? '20px' : '16px'};
+          height: ${shouldUseMobileLayout ? "20px" : "16px"};
+          width: ${shouldUseMobileLayout ? "20px" : "16px"};
           border-radius: 50%;
           background: ${accentColors.primary};
-          cursor: pointer;
           box-shadow: 0 0 10px ${accentColors.glow};
         }
 
         .audio-slider::-moz-range-thumb {
-          height: ${shouldUseMobileLayout ? '20px' : '16px'};
-          width: ${shouldUseMobileLayout ? '20px' : '16px'};
+          height: ${shouldUseMobileLayout ? "20px" : "16px"};
+          width: ${shouldUseMobileLayout ? "20px" : "16px"};
           border-radius: 50%;
           background: ${accentColors.primary};
-          cursor: pointer;
           border: none;
           box-shadow: 0 0 10px ${accentColors.glow};
         }

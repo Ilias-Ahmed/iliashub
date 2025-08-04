@@ -1,17 +1,43 @@
-import { useState, useMemo, useRef } from "react";
+import { useTheme } from "@/contexts/ThemeContext";
 import { motion, useInView } from "framer-motion";
-import { Skill, ViewMode } from "./types";
+import { lazy, Suspense, useCallback, useMemo, useRef, useState } from "react";
 import { skills } from "./skillsData";
 import SkillsFilters from "./SkillsFilters";
-import GridView from "./GridView";
-import MasteryView from "./MasteryView";
-import ComparisonView from "./ComparisonView";
-import SkillVisualization from "./SkillVisualization";
-import SkillDetailModal from "./SkillDetailModal";
-import { useTheme } from "@/contexts/ThemeContext";
+import { Skill, ViewMode } from "./types";
+
+// Lazy load heavy components for better performance
+const GridView = lazy(() => import("./GridView"));
+const MasteryView = lazy(() => import("./MasteryView"));
+const ComparisonView = lazy(() => import("./ComparisonView"));
+const VisxSkillsVisualization = lazy(() => import("./VisxSkillsVisualization"));
+const SkillDetailModal = lazy(() => import("./SkillDetailModal"));
+
+// Loading fallback component
+const LoadingFallback = ({ height = "400px" }: { height?: string }) => {
+  const { getAccentColors } = useTheme();
+  const accentColors = getAccentColors();
+
+  return (
+    <div
+      className="flex items-center justify-center rounded-xl border border-border/30"
+      style={{ height }}
+    >
+      <div className="flex flex-col items-center space-y-4">
+        <div
+          className="w-8 h-8 rounded-full animate-spin border-2 border-transparent"
+          style={{
+            borderTopColor: accentColors.primary,
+            borderRightColor: accentColors.secondary,
+          }}
+        />
+        <p className="text-sm text-muted-foreground">Loading...</p>
+      </div>
+    </div>
+  );
+};
 
 /**
- * Main Skills section component with comprehensive skill management
+ * Optimized Skills section component with performance monitoring and lazy loading
  */
 const SkillsSection = () => {
   const ref = useRef(null);
@@ -20,7 +46,7 @@ const SkillsSection = () => {
   const { isDark, getAccentColors } = useTheme();
   const accentColors = getAccentColors();
 
-  // State management
+  // State management with optimized updates
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,7 +54,7 @@ const SkillsSection = () => {
   const [comparisonSkills, setComparisonSkills] = useState<string[]>([]);
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
 
-  // Filter skills based on category and search query
+  // Memoized filter function for better performance
   const filteredSkills = useMemo(() => {
     return skills.filter((skill) => {
       const matchesCategory =
@@ -41,8 +67,8 @@ const SkillsSection = () => {
     });
   }, [selectedCategory, searchQuery]);
 
-  // Toggle skill in comparison
-  const toggleComparisonSkill = (skillId: string) => {
+  // Optimized comparison skill toggle
+  const toggleComparisonSkill = useCallback((skillId: string) => {
     setComparisonSkills((prev) => {
       if (prev.includes(skillId)) {
         return prev.filter((id) => id !== skillId);
@@ -51,7 +77,13 @@ const SkillsSection = () => {
       }
       return prev;
     });
-  };
+  }, []);
+
+  // Reset filters function
+  const resetFilters = useCallback(() => {
+    setSelectedCategory("All");
+    setSearchQuery("");
+  }, []);
 
   // Animation variants
   const containerVariants = {
@@ -67,17 +99,13 @@ const SkillsSection = () => {
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-    },
+    visible: { y: 0, opacity: 1 },
   };
 
   return (
     <section
       ref={ref}
-      className="py-24 px-6 relative overflow-hidden"
+      className=" px-6 relative overflow-hidden skills-section"
       id="skills"
     >
       {/* Background Elements */}
@@ -102,9 +130,9 @@ const SkillsSection = () => {
           variants={containerVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <motion.div variants={itemVariants}>
+          <motion.div variants={itemVariants} transition={{ duration: 0.6 }}>
             <h2
               className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r"
               style={{
@@ -125,15 +153,20 @@ const SkillsSection = () => {
           </motion.div>
         </motion.div>
 
-        {/* Skills Visualization */}
-        <motion.div
-          variants={itemVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="mb-16"
-        >
-          <SkillVisualization skills={filteredSkills} />
-        </motion.div>
+        {/* Skills Visualization - Only render if skills are not filtered for performance */}
+        {selectedCategory === "All" && !searchQuery && (
+          <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            transition={{ duration: 0.6 }}
+            className="mb-8"
+          >
+            <Suspense fallback={<LoadingFallback height="300px" />}>
+              <VisxSkillsVisualization skills={skills.slice(0, 8)} />
+            </Suspense>
+          </motion.div>
+        )}
 
         {/* Filters and Controls */}
         <SkillsFilters
@@ -146,39 +179,42 @@ const SkillsSection = () => {
           setComparisonSkills={setComparisonSkills}
         />
 
-        {/* Skills Content */}
+        {/* Skills Content with Suspense */}
         <motion.div
           variants={itemVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
+          transition={{ duration: 0.6, delay: 0.2 }}
           className="min-h-[600px]"
         >
-          {viewMode === "grid" && (
-            <GridView
-              skills={filteredSkills}
-              setSelectedSkill={setSelectedSkill}
-              hoveredSkill={hoveredSkill}
-              setHoveredSkill={setHoveredSkill}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-              setComparisonSkills={setComparisonSkills}
-            />
-          )}
+          <Suspense fallback={<LoadingFallback height="600px" />}>
+            {viewMode === "grid" && (
+              <GridView
+                skills={filteredSkills}
+                setSelectedSkill={setSelectedSkill}
+                hoveredSkill={hoveredSkill}
+                setHoveredSkill={setHoveredSkill}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+                setComparisonSkills={setComparisonSkills}
+              />
+            )}
 
-          {viewMode === "mastery" && (
-            <MasteryView
-              skills={filteredSkills}
-              setSelectedSkill={setSelectedSkill}
-            />
-          )}
+            {viewMode === "mastery" && (
+              <MasteryView
+                skills={filteredSkills}
+                setSelectedSkill={setSelectedSkill}
+              />
+            )}
 
-          {viewMode === "comparison" && (
-            <ComparisonView
-              comparisonSkills={comparisonSkills}
-              toggleComparisonSkill={toggleComparisonSkill}
-              skills={skills}
-            />
-          )}
+            {viewMode === "comparison" && (
+              <ComparisonView
+                comparisonSkills={comparisonSkills}
+                toggleComparisonSkill={toggleComparisonSkill}
+                skills={skills}
+              />
+            )}
+          </Suspense>
         </motion.div>
 
         {/* Results Summary */}
@@ -186,7 +222,7 @@ const SkillsSection = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-12 text-center"
+            className="mt-8 text-center"
           >
             <p
               className="text-lg"
@@ -230,10 +266,7 @@ const SkillsSection = () => {
               skills you're looking for.
             </p>
             <motion.button
-              onClick={() => {
-                setSelectedCategory("All");
-                setSearchQuery("");
-              }}
+              onClick={resetFilters}
               className="mt-6 px-6 py-3 rounded-lg font-medium transition-all duration-200"
               style={{
                 backgroundColor: accentColors.primary,
@@ -248,15 +281,17 @@ const SkillsSection = () => {
         )}
       </div>
 
-      {/* Skill Detail Modal */}
-      <SkillDetailModal
-        selectedSkill={selectedSkill}
-        setSelectedSkill={setSelectedSkill}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        setComparisonSkills={setComparisonSkills}
-        skills={skills}
-      />
+      {/* Skill Detail Modal with Suspense */}
+      <Suspense fallback={null}>
+        <SkillDetailModal
+          selectedSkill={selectedSkill}
+          setSelectedSkill={setSelectedSkill}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          setComparisonSkills={setComparisonSkills}
+          skills={skills}
+        />
+      </Suspense>
     </section>
   );
 };

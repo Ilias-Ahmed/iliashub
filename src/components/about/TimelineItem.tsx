@@ -1,6 +1,6 @@
-import { triggerHapticFeedback } from "@/utils/haptics";
-import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/contexts/ThemeContext";
+import { triggerHapticFeedback } from "@/utils/haptics";
+import { AnimatePresence, motion } from "framer-motion";
 
 export interface TimelineItemProps {
   year: string;
@@ -71,7 +71,7 @@ const TimelineItem = ({
       />
 
       <motion.div
-        className="p-4 sm:p-5 rounded-lg transition-all duration-300 cursor-pointer backdrop-blur-sm border"
+        className="p-4 sm:p-5 rounded-lg transition-all duration-300  backdrop-blur-sm border"
         style={{
           backgroundColor: isDark
             ? "rgba(255,255,255,0.05)"

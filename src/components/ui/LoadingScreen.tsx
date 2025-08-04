@@ -1,815 +1,456 @@
-import { useEffect, useMemo, useState, useRef, useCallback } from "react";
-import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
 import { useTheme } from "@/contexts/ThemeContext";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface LoadingScreenProps {
   onLoadingComplete?: () => void;
   duration?: number;
-  quotes?: string[];
 }
 
 /**
- * An advanced, unique loading screen with 3D effects, elegant animations,
- * particle systems, and dynamic interactions with proper theming
+ * Award-winning loading screen with sophisticated animations
  */
 const LoadingScreen = ({
   onLoadingComplete,
-  duration = 5000,
-  quotes = [
-    "Crafting digital experiences that inspire.",
-    "Where innovation meets design.",
-    "Turning ideas into elegant solutions.",
-    "Building tomorrow's interfaces today.",
-    "Perfection is in the details.",
-  ],
+  duration = 6000, // Industry standard: 4-8 seconds
 }: LoadingScreenProps) => {
-  const {isDark } = useTheme();
+  const { accent } = useTheme();
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Main state management
   const [progress, setProgress] = useState(0);
-  const [loadingComplete, setLoadingComplete] = useState(false);
-  const [exitAnimation, setExitAnimation] = useState(false);
-  const [activeQuoteIndex, setActiveQuoteIndex] = useState(0);
-  const [typedQuote, setTypedQuote] = useState("");
-  const [typingIndex, setTypingIndex] = useState(0);
-  const [particles, setParticles] = useState<
-    Array<{ x: number; y: number; size: number; speed: number; color: string }>
-  >([]);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isMounted, setIsMounted] = useState(false);
+  const [currentStage, setCurrentStage] = useState(0);
+  const [showExit, setShowExit] = useState(false);
+  const [loadingText, setLoadingText] = useState("");
+  const [minTimeComplete, setMinTimeComplete] = useState(false);
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const frameRef = useRef<number>(0);
-  const progressControls = useAnimationControls();
-  const galaxyRef = useRef<HTMLDivElement>(null);
+  // Mouse tracking for subtle parallax
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const springX = useSpring(mouseX, { stiffness: 300, damping: 50 });
+  const springY = useSpring(mouseY, { stiffness: 300, damping: 50 });
 
-  // Get computed theme colors for canvas usage
-  const getComputedThemeColors = useCallback(() => {
-    if (typeof window === "undefined") return null;
-
-    const root = document.documentElement;
-    const computedStyle = getComputedStyle(root);
-
-    // Get the HSL values and convert to usable format
-    const primaryHSL = computedStyle.getPropertyValue("--primary").trim();
-
-    // Convert HSL to RGB for canvas usage
-    const hslToRgb = (h: number, s: number, l: number) => {
-      s /= 100;
-      l /= 100;
-      const c = (1 - Math.abs(2 * l - 1)) * s;
-      const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-      const m = l - c / 2;
-      let r = 0,
-        g = 0,
-        b = 0;
-
-      if (0 <= h && h < 60) {
-        r = c;
-        g = x;
-        b = 0;
-      } else if (60 <= h && h < 120) {
-        r = x;
-        g = c;
-        b = 0;
-      } else if (120 <= h && h < 180) {
-        r = 0;
-        g = c;
-        b = x;
-      } else if (180 <= h && h < 240) {
-        r = 0;
-        g = x;
-        b = c;
-      } else if (240 <= h && h < 300) {
-        r = x;
-        g = 0;
-        b = c;
-      } else if (300 <= h && h < 360) {
-        r = c;
-        g = 0;
-        b = x;
-      }
-
-      r = Math.round((r + m) * 255);
-      g = Math.round((g + m) * 255);
-      b = Math.round((b + m) * 255);
-
-      return { r, g, b };
-    };
-
-    // Parse HSL values
-    const hslValues = primaryHSL
-      .split(" ")
-      .map((v) => parseFloat(v.replace("%", "")));
-    const [h, s, l] = hslValues;
-    const { r, g, b } = hslToRgb(h, s, l);
-
-    return {
-      primary: `rgb(${r}, ${g}, ${b})`,
-      primaryAlpha: (alpha: number) => `rgba(${r}, ${g}, ${b}, ${alpha})`,
-      secondary: `rgb(${Math.min(255, r + 20)}, ${Math.min(
-        255,
-        g + 20
-      )}, ${Math.min(255, b + 20)})`,
-      secondaryAlpha: (alpha: number) =>
-        `rgba(${Math.min(255, r + 20)}, ${Math.min(255, g + 20)}, ${Math.min(
-          255,
-          b + 20
-        )}, ${alpha})`,
-    };
-  }, []);
-
-  const themeColors = getComputedThemeColors();
-
-  // Component mount detection
-  useEffect(() => {
-    setIsMounted(true);
-    return () => setIsMounted(false);
-  }, []);
-
-  // Generate hexagon grid for background
-  const hexagons = useMemo(() => {
-    const hexArray = [];
-    for (let i = 0; i < 50; i++) {
-      hexArray.push({
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: Math.random() * 1.5 + 0.5,
-        opacity: Math.random() * 0.4 + 0.1,
-        hueRotate: Math.floor(Math.random() * 90) - 45,
-      });
-    }
-    return hexArray;
-  }, []);
-
-  // Initialize random particles with theme colors
-  useEffect(() => {
-    if (!themeColors) return;
-
-    const newParticles = [];
-    for (let i = 0; i < 40; i++) {
-      newParticles.push({
-        x:
-          Math.random() *
-          (typeof window !== "undefined" ? window.innerWidth : 800),
-        y:
-          Math.random() *
-          (typeof window !== "undefined" ? window.innerHeight : 600),
-        size: Math.random() * 3 + 1,
-        speed: Math.random() * 0.5 + 0.1,
-        color:
-          Math.random() > 0.5 ? themeColors.primary : themeColors.secondary,
-      });
-    }
-    setParticles(newParticles);
-  }, [themeColors]);
-
-  // Handle typing effect for quotes
-  useEffect(() => {
-    const currentQuote = quotes[activeQuoteIndex];
-
-    if (typingIndex < currentQuote.length) {
-      const timeout = setTimeout(() => {
-        setTypedQuote((prev) => prev + currentQuote[typingIndex]);
-        setTypingIndex((prev) => prev + 1);
-      }, 40);
-
-      return () => clearTimeout(timeout);
-    } else {
-      // After completing typing, wait and then switch to next quote
-      const timeout = setTimeout(() => {
-        setTypedQuote("");
-        setTypingIndex(0);
-        setActiveQuoteIndex((prev) => (prev + 1) % quotes.length);
-      }, 3000);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [activeQuoteIndex, quotes, typingIndex]);
-
-  // Mouse move effect for interactive elements
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("mousemove", handleMouseMove);
-      return () => window.removeEventListener("mousemove", handleMouseMove);
-    }
-  }, []);
-
-  // Interactive galaxy effect rendering
-  useEffect(() => {
-    if (
-      !canvasRef.current ||
-      !galaxyRef.current ||
-      typeof window === "undefined" ||
-      !themeColors
-    )
-      return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    // Set canvas size
-    const updateCanvasSize = () => {
-      const galaxyEl = galaxyRef.current;
-      if (galaxyEl) {
-        canvas.width = galaxyEl.offsetWidth;
-        canvas.height = galaxyEl.offsetHeight;
-      }
-    };
-
-    updateCanvasSize();
-    window.addEventListener("resize", updateCanvasSize);
-
-    // Animation loop for galaxy effect
-    const renderGalaxy = () => {
-      if (!ctx || !canvas) return;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Calculate center with subtle mouse influence
-      const centerX =
-        canvas.width / 2 + (mousePosition.x - window.innerWidth / 2) * 0.05;
-      const centerY =
-        canvas.height / 2 + (mousePosition.y - window.innerHeight / 2) * 0.05;
-
-      // Draw galaxy spiral arms
-      const drawArm = (rotation: number, color: string, width: number) => {
-        ctx.strokeStyle = color;
-        ctx.lineWidth = width;
-        ctx.beginPath();
-
-        for (let i = 0; i < 400; i++) {
-          const angle = i * 0.05 + rotation;
-          const radius = i * 0.35;
-          const x = centerX + Math.cos(angle) * radius;
-          const y = centerY + Math.sin(angle) * radius;
-
-          if (i === 0) {
-            ctx.moveTo(x, y);
-          } else {
-            ctx.lineTo(x, y);
-          }
-        }
-
-        ctx.stroke();
-      };
-
-      // Draw multiple arms with slight variations
-      const time = Date.now() * 0.0001;
-      const rotationBase = time % (Math.PI * 2);
-
-      ctx.globalAlpha = 0.4;
-      drawArm(rotationBase, themeColors.primary, 1.5);
-      drawArm(rotationBase + Math.PI * 0.25, themeColors.secondary, 1.2);
-      drawArm(rotationBase + Math.PI * 0.5, themeColors.primary, 1);
-      drawArm(rotationBase + Math.PI * 0.75, themeColors.secondary, 0.8);
-
-      // Particles
-      ctx.globalAlpha = 0.7;
-      particles.forEach((particle, i) => {
-        // Update particle position
-        particle.y -= particle.speed;
-        if (particle.y < -10) {
-          particle.y = canvas.height + 10;
-          particle.x = Math.random() * canvas.width;
-        }
-
-        // Draw particle
-        ctx.fillStyle = particle.color;
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Update the particle in the array
-        const newParticles = [...particles];
-        newParticles[i] = particle;
-        setParticles(newParticles);
-      });
-
-      // Core glow
-      const gradient = ctx.createRadialGradient(
-        centerX,
-        centerY,
-        0,
-        centerX,
-        centerY,
-        100
-      );
-      gradient.addColorStop(0, themeColors.primaryAlpha(0.8));
-      gradient.addColorStop(0.5, themeColors.secondaryAlpha(0.4));
-      gradient.addColorStop(1, "transparent");
-
-      ctx.globalAlpha = 0.3;
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 100, 0, Math.PI * 2);
-      ctx.fill();
-
-      frameRef.current = requestAnimationFrame(renderGalaxy);
-    };
-
-    renderGalaxy();
-
-    return () => {
-      window.removeEventListener("resize", updateCanvasSize);
-      cancelAnimationFrame(frameRef.current);
-    };
-  }, [particles, mousePosition, themeColors]);
-
-  // Cubic bezier function for smooth easing
-  const cubicBezier = useCallback(
-    (x1: number, y1: number, x2: number, y2: number, t: number): number => {
-      // Implementation of cubic bezier curve calculation
-      const cx = 3 * x1;
-      const bx = 3 * (x2 - x1) - cx;
-      const ax = 1 - cx - bx;
-
-      const cy = 3 * y1;
-      const by = 3 * (y2 - y1) - cy;
-      const ay = 1 - cy - by;
-
-      const sampleCurveX = (t: number) => ((ax * t + bx) * t + cx) * t;
-      const sampleCurveY = (t: number) => ((ay * t + by) * t + cy) * t;
-
-      // Use binary search to find t for given x
-      if (t === 0 || t === 1) return t;
-
-      // Newton-Raphson iteration to find better t approximation
-      let tCurrent = t;
-      for (let i = 0; i < 8; i++) {
-        const currentX = sampleCurveX(tCurrent) - t;
-        if (Math.abs(currentX) < 0.001) break;
-
-        const derivative = (3 * ax * tCurrent + 2 * bx) * tCurrent + cx;
-        if (Math.abs(derivative) < 0.000001) break;
-
-        tCurrent = tCurrent - currentX / derivative;
-      }
-
-      return sampleCurveY(tCurrent);
-    },
+  const stages = useMemo(
+    () => [
+      {
+        label: "Initializing System",
+        end: 15,
+        assets: ["core.js", "main.css"],
+      },
+      {
+        label: "Loading Core Assets",
+        end: 35,
+        assets: ["components.js", "icons.svg", "fonts.woff"],
+      },
+      {
+        label: "Processing Components",
+        end: 55,
+        assets: ["animations.js", "effects.css"],
+      },
+      {
+        label: "Preparing Interface",
+        end: 75,
+        assets: ["layout.css", "responsive.css"],
+      },
+      {
+        label: "Optimizing Performance",
+        end: 90,
+        assets: ["chunks.js", "lazy.js"],
+      },
+      {
+        label: "Finalizing Experience",
+        end: 100,
+        assets: ["analytics.js", "sw.js"],
+      },
+    ],
     []
   );
 
-  // Exit animation trigger
-  const triggerExitAnimation = useCallback(() => {
-    if (!isMounted) return;
+  const getAccentColors = () => {
+    const colorMap = {
+      purple: { rgb: "147, 51, 234", hex: "#9333EA" },
+      blue: { rgb: "59, 130, 246", hex: "#3B82F6" },
+      pink: { rgb: "236, 72, 153", hex: "#EC4899" },
+      green: { rgb: "34, 197, 94", hex: "#22C55E" },
+      orange: { rgb: "249, 115, 22", hex: "#F97316" },
+    };
+    return colorMap[accent] || colorMap.purple;
+  };
 
-    progressControls.start({
-      scale: [1, 1.2, 0],
-      opacity: [1, 1, 0],
-      transition: { duration: 1.5 },
-    });
-
-    setExitAnimation(true);
-
-    // Complete loading after exit animation
-    setTimeout(() => {
-      setLoadingComplete(true);
-      if (onLoadingComplete) onLoadingComplete();
-    }, 2500);
-  }, [isMounted, progressControls, onLoadingComplete]);
-
-  // Main loading progress simulation
+  // Enhanced progress animation with realistic timing
   useEffect(() => {
-    if (!isMounted) return;
+    const startTime = Date.now();
+    let animationFrame: number;
 
-    // Smooth progression with easing
-    const simulateProgress = () => {
-      const startTime = Date.now();
-      const animateProgress = () => {
-        const currentTime = Date.now();
-        const elapsed = currentTime - startTime;
+    const updateProgress = () => {
+      const elapsed = Date.now() - startTime;
+      const rawProgress = Math.min((elapsed / duration) * 100, 100);
 
-        // Calculate progress with cubic-bezier easing
-        const t = Math.min(elapsed / duration, 1);
-        const easedT = cubicBezier(0.34, 0.52, 0.57, 0.98, t);
-        const nextProgress = Math.min(100, easedT * 100);
+      // Realistic loading curve - slower at start, faster in middle, slower at end
+      let easedProgress;
+      if (rawProgress < 10) {
+        // Very slow start (0-10%)
+        easedProgress = rawProgress * 0.3;
+      } else if (rawProgress < 80) {
+        // Normal speed (10-80%)
+        const normalizedProgress = (rawProgress - 10) / 70;
+        easedProgress = 3 + normalizedProgress * 77;
+      } else {
+        // Slow down near end (80-100%)
+        const normalizedProgress = (rawProgress - 80) / 20;
+        const slowEnd = 1 - Math.pow(1 - normalizedProgress, 2);
+        easedProgress = 80 + slowEnd * 20;
+      }
 
-        setProgress(nextProgress);
+      setProgress(easedProgress);
 
-        // Determine if we should continue animation
-        if (t < 1) {
-          requestAnimationFrame(animateProgress);
-        } else {
-          // Trigger exit animation after reaching 100%
-          setTimeout(() => {
-            triggerExitAnimation();
-          }, 800);
+      // Update stage based on progress
+      const activeStage = stages.findIndex(
+        (stage) => easedProgress <= stage.end
+      );
+      const newStage = activeStage >= 0 ? activeStage : stages.length - 1;
+      setCurrentStage(newStage);
+
+      // Update loading text with current asset
+      const currentStageData = stages[newStage];
+      if (currentStageData?.assets) {
+        const assetIndex = Math.floor(
+          ((easedProgress - (newStage > 0 ? stages[newStage - 1].end : 0)) /
+            (currentStageData.end -
+              (newStage > 0 ? stages[newStage - 1].end : 0))) *
+            currentStageData.assets.length
+        );
+        const asset =
+          currentStageData.assets[
+            Math.min(assetIndex, currentStageData.assets.length - 1)
+          ];
+        setLoadingText(asset);
+      }
+
+      if (rawProgress >= 100) {
+        // Ensure minimum loading time of 3 seconds for UX
+        if (!minTimeComplete) {
+          setTimeout(
+            () => setMinTimeComplete(true),
+            Math.max(0, 3000 - elapsed)
+          );
         }
-      };
 
-      requestAnimationFrame(animateProgress);
+        // Only exit when both progress is complete AND minimum time has passed
+        if (minTimeComplete || elapsed >= 3000) {
+          setTimeout(() => setShowExit(true), 1200);
+          setTimeout(() => onLoadingComplete?.(), 2000);
+        } else {
+          animationFrame = requestAnimationFrame(updateProgress);
+        }
+      } else {
+        animationFrame = requestAnimationFrame(updateProgress);
+      }
     };
 
-    simulateProgress();
-  }, [duration, cubicBezier, triggerExitAnimation, isMounted]);
+    // Start the animation
+    animationFrame = requestAnimationFrame(updateProgress);
 
-  if (loadingComplete || !themeColors) return null;
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, [duration, onLoadingComplete, stages, minTimeComplete]);
+
+  // Ensure minimum loading time (industry standard UX practice)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinTimeComplete(true);
+    }, 3000); // Minimum 3 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Mouse tracking
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        mouseX.set((e.clientX - centerX) * 0.01);
+        mouseY.set((e.clientY - centerY) * 0.01);
+      }
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [mouseX, mouseY]);
+
+  const colors = getAccentColors();
 
   return (
     <AnimatePresence>
-      <motion.div
-        className="fixed inset-0 z-[100] overflow-hidden flex items-center justify-center"
-        style={{ backgroundColor: isDark ? "#000000" : "#ffffff" }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Hexagon grid */}
-          <div className="absolute inset-0 opacity-20">
-            {hexagons.map((hex, index) => (
-              <motion.div
-                key={index}
-                className="absolute rounded-md origin-center"
-                style={{
-                  width: `${hex.size}rem`,
-                  height: `${hex.size}rem`,
-                  left: `${hex.x}%`,
-                  top: `${hex.y}%`,
-                  background: `linear-gradient(135deg, ${themeColors.primaryAlpha(
-                    hex.opacity
-                  )} 0%, ${themeColors.secondaryAlpha(hex.opacity)} 100%)`,
-                  filter: `hue-rotate(${hex.hueRotate}deg)`,
-                }}
-                animate={{
-                  rotate: [0, 360],
-                  scale: [1, 1.2, 1],
-                }}
-                transition={{
-                  rotate: {
-                    repeat: Infinity,
-                    duration: 20 + Math.random() * 10,
-                    ease: "linear",
-                  },
-                  scale: {
-                    repeat: Infinity,
-                    duration: 4 + Math.random() * 2,
-                    ease: "easeInOut",
-                  },
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Interactive galaxy background */}
-          <div ref={galaxyRef} className="absolute inset-0 opacity-70">
-            <canvas ref={canvasRef} className="w-full h-full" />
-          </div>
-        </div>
-
-        {/* Central container */}
+      {!showExit && (
         <motion.div
-          className="relative z-10 w-96 flex flex-col items-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          ref={containerRef}
+          className="fixed inset-0 z-99 overflow-hidden"
+          style={{
+            background: `radial-gradient(ellipse at center,
+              rgba(${colors.rgb}, 0.08) 0%,
+              rgba(0, 0, 0, 0.95) 40%,
+              rgba(0, 0, 0, 1) 100%)`,
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{
+            opacity: 0,
+            scale: 1.1,
+            transition: { duration: 1.2, ease: [0.4, 0, 0.2, 1] },
+          }}
         >
-          {/* 3D Logo element */}
-          <div className="perspective-1000 mb-10">
+          {/* Animated Grid Background */}
+          <div className="absolute inset-0 opacity-20">
             <motion.div
-              className="relative w-24 h-24 flex items-center justify-center"
+              className="w-full h-full"
+              style={{
+                backgroundImage: `
+                  linear-gradient(rgba(${colors.rgb}, 0.1) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(${colors.rgb}, 0.1) 1px, transparent 1px)
+                `,
+                backgroundSize: "50px 50px",
+                x: springX,
+                y: springY,
+              }}
               animate={{
-                rotateY: [0, 180, 360],
-                rotateX: [0, 30, 0, -30, 0],
+                backgroundPosition: ["0px 0px", "50px 50px"],
               }}
               transition={{
-                rotateY: { duration: 10, repeat: Infinity, ease: "linear" },
-                rotateX: { duration: 5, repeat: Infinity, ease: "easeInOut" },
+                duration: 20,
+                repeat: Infinity,
+                ease: "linear",
               }}
-            >
-              {/* Layers of the 3D cube */}
-              {[...Array(5)].map((_, index) => (
-                <motion.div
-                  key={index}
-                  className="absolute inset-0 rounded-xl flex items-center justify-center"
-                  style={{
-                    backgroundColor:
-                      index === 0
-                        ? themeColors.primaryAlpha(0.3)
-                        : "transparent",
-                    transform: `translateZ(${-(index * 5)}px)`,
-                    backdropFilter: "blur(5px)",
-                    border: `1px solid ${
-                      isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)"
-                    }`,
-                  }}
-                  animate={{
-                    boxShadow: [
-                      `0 0 20px ${themeColors.primaryAlpha(0.3)}`,
-                      `0 0 30px ${themeColors.secondaryAlpha(0.5)}`,
-                      `0 0 20px ${themeColors.primaryAlpha(0.3)}`,
-                    ],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: index * 0.2,
-                  }}
-                >
-                  {index === 0 && (
-                    <div
-                      className="text-2xl font-bold tracking-wider"
-                      style={{ color: isDark ? "#ffffff" : "#000000" }}
-                    >
-                      IA
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-            </motion.div>
+            />
           </div>
 
-          {/* Progress display */}
-          <motion.div className="relative mb-6" animate={progressControls}>
-            {/* Digital counter */}
-            <div className="w-full text-center mb-4">
-              <div className="inline-block relative">
-                <motion.div
-                  className="text-5xl font-bold filter drop-shadow-lg"
-                  style={{
-                    background: `linear-gradient(90deg, ${themeColors.primary}, ${themeColors.secondary}, ${themeColors.primary})`,
-                    backgroundSize: "200% 100%",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                  animate={{
-                    backgroundPosition: ["0% center", "200% center"],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                >
-                  {Math.floor(progress)}
-                </motion.div>
-                <div
-                  className="absolute -right-8 top-0 text-3xl font-light"
-                  style={{ color: themeColors.primary }}
-                >
-                  %
-                </div>
-              </div>
-            </div>
-
-            {/* Progress bar */}
-            <div
-              className="relative w-64 h-2 rounded-full overflow-hidden"
-              style={{
-                backgroundColor: isDark
-                  ? "rgba(255, 255, 255, 0.1)"
-                  : "rgba(0, 0, 0, 0.1)",
-              }}
+          {/* Main Content */}
+          <motion.div
+            className="relative z-10 h-full flex flex-col items-center justify-center px-6"
+            style={{ x: springX, y: springY }}
+          >
+            {/* Logo Section */}
+            <motion.div
+              className="text-center mb-16"
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
-              {/* Ambient glow */}
-              <motion.div
-                className="absolute inset-0 rounded-full"
+              <motion.h1
+                className="text-7xl md:text-9xl font-black"
                 style={{
-                  boxShadow: `0 0 10px ${themeColors.primary}, 0 0 20px ${themeColors.secondary}`,
-                }}
-                animate={{ opacity: [0.5, 0.8, 0.5] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-
-              {/* Main progress fill */}
-              <motion.div
-                className="h-full rounded-full"
-                style={{
-                  width: `${progress}%`,
-                  background: `linear-gradient(90deg, ${themeColors.primary}, ${themeColors.secondary})`,
-                }}
-              />
-
-              {/* Animated glow particles along progress bar */}
-              <motion.div
-                className="absolute top-0 bottom-0 w-20 rounded-full"
-                style={{
-                  background: `linear-gradient(90deg, transparent, ${themeColors.primaryAlpha(
-                    0.8
-                  )}, ${themeColors.secondaryAlpha(0.8)}, transparent)`,
-                  left: `${progress - 10}%`,
+                  background: `linear-gradient(45deg,
+                    #ffffff 0%,
+                    ${colors.hex} 50%,
+                    #ffffff 100%)`,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundSize: "300% 300%",
                 }}
                 animate={{
-                  opacity: [0, 0.8, 0],
+                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
                 }}
                 transition={{
-                  duration: 1.5,
+                  duration: 4,
                   repeat: Infinity,
+                  ease: "easeInOut",
                 }}
-              />
+              >
+                PORTFOLIO
+              </motion.h1>
+
+              <motion.div
+                className="mt-4 text-xl text-gray-400 font-light tracking-[0.3em]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+              >
+                DIGITAL ARTISTRY
+              </motion.div>
+            </motion.div>
+
+            {/* Progress Section */}
+            <motion.div
+              className="w-full max-w-md"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+            >
+              {/* Progress Ring */}
+              <div className="relative w-40 h-40 mx-auto mb-8">
+                <svg
+                  className="w-full h-full transform -rotate-90"
+                  viewBox="0 0 120 120"
+                >
+                  {/* Background ring */}
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="54"
+                    stroke="rgba(255,255,255,0.05)"
+                    strokeWidth="2"
+                    fill="transparent"
+                  />
+
+                  {/* Progress ring */}
+                  <motion.circle
+                    cx="60"
+                    cy="60"
+                    r="54"
+                    stroke={colors.hex}
+                    strokeWidth="2"
+                    fill="transparent"
+                    strokeLinecap="round"
+                    strokeDasharray={339.292} // 2 * PI * 54
+                    initial={{ strokeDashoffset: 339.292 }}
+                    animate={{
+                      strokeDashoffset: 339.292 - (progress / 100) * 339.292,
+                    }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    style={{
+                      filter: `drop-shadow(0 0 8px ${colors.hex})`,
+                    }}
+                  />
+
+                  {/* Animated dot */}
+                  <motion.circle
+                    cx={
+                      60 +
+                      54 *
+                        Math.cos((progress / 100) * 2 * Math.PI - Math.PI / 2)
+                    }
+                    cy={
+                      60 +
+                      54 *
+                        Math.sin((progress / 100) * 2 * Math.PI - Math.PI / 2)
+                    }
+                    r="4"
+                    fill={colors.hex}
+                    style={{
+                      filter: `drop-shadow(0 0 12px ${colors.hex})`,
+                    }}
+                  >
+                    <animate
+                      attributeName="r"
+                      values="4;6;4"
+                      dur="2s"
+                      repeatCount="indefinite"
+                    />
+                  </motion.circle>
+                </svg>
+
+                {/* Center percentage */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <motion.div
+                    className="text-center"
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <div className="text-3xl font-bold text-white">
+                      {Math.round(progress)}%
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* Stage indicator */}
+              <motion.div
+                className="text-center"
+                key={currentStage}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="text-gray-400 text-sm font-medium tracking-widest uppercase mb-2">
+                  {stages[currentStage]?.label}
+                </div>
+                {loadingText && (
+                  <motion.div
+                    className="text-gray-500 text-xs font-mono"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Loading: {loadingText}
+                  </motion.div>
+                )}
+              </motion.div>
+            </motion.div>
+
+            {/* Floating Elements */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              {[...Array(12)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute"
+                  style={{
+                    left: `${10 + i * 7}%`,
+                    top: `${20 + Math.sin(i) * 60}%`,
+                  }}
+                  animate={{
+                    y: [0, -30, 0],
+                    opacity: [0.2, 0.8, 0.2],
+                    scale: [0.8, 1.2, 0.8],
+                  }}
+                  transition={{
+                    duration: 4 + Math.sin(i) * 2,
+                    repeat: Infinity,
+                    delay: i * 0.5,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{
+                      background: `radial-gradient(circle, ${colors.hex} 0%, transparent 70%)`,
+                      boxShadow: `0 0 20px ${colors.hex}`,
+                    }}
+                  />
+                </motion.div>
+              ))}
             </div>
           </motion.div>
 
-          {/* Quote Display */}
-          <motion.div
-            className="text-center w-full h-20 flex items-center justify-center mb-10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-          >
+          {/* Completion animation */}
+          {progress >= 100 && (
             <motion.div
-              className="text-lg italic px-6"
-              style={{
-                color: isDark
-                  ? "rgba(255, 255, 255, 0.7)"
-                  : "rgba(0, 0, 0, 0.7)",
-              }}
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 4, repeat: Infinity }}
+              className="absolute inset-0 pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
             >
-              "{typedQuote}
-              <motion.span
-                animate={{ opacity: [0, 1, 0] }}
-                transition={{ duration: 0.8, repeat: Infinity }}
-              >
-                |
-              </motion.span>
-              "
-            </motion.div>
-          </motion.div>
-
-          {/* Status messages with tech-inspired animations */}
-          <motion.div
-            className="w-full relative h-6 overflow-hidden font-mono text-sm text-center"
-            style={{
-              color:
-                progress < 50 ? themeColors.primary : themeColors.secondary,
-            }}
-          >
-            <AnimatePresence mode="wait">
               <motion.div
-                key={`status-${Math.floor(progress / 25)}`}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -20, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {progress < 25
-                  ? "Initializing core systems..."
-                  : progress < 50
-                  ? "Loading digital assets..."
-                  : progress < 75
-                  ? "Establishing neural connections..."
-                  : progress < 95
-                  ? "Calibrating interface dynamics..."
-                  : "Synchronization complete..."}
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
-        </motion.div>
-
-        {/* Side decorative elements - Left */}
-        <div className="absolute left-10 top-0 bottom-0 w-20 pointer-events-none opacity-60">
-          <motion.div
-            className="absolute top-1/2 -translate-y-1/2 w-0.5 h-1/2 rounded-full"
-            style={{
-              background: `linear-gradient(to bottom, transparent, ${themeColors.primary}, transparent)`,
-            }}
-            animate={{
-              height: ["40%", "60%", "40%"],
-              opacity: [0.3, 0.7, 0.3],
-            }}
-            transition={{ duration: 4, repeat: Infinity }}
-          />
-          <motion.div
-            className="absolute top-[40%] left-2 h-0.5 rounded-full"
-            style={{
-              background: `linear-gradient(to right, transparent, ${themeColors.primary})`,
-            }}
-            animate={{ width: ["0.5rem", "2.5rem", "0.5rem"] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-          />
-          <motion.div
-            className="absolute top-[60%] left-2 h-0.5 rounded-full"
-            style={{
-              background: `linear-gradient(to right, transparent, ${themeColors.secondary})`,
-            }}
-            animate={{ width: ["0.5rem", "4rem", "0.5rem"] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
-          />
-        </div>
-
-        {/* Side decorative elements - Right */}
-        <div className="absolute right-10 top-0 bottom-0 w-20 pointer-events-none opacity-60">
-          <motion.div
-            className="absolute top-1/2 -translate-y-1/2 right-0 w-0.5 h-1/2 rounded-full"
-            style={{
-              background: `linear-gradient(to bottom, transparent, ${themeColors.secondary}, transparent)`,
-            }}
-            animate={{
-              height: ["40%", "60%", "40%"],
-              opacity: [0.3, 0.7, 0.3],
-            }}
-            transition={{ duration: 4, repeat: Infinity, delay: 1 }}
-          />
-          <motion.div
-            className="absolute top-[40%] right-2 h-0.5 rounded-full"
-            style={{
-              background: `linear-gradient(to left, transparent, ${themeColors.secondary})`,
-            }}
-            animate={{ width: ["0.5rem", "2.5rem", "0.5rem"] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
-          />
-          <motion.div
-            className="absolute top-[60%] right-2 h-0.5 rounded-full"
-            style={{
-              background: `linear-gradient(to left, transparent, ${themeColors.primary})`,
-            }}
-            animate={{ width: ["0.5rem", "4rem", "0.5rem"] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 1.5 }}
-          />
-        </div>
-
-        {/* Top and bottom decorative elements */}
-        <div className="absolute inset-x-0 top-10 h-20 flex justify-center pointer-events-none opacity-60">
-          <motion.div
-            className="w-0.5 rounded-full"
-            style={{
-              background: `linear-gradient(to bottom, transparent, ${themeColors.primary})`,
-            }}
-            animate={{ height: ["1rem", "2.5rem", "1rem"] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-          />
-        </div>
-        <div className="absolute inset-x-0 bottom-10 h-20 flex justify-center pointer-events-none opacity-60">
-          <motion.div
-            className="w-0.5 rounded-full"
-            style={{
-              background: `linear-gradient(to top, transparent, ${themeColors.secondary})`,
-            }}
-            animate={{ height: ["1rem", "2.5rem", "1rem"] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
-          />
-        </div>
-
-        {/* Exit animation effects */}
-        <AnimatePresence>
-          {exitAnimation && (
-            <>
-              {/* Split screen animation */}
-              <motion.div
-                className="absolute left-0 top-0 bottom-0 right-1/2 z-40"
-                style={{ backgroundColor: isDark ? "#000000" : "#ffffff" }}
-                initial={{ x: 0 }}
-                animate={{ x: "-100%" }}
+                className="absolute inset-0"
+                style={{
+                  background: `radial-gradient(circle,
+                    ${colors.hex}20 0%,
+                    transparent 50%)`,
+                }}
+                animate={{
+                  scale: [0, 3],
+                  opacity: [0, 0.6, 0],
+                }}
                 transition={{
                   duration: 1.5,
-                  ease: [0.43, 0.13, 0.23, 0.96],
-                  delay: 0.5,
+                  ease: "easeOut",
                 }}
-              >
-                <div
-                  className="absolute right-0 top-0 bottom-0 w-1 opacity-50"
-                  style={{
-                    background: `linear-gradient(to bottom, transparent, ${themeColors.primary}, transparent)`,
-                  }}
-                />
-              </motion.div>
-              <motion.div
-                className="absolute left-1/2 top-0 bottom-0 right-0 z-40"
-                style={{ backgroundColor: isDark ? "#000000" : "#ffffff" }}
-                initial={{ x: 0 }}
-                animate={{ x: "100%" }}
-                transition={{
-                  duration: 1.5,
-                  ease: [0.43, 0.13, 0.23, 0.96],
-                  delay: 0.5,
-                }}
-              >
-                <div
-                  className="absolute left-0 top-0 bottom-0 w-1 opacity-50"
-                  style={{
-                    background: `linear-gradient(to bottom, transparent, ${themeColors.secondary}, transparent)`,
-                  }}
-                />
-              </motion.div>
-
-              {/* Flash effect */}
-              <motion.div
-                className="absolute inset-0 z-30"
-                style={{ backgroundColor: isDark ? "#ffffff" : "#000000" }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.9, 0] }}
-                transition={{ duration: 1, times: [0, 0.5, 1], delay: 0.3 }}
               />
-            </>
+            </motion.div>
           )}
-        </AnimatePresence>
-      </motion.div>
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 };
 
 export default LoadingScreen;
-

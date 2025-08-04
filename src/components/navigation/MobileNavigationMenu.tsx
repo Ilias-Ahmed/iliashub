@@ -12,20 +12,25 @@ import {
   Mail,
   Monitor,
   Moon,
+  Search,
   Sun,
   User,
   Workflow,
+  X,
 } from "lucide-react";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-interface NavigationMenuProps {
+interface MobileNavigationMenuProps {
   className?: string;
 }
 
-const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
+const MobileNavigationMenu: React.FC<MobileNavigationMenuProps> = ({
+  className = "",
+}) => {
   const navigation = useNavigation();
   const theme = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Safe destructuring with fallbacks
   const {
@@ -87,8 +92,13 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
     },
   ];
 
-  // Navigation sections are always shown (no filtering)
-  const filteredSections = sections;
+  // Filter sections based on search
+  const filteredSections = sections.filter(
+    (section) =>
+      !searchQuery ||
+      section.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      section.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Handle navigation
   const handleNavigation = (sectionId: string) => {
@@ -117,6 +127,18 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
       console.error("Accent change error:", error);
     }
   };
+
+  // Auto-focus search on open
+  useEffect(() => {
+    if (isMenuOpen) {
+      const searchInput = menuRef.current?.querySelector(
+        'input[type="search"]'
+      ) as HTMLInputElement;
+      if (searchInput) {
+        setTimeout(() => searchInput.focus(), 150);
+      }
+    }
+  }, [isMenuOpen]);
 
   // Keyboard handling
   useEffect(() => {
@@ -180,25 +202,55 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
             aria-label="Navigation menu"
           >
             <div className="flex flex-col h-full">
-              {/* Header with close button */}
+              {/* Header */}
+              <motion.div
+                variants={itemVariants}
+                className={`flex items-center justify-between p-6 ${
+                  isDark
+                    ? "border-b border-gray-800/50"
+                    : "border-b border-gray-200/50"
+                }`}
+              >
+                <h1 className="text-xl font-semibold">Menu</h1>
+                <button
+                  onClick={closeMenu}
+                  className={`p-3 rounded-xl transition-colors touch-manipulation ${
+                    isDark ? "hover:bg-gray-800/50" : "hover:bg-gray-100/50"
+                  }`}
+                  aria-label="Close menu"
+                >
+                  <X size={24} />
+                </button>
+              </motion.div>
+
+              {/* Search */}
               <motion.div variants={itemVariants} className="p-6 pt-4">
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={closeMenu}
-                    className={`p-2 rounded-lg transition-all duration-200 ${
-                      isDark
-                        ? "hover:bg-gray-800/50 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]"
-                        : "hover:bg-gray-100/50 hover:shadow-[0_0_15px_rgba(139,92,246,0.2)]"
-                    }`}
-                    aria-label="Close menu"
-                  >
-                    <div className="w-6 h-6 relative">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-4 h-0.5 bg-current transform rotate-45" />
-                        <div className="w-4 h-0.5 bg-current transform -rotate-45" />
-                      </div>
-                    </div>
-                  </button>
+                <div className="relative">
+                  <Search
+                    size={20}
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+                  />
+                  <input
+                    type="search"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={`w-full pl-12 pr-4 py-4 rounded-xl border text-base transition-all
+                      focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+                        isDark
+                          ? "bg-gray-800/50 border-gray-700/50 text-white placeholder-gray-400"
+                          : "bg-gray-50/50 border-gray-200/50 text-gray-900 placeholder-gray-500"
+                      }`}
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2"
+                      aria-label="Clear search"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
                 </div>
               </motion.div>
 
@@ -206,6 +258,9 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
               <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-8">
                 {/* Navigation Sections */}
                 <motion.div variants={itemVariants}>
+                  <h2 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider">
+                    Navigation
+                  </h2>
                   <div className="space-y-2">
                     {filteredSections.map((section) => {
                       const isActive = activeSection === section.id;
@@ -218,10 +273,10 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
                           className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl
                             text-left transition-all duration-200 touch-manipulation ${
                               isActive
-                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                                ? "bg-primary text-primary-foreground shadow-lg"
                                 : isDark
-                                ? "hover:bg-gray-800/50 hover:shadow-[0_0_10px_rgba(139,92,246,0.2)]"
-                                : "hover:bg-gray-100/50 hover:shadow-[0_0_10px_rgba(139,92,246,0.15)]"
+                                ? "hover:bg-gray-800/50"
+                                : "hover:bg-gray-100/50"
                             }`}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
@@ -287,6 +342,7 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
 
                   {/* Theme Modes */}
                   <div className="mb-6">
+                    <div className="text-sm font-medium mb-3">Theme</div>
                     <div className="grid grid-cols-3 gap-2">
                       {(["light", "dark", "system"] as ThemeMode[]).map(
                         (themeMode) => {
@@ -300,10 +356,10 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
                               className={`flex flex-col items-center gap-2 p-3 rounded-xl
                               transition-all duration-200 text-xs touch-manipulation ${
                                 isActive
-                                  ? "bg-primary/20 text-primary border border-primary/30 shadow-[0_0_15px_rgba(139,92,246,0.3)]"
+                                  ? "bg-primary/20 text-primary border border-primary/30"
                                   : isDark
-                                  ? "hover:bg-gray-800/50 hover:shadow-[0_0_10px_rgba(139,92,246,0.2)]"
-                                  : "hover:bg-gray-100/50 hover:shadow-[0_0_10px_rgba(139,92,246,0.15)]"
+                                  ? "hover:bg-gray-800/50"
+                                  : "hover:bg-gray-100/50"
                               }`}
                               aria-pressed={isActive}
                             >
@@ -331,8 +387,8 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
                               option.gradient
                             } touch-manipulation ${
                             accent === option.color
-                              ? "border-foreground scale-110 shadow-lg shadow-primary/25"
-                              : "border-transparent hover:border-foreground/30 hover:shadow-[0_0_10px_rgba(139,92,246,0.2)]"
+                              ? "border-foreground scale-110 shadow-lg"
+                              : "border-transparent hover:border-foreground/30"
                           }`}
                           aria-label={`Set accent color to ${option.label}`}
                           aria-pressed={accent === option.color}
@@ -356,4 +412,4 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
   );
 };
 
-export default NavigationMenu;
+export default MobileNavigationMenu;

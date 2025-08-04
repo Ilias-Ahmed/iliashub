@@ -1,12 +1,16 @@
+import {
+  AUDIO_CONFIG,
+  loadAudioWithFallbacks,
+  setupAudioLoop,
+} from "@/utils/audioUtils";
 import React, {
   createContext,
-  useContext,
-  useState,
-  useRef,
-  useEffect,
   useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
 } from "react";
-import { AUDIO_CONFIG, setupAudioLoop, loadAudioWithFallbacks } from "@/utils/audioUtils";
 
 interface AudioContextType {
   isPlaying: boolean;
@@ -47,7 +51,9 @@ export function AudioProvider({
   children,
 }: AudioProviderProps): React.ReactElement {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolumeState] = useState<number>(AUDIO_CONFIG.DEFAULT_VOLUME);
+  const [volume, setVolumeState] = useState<number>(
+    AUDIO_CONFIG.DEFAULT_VOLUME
+  );
   const [currentTrack, setCurrentTrack] = useState<string | null>(null);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -55,7 +61,9 @@ export function AudioProvider({
   const [error, setError] = useState<string | null>(null);
   const [audioData, setAudioData] = useState<Uint8Array | null>(null);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
-  const [isLooping, setIsLoopingState] = useState<boolean>(AUDIO_CONFIG.DEFAULT_LOOP);
+  const [isLooping, setIsLoopingState] = useState<boolean>(
+    AUDIO_CONFIG.DEFAULT_LOOP
+  );
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -63,6 +71,10 @@ export function AudioProvider({
   const animationFrameRef = useRef<number | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const isInitializedRef = useRef(false);
+  const lastUpdateTime = useRef(0);
+
+  // Throttled audio data update for performance
+  const UPDATE_INTERVAL = 100; // Update every 100ms instead of every frame
 
   // Initialize audio context and analyser
   const initializeAudioContext = useCallback(async () => {
@@ -75,7 +87,8 @@ export function AudioProvider({
       if (!audioContextRef.current) {
         const AudioContextClass =
           window.AudioContext ||
-          (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+          (window as Window & { webkitAudioContext?: typeof AudioContext })
+            .webkitAudioContext;
 
         if (!AudioContextClass) {
           throw new Error("Web Audio API not supported");
@@ -100,10 +113,10 @@ export function AudioProvider({
           gainNodeRef.current = audioContextRef.current.createGain();
           gainNodeRef.current.gain.value = volume;
 
+          // Reduced analyser settings for better performance
           const analyserNode = audioContextRef.current.createAnalyser();
-          analyserNode.fftSize = AUDIO_CONFIG.ANALYSER_CONFIG.fftSize;
-          analyserNode.smoothingTimeConstant =
-            AUDIO_CONFIG.ANALYSER_CONFIG.smoothingTimeConstant;
+          analyserNode.fftSize = 256; // Reduced from default 2048
+          analyserNode.smoothingTimeConstant = 0.8; // Default smoothing
 
           // Connect the audio graph
           sourceRef.current.connect(gainNodeRef.current);
@@ -126,13 +139,25 @@ export function AudioProvider({
     }
   }, [volume]);
 
-  // Update audio data for visualization
+  // Throttled audio data update for performance
   const updateAudioData = useCallback(() => {
     if (analyser && isPlaying) {
-      const bufferLength = analyser.frequencyBinCount;
+      const now = performance.now();
+
+      // Only update audio data every UPDATE_INTERVAL milliseconds
+      if (now - lastUpdateTime.current < UPDATE_INTERVAL) {
+        animationFrameRef.current = requestAnimationFrame(updateAudioData);
+        return;
+      }
+
+      lastUpdateTime.current = now;
+
+      // Reduced frequency resolution for performance
+      const bufferLength = Math.min(analyser.frequencyBinCount, 128); // Limit to 128 bins max
       const dataArray = new Uint8Array(bufferLength);
       analyser.getByteFrequencyData(dataArray);
       setAudioData(dataArray);
+
       animationFrameRef.current = requestAnimationFrame(updateAudioData);
     }
   }, [analyser, isPlaying]);
@@ -513,4 +538,3 @@ export function AudioProvider({
     <AudioContext.Provider value={value}>{children}</AudioContext.Provider>
   );
 }
-

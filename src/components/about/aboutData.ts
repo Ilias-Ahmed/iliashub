@@ -23,48 +23,49 @@ export interface CertificationItem {
 
 export const timelineData: TimelineData[] = [
   {
-    year: "2023",
+    year: "2025",
     title: "Senior Full-Stack Developer",
     company: "Tech Innovations Inc.",
     description:
-      "Leading development of next-generation applications using React, Node.js and cloud technologies.",
+      "Leading the development of modern web applications using React, Node.js, and AWS cloud solutions.",
     achievements: [
-      "Architected microservices infrastructure",
-      "Reduced API response time by 40%",
-      "Led team of 5 developers",
-      "Implemented CI/CD pipelines",
+      "Architected microservices infrastructure for scalable deployments",
+      "Reduced API latency by 40% through performance optimization",
+      "Mentored and led a team of 5 developers",
+      "Implemented CI/CD workflows for automated delivery",
     ],
-    technologies: ["React", "Express", "MongoDB", "Redux", "AWS"],
+    technologies: ["NODE", "Express", "MongoDB", "Redux", "AWS"],
   },
   {
-    year: "2018",
+    year: "2024",
     title: "Frontend Developer",
     company: "Creative Agency",
     description:
-      "Worked on multiple client projects focusing on responsive design and interactivity.",
+      "Focused on delivering rich, interactive UI/UX for clients across various industries.",
     achievements: [
-      "Created interactive web experiences",
-      "Implemented animations with GSAP",
-      "Optimized website performance",
-      "Developed mobile-first designs",
+      "Created immersive user interfaces with GSAP animations",
+      "Optimized website performance and load times",
+      "Built fully responsive, mobile-first designs",
+      "Collaborated with cross-functional teams to deliver projects",
     ],
-    technologies: ["JavaScript", "HTML/CSS", "GSAP", "jQuery", "Sass"],
+    technologies: ["JavaScript", "REACT", "GSAP", "motion", "Tailwind CSS"],
   },
   {
-    year: "2016",
+    year: "2022",
     title: "Junior Developer",
-    company: "Startup Nexus",
+    company: "NA",
     description:
-      "Started career journey building websites and learning modern development practices.",
+      "Started my development journey by building and maintaining websites while learning modern best practices.",
     achievements: [
-      "Built company website",
-      "Learned front-end frameworks",
-      "Contributed to open source",
-      "Developed WordPress themes",
+      "Built company’s main website from scratch",
+      "Explored frontend libraries and frameworks",
+      "Contributed to open-source communities",
+      "Developed and customized WordPress themes",
     ],
-    technologies: ["HTML/CSS", "JavaScript", "Bootstrap", "PHP", "WordPress"],
+    technologies: ["HTML",  "CSS", "JavaScript",],
   },
 ];
+
 
 export const certifications: CertificationItem[] = [
   {
@@ -97,110 +98,112 @@ export const certifications: CertificationItem[] = [
   },
 ];
 
+
 export const techStack: TechStackItem[] = [
   {
     name: "React",
     icon: "⚛️",
     category: "Frontend",
     description:
-      "My primary UI library for building component-based interfaces with a declarative approach. I've used React for everything from small websites to large enterprise applications.",
+      "Primary UI library for building fast, dynamic, and component-driven interfaces.",
   },
   {
     name: "TypeScript",
     icon: "TS",
     category: "Frontend",
     description:
-      "I use TypeScript to add static typing to JavaScript, improving code quality, catching errors early, and enhancing developer experience with better tooling.",
+      "Typed superset of JavaScript that helps reduce bugs and enhance code readability and scalability.",
   },
   {
     name: "Node.js",
     icon: "🟢",
     category: "Backend",
     description:
-      "My go-to JavaScript runtime for building scalable server-side applications and APIs. I've built everything from RESTful services to real-time applications.",
+      "JavaScript runtime used to build fast, scalable backend services and REST APIs.",
   },
   {
     name: "Express",
     icon: "🚂",
     category: "Backend",
     description:
-      "A minimal and flexible Node.js web application framework that provides a robust set of features for web and mobile applications.",
+      "Minimal Node.js web framework for creating robust backend routes and APIs.",
   },
   {
     name: "MongoDB",
     icon: "🍃",
     category: "Database",
     description:
-      "My preferred NoSQL database for building flexible, scalable applications with JSON-like documents and dynamic schemas.",
+      "NoSQL database used for flexible and scalable data storage with dynamic schemas.",
   },
   {
     name: "GraphQL",
     icon: "◯",
     category: "API",
     description:
-      "I use GraphQL to build efficient APIs by enabling clients to request exactly what they need, making it easier to evolve APIs over time.",
+      "API query language that lets clients request only the data they need, improving efficiency.",
   },
   {
     name: "Docker",
     icon: "🐳",
     category: "DevOps",
     description:
-      "I containerize applications to ensure consistency across development, testing, and production environments, simplifying deployment and scaling.",
+      "Containerization tool to ensure consistent development and deployment environments.",
   },
   {
     name: "AWS",
     icon: "☁️",
     category: "Cloud",
     description:
-      "I leverage AWS services to build scalable, reliable cloud infrastructure for applications, including EC2, S3, Lambda, and more.",
+      "Cloud platform used to deploy and scale applications using services like EC2, Lambda, and S3.",
   },
   {
     name: "Three.js",
     icon: "🔺",
     category: "Graphics",
     description:
-      "I use Three.js to create immersive 3D experiences and visualizations in the browser, adding depth and interactivity to web applications.",
+      "Powerful library for creating interactive 3D experiences directly in the browser.",
   },
   {
     name: "Next.js",
     icon: "N",
     category: "Frontend",
     description:
-      "My preferred React framework for building production-ready applications with server-side rendering, static site generation, and more.",
+      "Production-grade React framework supporting SSR, SSG, API routes, and hybrid rendering.",
   },
   {
     name: "TailwindCSS",
     icon: "🌊",
     category: "Frontend",
     description:
-      "A utility-first CSS framework I use to rapidly build custom user interfaces without leaving HTML, enabling consistent design systems.",
+      "Utility-first CSS framework used to rapidly build modern, responsive UIs with ease.",
   },
   {
     name: "PostgreSQL",
     icon: "🐘",
     category: "Database",
     description:
-      "My go-to relational database for applications requiring complex queries, transactions, and data integrity constraints.",
+      "Open-source SQL database known for reliability, advanced querying, and transaction support.",
   },
   {
     name: "Redis",
     icon: "🔴",
     category: "Database",
     description:
-      "I use Redis as an in-memory data structure store for caching, real-time analytics, and high-performance data operations.",
+      "In-memory database used for caching, pub/sub, and managing real-time data operations.",
   },
   {
     name: "GitHub Actions",
     icon: "🔄",
     category: "DevOps",
     description:
-      "My preferred CI/CD tool for automating workflows, testing, and deployment pipelines directly from GitHub repositories.",
+      "Automation tool for CI/CD directly in GitHub, managing tests, builds, and deployments.",
   },
   {
     name: "Framer Motion",
     icon: "🎭",
     category: "Frontend",
     description:
-      "A production-ready motion library for React that I use to create fluid animations and interactive UI elements.",
+      "Advanced animation library for React, used to create fluid transitions and dynamic UIs.",
   },
 ];
+

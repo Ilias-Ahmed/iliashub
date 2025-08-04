@@ -1,14 +1,12 @@
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
-import { Sparkles } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { motion, useInView } from "framer-motion";
+import { useMemo, useRef } from "react";
 
-import TextGlitch from "@/components/contact/TextGlitch";
-import ContactInfo from "@/components/contact/ContactInfo";
-import SocialLinks from "@/components/contact/SocialLinks";
 import AvailabilityBadges from "@/components/contact/AvailabilityBadges";
-import InteractiveMap from "@/components/contact/InteractiveMap";
 import ContactForm from "@/components/contact/ContactForm";
+import ContactInfo from "@/components/contact/ContactInfo";
+import InteractiveMap from "@/components/contact/InteractiveMap";
+import SocialLinks from "@/components/contact/SocialLinks";
 
 const ContactSection = () => {
   const sectionRef = useRef(null);
@@ -19,36 +17,48 @@ const ContactSection = () => {
   const { isDark, getAccentColors } = useTheme();
   const accentColors = getAccentColors();
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
+  // Memoize animation variants to prevent recreation on every render
+  const containerVariants = useMemo(
+    () => ({
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          staggerChildren: 0.1,
+        },
       },
-    },
-  };
+    }),
+    []
+  );
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-    },
-  };
+  const itemVariants = useMemo(
+    () => ({
+      hidden: { y: 20, opacity: 0 },
+      visible: {
+        y: 0,
+        opacity: 1,
+        transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
+      },
+    }),
+    []
+  );
+
+  // Memoize background style to prevent recalculation
+  const backgroundStyle = useMemo(
+    () => ({
+      background: isDark
+        ? `radial-gradient(ellipse at center, ${accentColors.primary}05 0%, transparent 50%)`
+        : `radial-gradient(ellipse at center, ${accentColors.primary}08 0%, transparent 50%)`,
+    }),
+    [isDark, accentColors.primary]
+  );
 
   return (
     <section
       ref={sectionRef}
       className="py-24 px-6 relative overflow-hidden theme-transition"
       id="contact"
-      style={{
-        background: isDark
-          ? `radial-gradient(ellipse at center, ${accentColors.primary}05 0%, transparent 50%)`
-          : `radial-gradient(ellipse at center, ${accentColors.primary}08 0%, transparent 50%)`,
-      }}
+      style={backgroundStyle}
     >
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -67,42 +77,6 @@ const ContactSection = () => {
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={
-            isSectionInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
-          }
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="text-center mb-16"
-        >
-          {/* Title with glitch effect and sparkles */}
-          <div className="inline-flex items-center justify-center mb-4">
-            <Sparkles
-              className="w-6 h-6 mr-2 animate-pulse"
-              style={{ color: accentColors.primary }}
-            />
-            <span
-              className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent"
-              style={{
-                backgroundImage: `linear-gradient(135deg, ${accentColors.primary} 0%, ${accentColors.secondary} 100%)`,
-              }}
-            >
-              <TextGlitch
-                text="Let's Connect"
-                className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent"
-              />
-            </span>
-            <Sparkles
-              className="w-6 h-6 ml-2 animate-pulse"
-              style={{ color: accentColors.primary }}
-            />
-          </div>
-
-          <p className="text-lg opacity-70 max-w-2xl mx-auto">
-            Have a project in mind or want to discuss opportunities? I'm always
-            open to new ideas and collaborations.
-          </p>
-        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Contact info and social links */}

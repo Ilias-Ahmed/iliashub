@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
 import { useTheme } from "@/contexts/ThemeContext";
+import { motion } from "framer-motion";
 import { TechStackItem } from "./aboutData";
 
 interface WhoIAmProps {
@@ -55,7 +55,7 @@ const WhoIAm = ({ techStack, isInView }: WhoIAmProps) => {
           {techStack.map((tech, index) => (
             <motion.div
               key={index}
-              className="px-3 py-1 rounded-full text-sm transition-all duration-300 cursor-pointer backdrop-blur-sm border"
+              className="px-3 py-1 rounded-full text-sm transition-all duration-300  backdrop-blur-sm border"
               style={{
                 backgroundColor: isDark
                   ? "rgba(255,255,255,0.05)"

@@ -1,8 +1,9 @@
-import { useMemo } from "react";
-import { motion } from "framer-motion";
-import { Skill } from "./types";
-import { triggerHapticFeedback } from "@/utils/haptics";
 import { useTheme } from "@/contexts/ThemeContext";
+import { triggerHapticFeedback } from "@/utils/haptics";
+import { motion } from "framer-motion";
+import { useMemo } from "react";
+import SkillComparisonChart from "./SkillComparisonChart";
+import { Skill } from "./types";
 
 interface ComparisonViewProps {
   comparisonSkills: string[];
@@ -41,25 +42,32 @@ const ComparisonView = ({
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="text-center mb-12">
-        <h3
-          className="text-2xl sm:text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r"
-          style={{
-            backgroundImage: `linear-gradient(to right, ${accentColors.primary}, ${accentColors.secondary})`,
-          }}
+      {/* Visx Comparison Chart */}
+      {selectedSkills.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="mb-12 flex justify-center"
         >
-          Skills Comparison
-        </h3>
-        <p
-          className="max-w-2xl mx-auto"
-          style={{
-            color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)",
-          }}
-        >
-          Compare skills side-by-side to understand proficiency levels,
-          experience, and project involvement across different technologies.
-        </p>
-      </div>
+          <div
+            className="p-8 rounded-2xl border backdrop-blur-sm shadow-xl"
+            style={{
+              backgroundColor: isDark
+                ? "rgba(0,0,0,0.3)"
+                : "rgba(255,255,255,0.9)",
+              borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+            }}
+          >
+            <SkillComparisonChart
+              skills={selectedSkills}
+              width={Math.min(800, selectedSkills.length * 150 + 200)}
+              height={450}
+              title="Interactive Skills Comparison"
+            />
+          </div>
+        </motion.div>
+      )}
 
       {/* Skill Selection */}
       {comparisonSkills.length < 3 && (
