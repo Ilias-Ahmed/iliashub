@@ -1,9 +1,9 @@
-import { motion } from "framer-motion";
-import { Search, Grid3X3, BarChart3, GitCompare, X } from "lucide-react";
-import { ViewMode } from "./types";
-import { skills } from "./skillsData";
-import { triggerHapticFeedback } from "@/utils/haptics";
 import { useTheme } from "@/contexts/ThemeContext";
+import { triggerHapticFeedback } from "@/utils/haptics";
+import { motion } from "framer-motion";
+import { BarChart3, GitCompare, Grid3X3, Search, X } from "lucide-react";
+import { skills } from "./skillsData";
+import { ViewMode } from "./types";
 
 interface SkillsFiltersProps {
   viewMode: ViewMode;
@@ -60,7 +60,7 @@ const SkillsFilters = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className="mb-12"
+      className="mb-8"
     >
       <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
         {/* Search Bar */}
@@ -162,7 +162,7 @@ const SkillsFilters = ({
               <motion.button
                 key={mode.id}
                 onClick={() => handleViewModeChange(mode.id)}
-                className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 relative"
+                className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 relative z-10"
                 style={{
                   backgroundColor: isActive
                     ? accentColors.primary
@@ -173,7 +173,12 @@ const SkillsFilters = ({
                     ? "rgba(255,255,255,0.7)"
                     : "rgba(0,0,0,0.7)",
                 }}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{
+                  scale: 1.05,
+                  backgroundColor: isActive
+                    ? accentColors.secondary
+                    : `${accentColors.primary}20`,
+                }}
                 whileTap={{ scale: 0.95 }}
               >
                 <Icon size={16} />
@@ -182,7 +187,7 @@ const SkillsFilters = ({
                 {isActive && (
                   <motion.div
                     layoutId="activeViewIndicator"
-                    className="absolute inset-0 rounded-md"
+                    className="absolute inset-0 rounded-md -z-10"
                     style={{ backgroundColor: accentColors.primary }}
                     initial={false}
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
@@ -257,4 +262,3 @@ const SkillsFilters = ({
 };
 
 export default SkillsFilters;
-

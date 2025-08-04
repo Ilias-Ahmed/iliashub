@@ -143,4 +143,66 @@ export const skills: Skill[] = [
     projects: 35,
     yearsExperience: 4,
   },
+  {
+    id: "vscode",
+    name: "VS Code",
+    level: 95,
+    category: "Tools",
+    icon: "🔧",
+    color: "#007acc",
+    description:
+      "Advanced code editor with extensions, debugging, and integrated development environment.",
+    projects: 40,
+    yearsExperience: 4,
+  },
+  {
+    id: "figma",
+    name: "Figma",
+    level: 75,
+    category: "Tools",
+    icon: "🎨",
+    color: "#f24e1e",
+    description:
+      "Collaborative design tool for UI/UX design, prototyping, and design systems.",
+    projects: 18,
+    yearsExperience: 2,
+  },
+
+  // Mobile Development
+  {
+    id: "react-native",
+    name: "React Native",
+    level: 82,
+    category: "Mobile",
+    icon: "📱",
+    color: "#61dafb",
+    description:
+      "Cross-platform mobile app development with React Native and Expo framework.",
+    projects: 8,
+    yearsExperience: 2,
+  },
+  {
+    id: "flutter",
+    name: "Flutter",
+    level: 70,
+    category: "Mobile",
+    icon: "🦋",
+    color: "#02569b",
+    description:
+      "Google's UI toolkit for building natively compiled mobile, web, and desktop applications.",
+    projects: 5,
+    yearsExperience: 1,
+  },
+  {
+    id: "expo",
+    name: "Expo",
+    level: 85,
+    category: "Mobile",
+    icon: "🚀",
+    color: "#000020",
+    description:
+      "Platform for universal React applications with tools and services for mobile development.",
+    projects: 10,
+    yearsExperience: 2,
+  },
 ];
