@@ -230,13 +230,35 @@ const Hero: React.FC = () => {
     navigateToSection("about");
   }, [navigateToSection]);
 
-  // Role rotation effect
+  // Role rotation effect - only when component is visible
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentRole((prev) => (prev + 1) % ROTATING_ROLES.length);
-    }, ROLE_ROTATION_INTERVAL);
+    let interval: NodeJS.Timeout;
 
-    return () => clearInterval(interval);
+    // Use intersection observer to only animate when visible
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            interval = setInterval(() => {
+              setCurrentRole((prev) => (prev + 1) % ROTATING_ROLES.length);
+            }, ROLE_ROTATION_INTERVAL);
+          } else {
+            if (interval) clearInterval(interval);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    const heroElement = document.getElementById("hero");
+    if (heroElement) {
+      observer.observe(heroElement);
+    }
+
+    return () => {
+      observer.disconnect();
+      if (interval) clearInterval(interval);
+    };
   }, []);
 
   // Component mount effect

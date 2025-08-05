@@ -151,17 +151,28 @@ const InteractiveMap = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
 
-    if (!ctx || !canvas || !isVisible) {
-      animationRef.current = requestAnimationFrame(animate);
+    if (!ctx || !canvas) {
+      return;
+    }
+
+    // Only animate when visible
+    if (!isVisible) {
+      // Clean up animation when not visible
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
       return;
     }
 
     drawFrame(ctx, canvas.width, canvas.height, Date.now());
 
-    // Throttle to 30fps instead of 60fps for better performance
+    // Throttle to 24fps for better performance while maintaining smoothness
     setTimeout(() => {
-      animationRef.current = requestAnimationFrame(animate);
-    }, 1000 / 30);
+      if (isVisible) {
+        animationRef.current = requestAnimationFrame(animate);
+      }
+    }, 1000 / 24);
   }, [drawFrame, isVisible]);
 
   useEffect(() => {

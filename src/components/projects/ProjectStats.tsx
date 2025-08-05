@@ -285,19 +285,24 @@ const ProjectStats = () => {
 
   return (
     <section className="pt-20 relative overflow-hidden" ref={ref}>
-      {/* Background Effect */}
+      {/* Background Effect - Only animate when in view and reduce intensity */}
       {isInView && (
         <div className="absolute inset-0 -z-10">
           <motion.div
             className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full opacity-5 blur-3xl"
             style={{ backgroundColor: accentColors.primary }}
             animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 360],
-              x: [0, 50, 0],
-              y: [0, -30, 0],
+              scale: [1, 1.1, 1],
+              rotate: [0, 180],
+              x: [0, 25, 0],
+              y: [0, -15, 0],
             }}
-            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+            transition={{
+              duration: 60, // Much slower
+              repeat: Infinity,
+              ease: "linear",
+              repeatType: "reverse", // Prevents jarring resets
+            }}
           />
         </div>
       )}

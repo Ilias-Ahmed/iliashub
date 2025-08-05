@@ -113,6 +113,28 @@ if (typeof window !== "undefined") {
     document.addEventListener("DOMContentLoaded", enforceCustomCursor);
   }
 
-  // Run periodically to catch dynamically added elements
-  setInterval(enforceCustomCursor, 1000);
+  // Use MutationObserver instead of setInterval for better performance
+  const observer = new MutationObserver((mutations) => {
+    let shouldUpdate = false;
+    mutations.forEach((mutation) => {
+      if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+        shouldUpdate = true;
+      }
+    });
+
+    if (shouldUpdate) {
+      // Debounce the updates
+      setTimeout(enforceCustomCursor, 100);
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+
+  // Store observer globally for potential cleanup
+  (
+    window as Window & { __cursorObserver?: MutationObserver }
+  ).__cursorObserver = observer;
 }

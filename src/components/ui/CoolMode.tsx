@@ -150,12 +150,23 @@ const applyParticleEffect = (
   }
 
   let animationFrame: number | undefined;
-
   let lastParticleTimestamp = 0;
+  let lastRenderTimestamp = 0;
   const particleGenerationDelay = 30;
+  const renderFrameRate = 60; // Target 60fps max
+  const renderInterval = 1000 / renderFrameRate;
 
   function loop() {
     const currentTime = performance.now();
+
+    // Throttle rendering to improve performance
+    if (currentTime - lastRenderTimestamp < renderInterval) {
+      animationFrame = requestAnimationFrame(loop);
+      return;
+    }
+
+    lastRenderTimestamp = currentTime;
+
     if (
       autoAddParticle &&
       particles.length < limit &&
@@ -166,7 +177,11 @@ const applyParticleEffect = (
     }
 
     refreshParticles();
-    animationFrame = requestAnimationFrame(loop);
+
+    // Only continue loop if there are particles to render
+    if (particles.length > 0 || autoAddParticle) {
+      animationFrame = requestAnimationFrame(loop);
+    }
   }
 
   loop();
@@ -236,9 +251,9 @@ export const CoolMode: React.FC<CoolModeProps> = ({ children, options }) => {
     }
   }, [options]);
 
-  const childWithRef = React.isValidElement(children) 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ? React.cloneElement(children, { ref } as any)
+  const childWithRef = React.isValidElement(children)
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      React.cloneElement(children, { ref } as any)
     : children;
 
   return childWithRef;

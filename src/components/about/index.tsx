@@ -21,28 +21,49 @@ const AboutSection = () => {
   // Parallax effect for background elements
   const [{ offset }, api] = useSpring(() => ({ offset: [0, 0] }));
 
-  // Track scroll position for parallax effects - improved with useCallback
+  // Track scroll position for parallax effects - throttled for performance
   const handleScroll = useCallback(() => {
     if (typeof window !== "undefined") {
       setScrollY(window.scrollY);
     }
   }, []);
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+  // Throttled scroll handler
+  const throttledScrollHandler = useCallback(() => {
+    let ticking = false;
+    return () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
   }, [handleScroll]);
 
-  // Improved mouse move handler with validation
+  useEffect(() => {
+    const scrollHandler = throttledScrollHandler();
+    window.addEventListener("scroll", scrollHandler, { passive: true });
+    return () => window.removeEventListener("scroll", scrollHandler);
+  }, [throttledScrollHandler]);
+
+  // Debounced mouse move handler for better performance
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
-      if (!e) return;
+      if (!e || !isInView) return; // Only handle when in view
 
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = (e.clientY / window.innerHeight) * 2 - 1;
-      api.start({ offset: [x * 15, y * 15] });
+
+      // Debounce the animation
+      const throttledUpdate = () => {
+        api.start({ offset: [x * 15, y * 15] });
+      };
+
+      requestAnimationFrame(throttledUpdate);
     },
-    [api]
+    [api, isInView]
   );
 
   // Animation variants
@@ -166,9 +187,7 @@ const AboutSection = () => {
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <TabsList
-              className="relative inline-flex items-center p-1 theme-transition"
-            >
+            <TabsList className="relative inline-flex items-center p-1 theme-transition">
               {[
                 {
                   value: "profile",
@@ -454,9 +473,11 @@ const AboutSection = () => {
               <motion.div
                 key={fact.title}
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index }}
-                className="text-center p-6 rounded-xl backdrop-blur-sm border group hover:scale-105 transition-all duration-300"
+                animate={
+                  isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+                }
+                transition={{ delay: isInView ? 0.1 * index : 0 }}
+                className="text-center p-6 rounded-xl backdrop-blur-sm border group transition-all duration-300"
                 style={{
                   backgroundColor: isDark
                     ? "rgba(255,255,255,0.05)"
@@ -465,13 +486,18 @@ const AboutSection = () => {
                     ? "rgba(255,255,255,0.1)"
                     : "rgba(0,0,0,0.1)",
                 }}
-                whileHover={{
-                  backgroundColor: `${accentColors.primary}10`,
-                  borderColor: `${accentColors.primary}30`,
-                }}
+                whileHover={
+                  isInView
+                    ? {
+                        scale: 1.02,
+                        backgroundColor: `${accentColors.primary}10`,
+                        borderColor: `${accentColors.primary}30`,
+                      }
+                    : undefined
+                }
               >
                 <div
-                  className="text-4xl mb-4 group-hover:scale-110 transition-transform"
+                  className="text-4xl mb-4 transition-transform"
                   style={{ filter: `drop-shadow(0 0 10px ${fact.color}50)` }}
                 >
                   {fact.icon}

@@ -1,9 +1,21 @@
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
-import { ChevronLeft, ChevronRight, Play, Pause, ExternalLink, Github } from "lucide-react";
-import { Project } from "./types";
 import { useTheme } from "@/contexts/ThemeContext";
 import { triggerHapticFeedback } from "@/utils/haptics";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Github,
+  Pause,
+  Play,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Project } from "./types";
 
 interface ProjectShowcaseProps {
   projects: Project[];
@@ -42,18 +54,50 @@ const ProjectShowcase = ({
     mouseY.set(0);
   };
 
-  // Auto-play functionality
+  // Auto-play functionality - only when component is visible
   useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+    const currentIntervalRef = intervalRef.current;
+
     if (isPlaying && projects.length > 1) {
-      intervalRef.current = setInterval(() => {
-        setDirection(1);
-        setCurrentIndex((prev) => (prev + 1) % projects.length);
-      }, 5000);
+      // Use intersection observer to only auto-play when visible
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              intervalId = setInterval(() => {
+                setDirection(1);
+                setCurrentIndex((prev) => (prev + 1) % projects.length);
+              }, 5000);
+              intervalRef.current = intervalId;
+            } else {
+              if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = undefined!;
+              }
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
+
+      const showcaseElement = document.querySelector(
+        '[data-testid="project-showcase"]'
+      );
+      if (showcaseElement) {
+        observer.observe(showcaseElement);
+      }
+
+      return () => {
+        observer.disconnect();
+        if (intervalId) clearInterval(intervalId);
+        if (currentIntervalRef) clearInterval(currentIntervalRef);
+      };
     }
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      if (currentIntervalRef) {
+        clearInterval(currentIntervalRef);
       }
     };
   }, [isPlaying, projects.length]);
@@ -109,7 +153,10 @@ const ProjectShowcase = ({
   };
 
   return (
-    <div className="relative w-full max-w-6xl mx-auto">
+    <div
+      className="relative w-full max-w-6xl mx-auto"
+      data-testid="project-showcase"
+    >
       {/* Main showcase area */}
       <div
         className="relative h-[600px] rounded-2xl overflow-hidden perspective-1000"
@@ -288,7 +335,9 @@ const ProjectShowcase = ({
                     />
                     <div
                       className="absolute inset-0 ring-2 ring-opacity-50 rounded-xl"
-                      style={{ boxShadow: `0 0 0 2px ${accentColors.primary}80` }}
+                      style={{
+                        boxShadow: `0 0 0 2px ${accentColors.primary}80`,
+                      }}
                     />
                   </div>
 
