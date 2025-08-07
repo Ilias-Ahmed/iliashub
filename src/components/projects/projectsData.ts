@@ -3,153 +3,14 @@ import { Project } from "./types";
 export const projectsData: Project[] = [
   {
     id: "1",
-    title: "E-Commerce Platform",
-    description:
-      "A modern, full-stack e-commerce solution with real-time inventory management, secure payment processing, and advanced analytics dashboard.",
-    longDescription:
-      "This comprehensive e-commerce platform was built to handle high-traffic scenarios with a focus on performance, security, and user experience. Features include real-time inventory tracking, multiple payment gateways, advanced search and filtering, order management, and detailed analytics.",
-    image:
-      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
-    tags: ["React", "Node.js", "MongoDB", "Stripe", "Redis", "AWS"],
-    technologies: [
-      "React",
-      "TypeScript",
-      "Node.js",
-      "Express",
-      "MongoDB",
-      "Redis",
-      "Stripe API",
-      "AWS S3",
-      "Docker",
-    ],
-    link: "https://example-ecommerce.com",
-    github: "https://github.com/username/ecommerce-platform",
-    featured: true,
-    category: "Web Application",
-    year: "2024",
-    status: "completed",
-    features: [
-      "Real-time inventory management",
-      "Secure payment processing with Stripe",
-      "Advanced search and filtering",
-      "Order tracking and management",
-      "Analytics dashboard",
-      "Mobile-responsive design",
-    ],
-    challenges: [
-      "Implementing real-time inventory updates across multiple users",
-      "Optimizing database queries for large product catalogs",
-      "Ensuring PCI compliance for payment processing",
-      "Building scalable microservices architecture",
-    ],
-    results: [
-      "99.9% uptime achieved",
-      "40% faster page load times",
-      "25% increase in conversion rates",
-      "Successfully handling 10k+ concurrent users",
-    ],
-  },
-  {
-    id: "2",
-    title: "Task Management App",
-    description:
-      "A collaborative project management tool with real-time updates, team collaboration features, and advanced project analytics.",
-    longDescription:
-      "Built for modern teams, this task management application provides comprehensive project tracking, team collaboration tools, and insightful analytics to boost productivity and streamline workflows.",
-    image:
-      "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=600&fit=crop",
-    tags: ["Vue.js", "Firebase", "Vuex", "PWA", "WebRTC"],
-    technologies: [
-      "Vue.js",
-      "Vuex",
-      "Firebase",
-      "Firestore",
-      "WebRTC",
-      "PWA",
-      "Chart.js",
-    ],
-    link: "https://example-taskmanager.com",
-    github: "https://github.com/username/task-manager",
-    featured: true,
-    category: "Productivity",
-    year: "2024",
-    status: "completed",
-    features: [
-      "Real-time collaboration",
-      "Drag-and-drop task management",
-      "Team chat and video calls",
-      "Project analytics and reporting",
-      "Offline functionality (PWA)",
-      "Custom workflows and automation",
-    ],
-    challenges: [
-      "Implementing real-time synchronization across multiple users",
-      "Building offline-first architecture",
-      "Optimizing performance for large datasets",
-      "Creating intuitive drag-and-drop interfaces",
-    ],
-    results: [
-      "50% improvement in team productivity",
-      "95% user satisfaction rate",
-      "Reduced project completion time by 30%",
-      "Successfully deployed to 500+ teams",
-    ],
-  },
-  {
-    id: "3",
-    title: "Weather Dashboard",
-    description:
-      "An interactive weather application with beautiful visualizations, location-based forecasts, and severe weather alerts.",
-    longDescription:
-      "A comprehensive weather dashboard that provides detailed weather information with stunning visualizations, interactive maps, and personalized weather alerts for multiple locations.",
-    image:
-      "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=800&h=600&fit=crop",
-    tags: ["React", "D3.js", "OpenWeather API", "Mapbox", "Chart.js"],
-    technologies: [
-      "React",
-      "TypeScript",
-      "D3.js",
-      "Mapbox GL",
-      "OpenWeather API",
-      "Chart.js",
-      "Styled Components",
-    ],
-    link: "https://example-weather.com",
-    github: "https://github.com/username/weather-dashboard",
-    category: "Data Visualization",
-    year: "2023",
-    status: "completed",
-    features: [
-      "Interactive weather maps",
-      "7-day detailed forecasts",
-      "Severe weather alerts",
-      "Historical weather data",
-      "Multiple location tracking",
-      "Beautiful data visualizations",
-    ],
-    challenges: [
-      "Handling large amounts of weather data efficiently",
-      "Creating smooth map interactions",
-      "Implementing accurate location detection",
-      "Building responsive charts and graphs",
-    ],
-    results: [
-      "100k+ active users",
-      "4.8/5 app store rating",
-      "Featured in weather app collections",
-      "99.5% API uptime maintained",
-    ],
-  },
-  {
-    id: "4",
     title: "NodeNest - Social Media Web App",
     description:
-      "A full-featured social media platform built with real-time messaging, secure authentication, and a modern, responsive UI.",
+      "A full-featured social media platform with real-time chat, post interactions, and user profile customization.",
     longDescription:
-      "NodeNest is a scalable and interactive social media web application developed using the MERN stack. It offers real-time chat, post sharing, likes, comments, and user profile customization. Built with performance, scalability, and modern design in mind, it provides a seamless experience for users across devices.",
+      "NodeNest is a scalable social media web application developed using the MERN stack. It includes real-time messaging (Socket.IO), authentication (JWT), post creation, likes, comments, and profile customization. Optimized for performance and scalability with a modern UI using Tailwind CSS and animations with Framer Motion.",
     image:
       "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=800&h=600&fit=crop",
-    tags: ["MERN", "Socket.IO", "JWT", "MongoDB", "Tailwind CSS"],
+    tags: ["MERN", "Socket.IO", "JWT", "Tailwind CSS"],
     technologies: [
       "MongoDB",
       "Express.js",
@@ -164,140 +25,181 @@ export const projectsData: Project[] = [
       "Framer Motion",
       "Vite",
     ],
-    link: "https://nodenest.live", // Replace with your actual deployed link
-    github: "https://github.com/Ilias-Ahmed/NodeNest", // Replace with your actual GitHub repo
+    link: "https://nodenest.live",
+    github: "https://github.com/Ilias-Ahmed/NodeNest",
     category: "Social Media",
     year: "2025",
     status: "completed",
     features: [
-      "Real-time messaging with Socket.IO",
-      "User authentication with JWT",
-      "Post creation, likes, and comments",
-      "Profile and cover photo upload via Cloudinary",
-      "Modern responsive UI with Tailwind CSS",
-      "Form validation using Zod and React Hook Form",
-      "Smooth animations with Framer Motion",
+      "Real-time chat system",
+      "JWT-based secure login",
+      "Post creation, comments, likes",
+      "Profile photo uploads via Cloudinary",
+      "Responsive UI and smooth animations",
     ],
     challenges: [
-      "Implementing real-time chat system",
-      "Managing state across complex UI components",
-      "Ensuring secure and scalable backend architecture",
-      "Image upload and storage handling",
-      "Maintaining responsive design across devices",
+      "Real-time messaging implementation",
+      "State management for complex UI",
+      "Secure image and post handling",
     ],
     results: [
-      "100% real-time communication achieved",
-      "Minimal API response time with optimized backend",
-      "Smooth user experience with modern animations",
-      "Successfully deployed with production readiness",
-      "Positive feedback from early users and testers",
+      "100% real-time communication",
+      "Production-ready deployment",
+      "Positive user feedback",
     ],
+    featured: true,
   },
-
   {
-    id: "5",
-    title: "Learning Management System",
+    id: "2",
+    title: "ChatNest - Realtime Chat App",
     description:
-      "A modern LMS with interactive courses, progress tracking, and AI-powered personalized learning paths.",
+      "A lightweight and secure real-time chat application built with Socket.IO and modern UI features.",
     longDescription:
-      "A comprehensive learning management system designed for educational institutions and corporate training, featuring interactive content, progress tracking, and AI-driven personalized learning experiences.",
+      "ChatNest is a real-time chat application enabling users to connect instantly with one-on-one and group messaging, online presence status, and message notifications. Built with a focus on simplicity, performance, and clean user experience.",
+    image:
+      "https://images.unsplash.com/photo-1525186402429-b4ff38bedec6?w=800&h=600&fit=crop",
+    tags: ["Next.js", "Socket.IO", "Tailwind CSS"],
+    technologies: [
+      "Next.js",
+      "TypeScript",
+      "Socket.IO",
+      "Node.js",
+      "Zustand",
+      "Tailwind CSS",
+      "Framer Motion",
+    ],
+    link: "https://chatnest.live",
+    github: "https://github.com/Ilias-Ahmed/ChatNest",
+    category: "Communication",
+    year: "2025",
+    status: "completed",
+    features: [
+      "Real-time messaging (Socket.IO)",
+      "Group and private chats",
+      "User online status",
+      "Typing indicators and read receipts",
+      "Smooth, responsive UI with animation",
+    ],
+    challenges: [
+      "Handling WebSocket connections at scale",
+      "Maintaining chat state across sessions",
+      "UX for chat threading and scroll behavior",
+    ],
+    results: [
+      "Seamless chat experience with <100ms latency",
+      "Deployed to 200+ users in testing phase",
+    ],
+    featured: true,
+  },
+  {
+    id: "3",
+    title: "EduTrack - Learning Management System",
+    description:
+      "An educational platform for institutes to manage courses, track progress, and facilitate real-time learning.",
+    longDescription:
+      "EduTrack is a complete LMS built for institutions, enabling course delivery, real-time collaboration, and personalized learning paths. Features include video lectures, assessments, student progress tracking, live chat, and admin dashboards.",
     image:
       "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop",
-    tags: ["React", "Node.js", "MongoDB", "Socket.io", "AWS"],
+    tags: ["React", "Node.js", "Socket.IO", "MongoDB"],
     technologies: [
       "React",
       "Node.js",
       "Express",
       "MongoDB",
-      "Socket.io",
-      "AWS",
+      "Socket.IO",
       "FFmpeg",
       "WebRTC",
+      "AWS S3",
     ],
-    link: "https://example-lms.com",
-    github: "https://github.com/username/learning-management",
+    link: "https://edutrack.live",
+    github: "https://github.com/Ilias-Ahmed/EduTrack",
     category: "Education",
-    year: "2023",
-    status: "in-progress",
-    features: [
-      "Interactive video courses",
-      "Real-time collaboration tools",
-      "Progress tracking and analytics",
-      "AI-powered learning recommendations",
-      "Virtual classroom functionality",
-      "Mobile learning app",
-    ],
-    challenges: [
-      "Building scalable video streaming infrastructure",
-      "Implementing real-time collaboration features",
-      "Creating adaptive learning algorithms",
-      "Ensuring accessibility compliance",
-    ],
-  },
-  {
-    id: "6",
-    title: "Cryptocurrency Tracker",
-    description:
-      "A real-time cryptocurrency tracking application with portfolio management and advanced trading analytics.",
-    longDescription:
-      "A comprehensive cryptocurrency tracking platform that provides real-time market data, portfolio management tools, and advanced analytics for crypto traders and investors.",
-    image:
-      "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&h=600&fit=crop",
-    tags: ["Vue.js", "Node.js", "WebSocket", "Chart.js", "CoinGecko API"],
-    technologies: [
-      "Vue.js",
-      "Nuxt.js",
-      "Node.js",
-      "WebSocket",
-      "Chart.js",
-      "CoinGecko API",
-      "TradingView",
-    ],
-    link: "https://example-crypto.com",
-    category: "Finance",
-    year: "2022",
+    year: "2024",
     status: "completed",
     features: [
-      "Real-time price tracking",
-      "Portfolio management",
-      "Advanced charting tools",
-      "Price alerts and notifications",
-      "Market analysis and insights",
-      "Trading simulation",
+      "Interactive video lectures",
+      "Course progress tracking",
+      "Live chat and collaboration tools",
+      "Admin dashboard and analytics",
+      "Responsive UI for students and teachers",
     ],
     challenges: [
-      "Handling real-time data streams efficiently",
-      "Building responsive financial charts",
-      "Implementing secure portfolio tracking",
-      "Managing API rate limits",
+      "Video streaming at scale",
+      "Building adaptive learning paths",
+      "Real-time sync for class interactions",
     ],
     results: [
-      "50k+ registered users",
-      "Real-time data for 5000+ cryptocurrencies",
-      "99.9% data accuracy maintained",
-      "Featured in crypto community forums",
+      "Successfully used by 3 institutions",
+      "Improved student engagement by 40%",
     ],
+    featured: true,
+  },
+  {
+    id: "4",
+    title: "Blog Post Site",
+    description:
+      "A personal blogging platform with markdown editor, custom themes, and SEO optimization.",
+    longDescription:
+      "This blog site supports markdown writing, custom themes, tags, and categories for organizing posts. Built with a fast-rendering frontend, server-side rendering, and responsive design. Ideal for personal or educational content.",
+    image:
+      "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=800&h=600&fit=crop",
+    tags: ["Next.js", "Markdown", "Tailwind CSS"],
+    technologies: ["Next.js", "MDX", "Tailwind CSS", "TypeScript", "Vercel"],
+    link: "https://blog.iliasahmed.dev",
+    github: "https://github.com/Ilias-Ahmed/Blog-Platform",
+    category: "Blog",
+    year: "2024",
+    status: "completed",
+    features: [
+      "Live markdown preview editor",
+      "SEO and open graph optimization",
+      "Blog categories and tags",
+      "Mobile responsive UI",
+    ],
+    challenges: [
+      "Markdown rendering and sanitization",
+      "Dynamic routing for SEO-friendly URLs",
+    ],
+    results: [
+      "Deployed with <1s load time",
+      "Indexed and ranked by search engines",
+    ],
+    featured: true,
+  },
+  {
+    id: "5",
+    title: "MIPedia - Personal Service Platform",
+    description:
+      "MIPedia is your one-stop personal platform providing developer tips, coding resources, and career support.",
+    longDescription:
+      "MIPedia is a personal service-based startup aimed at helping beginner to advanced developers with curated coding resources, career preparation tools, and project showcases. It's a growing hub for students and software engineers.",
+    image:
+      "https://images.unsplash.com/photo-1581092795360-7043e6d16df4?w=800&h=600&fit=crop",
+    tags: ["Next.js", "Notion API", "Vercel", "Personal"],
+    technologies: [
+      "Next.js",
+      "Notion API",
+      "Vercel",
+      "Tailwind CSS",
+      "TypeScript",
+      "Supabase",
+    ],
+    link: "https://mipedia.tech",
+    github: "https://github.com/Ilias-Ahmed/MIPedia",
+    category: "Startup",
+    year: "2025",
+    status: "in-progress",
+    features: [
+      "Daily coding tips and articles",
+      "Personal Notion integration",
+      "Free resources and tools",
+      "Developer-focused UI",
+      "Custom roadmap builder",
+    ],
+    challenges: [
+      "Managing content dynamically via Notion API",
+      "Building SEO-optimized personal platform",
+    ],
+    featured: true,
   },
 ];
-
-// Featured projects (subset of main projects)
-export const featuredProjects = projectsData.filter(
-  (project) => project.featured
-);
-
-// Projects by category
-export const projectsByCategory = projectsData.reduce((acc, project) => {
-  const category = project.category || "Other";
-  if (!acc[category]) {
-    acc[category] = [];
-  }
-  acc[category].push(project);
-  return acc;
-}, {} as Record<string, Project[]>);
-
-// Recent projects (last 2 years)
-export const recentProjects = projectsData.filter((project) => {
-  const projectYear = parseInt(project.year || "2024");
-  const currentYear = new Date().getFullYear();
-  return currentYear - projectYear <= 2;
-});

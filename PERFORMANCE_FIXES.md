@@ -30,7 +30,6 @@
 - **Fix**: Added visibility detection using `IntersectionObserver`
 - **Impact**: Stops carousel animations when component is off-screen
 
-### 5. **Fun Facts Animations**
 
 - **File**: `src/components/about/index.tsx`
 - **Issue**: Hover animations running even when not in view
