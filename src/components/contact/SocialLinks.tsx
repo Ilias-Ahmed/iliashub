@@ -1,5 +1,4 @@
 import { OrbitingCircles } from "@/components/ui/OrbitingCircles";
-import { useTheme } from "@/contexts/ThemeContext";
 import { triggerHapticFeedback } from "@/utils/haptics";
 import { motion } from "framer-motion";
 import { BookOpen, Github, Instagram, Linkedin, Twitter } from "lucide-react";
@@ -19,8 +18,6 @@ const SocialIcon = ({
   social: SocialLink;
   size?: number;
 }) => {
-  const { getAccentColors } = useTheme();
-  const accentColors = getAccentColors();
 
   return (
     <motion.a
@@ -50,9 +47,6 @@ const SocialIcon = ({
 };
 
 const SocialLinks = () => {
-  const { isDark, getAccentColors } = useTheme();
-  const accentColors = getAccentColors();
-
   const socialLinks: SocialLink[] = [
     {
       icon: <Github size={18} />,
