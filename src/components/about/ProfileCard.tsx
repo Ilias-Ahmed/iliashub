@@ -1,4 +1,3 @@
-import { VelocityScroll } from "@/components/ui/VelocityScroll";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
 import {
@@ -292,52 +291,6 @@ const ProfileCard = () => {
         </div>
       </div>
 
-
-      {/* Quote Section with VelocityScroll - Responsive text */}
-      <motion.div
-        className="text-center py-6 md:py-8"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 0.8 }}
-      >
-        <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
-          <VelocityScroll
-            defaultVelocity={2}
-            className="text-lg md:text-xl lg:text-2xl font-medium italic"
-            style={{ color: accentColors.primary }}
-          >
-            "The best code is not just functional—it's an expression of empathy,
-            crafted with the user's journey in mind."
-          </VelocityScroll>
-
-          {/* Gradient overlays for smooth fade effect */}
-          <div
-            className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r"
-            style={{
-              background: `linear-gradient(to right, ${
-                isDark ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)"
-              }, transparent)`,
-            }}
-          ></div>
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l"
-            style={{
-              background: `linear-gradient(to left, ${
-                isDark ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)"
-              }, transparent)`,
-            }}
-          ></div>
-        </div>
-
-        <motion.p
-          className="mt-6 md:mt-8 opacity-70 text-sm md:text-base"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.7 }}
-          transition={{ delay: 1.4 }}
-        >
-          — My approach to development
-        </motion.p>
-      </motion.div>
     </motion.div>
   );
 };

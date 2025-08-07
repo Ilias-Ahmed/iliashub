@@ -1,7 +1,6 @@
 import styles from "@/components/ui/bubble.module.css";
 import ControlPanel from "@/components/ui/ControlPanel";
 import { useBackground } from "@/contexts/BackgroundContext";
-import { useNavigation } from "@/contexts/NavigationContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -11,13 +10,9 @@ import {
   useSpring,
 } from "framer-motion";
 import {
-  ChevronDown,
   Code2,
   Download,
   ExternalLink,
-  Github,
-  Linkedin,
-  Mail,
   Sparkles,
   Terminal,
   Zap,
@@ -143,7 +138,6 @@ const Hero: React.FC = () => {
   const accentColors: AccentColors =
     getAccentColors() as unknown as AccentColors;
   const { setCurrentSection } = useBackground();
-  const { navigateToSection } = useNavigation();
   const isMobile = useIsMobile();
 
   // Mouse tracking for parallax
@@ -156,24 +150,6 @@ const Hero: React.FC = () => {
   // Social links configuration
   const socialLinks: SocialLink[] = useMemo(
     () => [
-      {
-        icon: Github,
-        href: "https://github.com/Ilias-Ahmed",
-        label: "GitHub",
-        description: "View my open source projects",
-      },
-      {
-        icon: Linkedin,
-        href: "https://www.linkedin.com/in/ilias-ahmed9613/",
-        label: "LinkedIn",
-        description: "Connect with me professionally",
-      },
-      {
-        icon: Mail,
-        href: "mailto:ilias.ahmed.dev@gmail.com",
-        label: "Email",
-        description: "Get in touch directly",
-      },
       {
         icon: Download,
         action: () => {
@@ -226,9 +202,6 @@ const Hero: React.FC = () => {
     []
   );
 
-  const handleScrollDown = useCallback(() => {
-    navigateToSection("about");
-  }, [navigateToSection]);
 
   // Role rotation effect - only when component is visible
   useEffect(() => {
@@ -458,36 +431,6 @@ const Hero: React.FC = () => {
               </motion.div>
             </motion.div>
           )}
-        </motion.div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          variants={itemVariants}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <span className="text-sm opacity-70">Scroll to explore</span>
-          <motion.button
-            onClick={handleScrollDown}
-            className="p-2 rounded-full border-2 transition-all duration-300"
-            style={{
-              borderColor: accentColors.border,
-              backgroundColor: `${accentColors.primary}10`,
-            }}
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            whileHover={{
-              scale: 1.1,
-              borderColor: accentColors.primary,
-              backgroundColor: `${accentColors.primary}20`,
-            }}
-            aria-label="Scroll to next section"
-          >
-            <ChevronDown
-              size={20}
-              className="transition-colors"
-              style={{ color: accentColors.primary }}
-            />
-          </motion.button>
         </motion.div>
       </div>
     </section>

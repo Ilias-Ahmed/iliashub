@@ -1,261 +1,195 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { MapPin } from "lucide-react";
+import { useCallback, useEffect, useRef } from "react";
 
 const InteractiveMap = () => {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
   const { isDark, getAccentColors } = useTheme();
   const accentColors = getAccentColors();
 
-  // Pre-generate stars for performance
-  const starsRef = useRef<
-    Array<{ x: number; y: number; radius: number; phase: number }>
-  >([]);
+  const setupCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
 
-  const initializeStars = useCallback((width: number, height: number) => {
-    starsRef.current = Array.from({ length: 50 }, (_, i) => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      radius: Math.random() * 1.5,
-      phase: i, // Use index as phase for consistent animation
-    }));
+    const container = canvas.parentElement;
+    if (container) {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = container.getBoundingClientRect();
+
+      canvas.width = rect.width * dpr;
+      canvas.height = 200 * dpr;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = '200px';
+
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.scale(dpr, dpr);
+      }
+      return ctx;
+    }
+    return null;
   }, []);
 
-  const drawStaticElements = useCallback(
-    (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-      // Background
-      ctx.fillStyle = isDark ? "rgba(15, 15, 20, 1)" : "rgba(240, 240, 245, 1)";
-      ctx.fillRect(0, 0, width, height);
+  const drawGrid = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
+    ctx.strokeStyle = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
+    ctx.lineWidth = 0.5;
 
-      // Grid - only draw if not already cached
-      ctx.strokeStyle = isDark
-        ? "rgba(255, 255, 255, 0.1)"
-        : "rgba(0, 0, 0, 0.1)";
-      ctx.lineWidth = 0.5;
-
-      const cellSize = 20;
-
-      // Vertical lines
-      for (let x = 0; x <= width; x += cellSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-
-      // Horizontal lines
-      for (let y = 0; y <= height; y += cellSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
-    },
-    [isDark]
-  );
-
-  // Optimized animation loop with performance improvements
-  const drawFrame = useCallback(
-    (
-      ctx: CanvasRenderingContext2D,
-      width: number,
-      height: number,
-      time: number
-    ) => {
-      // Only redraw if visible
-      if (!isVisible) return;
-
-      // Clear and redraw static elements
-      drawStaticElements(ctx, width, height);
-
-      // Draw twinkling stars with cached positions
-      starsRef.current.forEach((star) => {
-        const twinkle = Math.sin(time * 0.001 + star.phase) * 0.5 + 0.5;
-
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-        ctx.fillStyle = isDark
-          ? `rgba(255, 255, 255, ${twinkle * 0.5 + 0.3})`
-          : `rgba(0, 0, 0, ${twinkle * 0.3 + 0.2})`;
-        ctx.fill();
-      });
-
-      // Draw optimized location marker
-      const centerX = width / 2;
-      const centerY = height / 2;
-      const pulseTime = time * 0.001;
-
-      // Convert hex to RGB - cache this calculation
-      const hexToRgb = (hex: string) => {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result
-          ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16),
-            }
-          : { r: 139, g: 92, b: 246 };
-      };
-
-      const primaryRgb = hexToRgb(accentColors.primary);
-      const rgbString = `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`;
-
-      // Optimized pulse animation - reduced calculations
-      const pulseRadius = 20 + Math.sin(pulseTime * 2) * 10;
-
-      // Outer pulse ring
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, pulseRadius, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${rgbString}, 0.1)`;
-      ctx.fill();
-
-      // Middle ring
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 15, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${rgbString}, 0.3)`;
-      ctx.fill();
-
-      // Inner circle
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 6, 0, Math.PI * 2);
-      ctx.fillStyle = accentColors.primary;
-      ctx.fill();
-
-      // Optimized cosmic rays - reduced count and calculations
-      const rayCount = 6; // Reduced from 8
-      for (let i = 0; i < rayCount; i++) {
-        const angle = (i / rayCount) * Math.PI * 2 + pulseTime * 0.3; // Slower rotation
-        const rayLength = 25 + Math.sin(pulseTime * 2 + i) * 8; // Reduced amplitude
-
-        const startX = centerX + Math.cos(angle) * 10;
-        const startY = centerY + Math.sin(angle) * 10;
-        const endX = centerX + Math.cos(angle) * rayLength;
-        const endY = centerY + Math.sin(angle) * rayLength;
-
-        ctx.beginPath();
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(endX, endY);
-        ctx.strokeStyle = `rgba(${rgbString}, 0.3)`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-    },
-    [isDark, accentColors, isVisible, drawStaticElements]
-  );
-
-  // Throttled animation loop for better performance
-  const animate = useCallback(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-
-    if (!ctx || !canvas) {
-      return;
+    const gridSize = 25;
+    ctx.beginPath();
+    for (let x = 0; x <= width; x += gridSize) {
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
     }
-
-    // Only animate when visible
-    if (!isVisible) {
-      // Clean up animation when not visible
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-        animationRef.current = null;
-      }
-      return;
+    for (let y = 0; y <= height; y += gridSize) {
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
     }
+    ctx.stroke();
+  }, [isDark]);
 
-    drawFrame(ctx, canvas.width, canvas.height, Date.now());
+  const drawPulse = useCallback((ctx: CanvasRenderingContext2D, x: number, y: number, time: number) => {
+    const pulseSize = 6 + Math.sin(time * 2.5) * 2;
 
-    // Throttle to 24fps for better performance while maintaining smoothness
-    setTimeout(() => {
-      if (isVisible) {
-        animationRef.current = requestAnimationFrame(animate);
-      }
-    }, 1000 / 24);
-  }, [drawFrame, isVisible]);
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(x, y, pulseSize, 0, Math.PI * 2);
+    ctx.fillStyle = accentColors.primary;
+    ctx.fill();
+
+    // Pulse rings
+    for (let i = 1; i <= 2; i++) {
+      const ringRadius = pulseSize + (i * 12) + Math.sin(time * 2 + i) * 4;
+      const opacity = Math.max(0, 0.4 - i * 0.15);
+
+      ctx.beginPath();
+      ctx.arc(x, y, ringRadius, 0, Math.PI * 2);
+      ctx.strokeStyle = `${accentColors.primary}${Math.floor(opacity * 255).toString(16).padStart(2, '0')}`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  }, [accentColors.primary]);
 
   useEffect(() => {
-    const container = mapContainerRef.current;
-    if (!container) return;
-
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+    const ctx = setupCanvas();
     if (!ctx) return;
 
-    canvas.width = container.clientWidth;
-    canvas.height = 220;
-    canvasRef.current = canvas;
+    let isAnimating = true;
 
-    // Initialize stars once
-    initializeStars(canvas.width, canvas.height);
+    const animationLoop = () => {
+      if (!isAnimating) return;
 
-    // Add canvas to the DOM
-    container.appendChild(canvas);
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-    // Use Intersection Observer for performance
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.1 }
-    );
+      const width = canvas.offsetWidth;
+      const height = canvas.offsetHeight;
+      const time = Date.now() * 0.001;
 
-    observer.observe(container);
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
 
-    // Start animation only when visible
-    if (isVisible) {
-      animate();
-    }
+      // Draw grid
+      drawGrid(ctx, width, height);
+
+      // Draw center pulse
+      drawPulse(ctx, width / 2, height / 2, time);
+
+      // Floating particles
+      const particles = 6;
+      for (let i = 0; i < particles; i++) {
+        const angle = (i / particles) * Math.PI * 2 + time * 0.3;
+        const radius = 40 + Math.sin(time * 0.8 + i) * 15;
+        const x = width / 2 + Math.cos(angle) * radius;
+        const y = height / 2 + Math.sin(angle) * radius;
+        const size = 1.5 + Math.sin(time * 1.5 + i) * 0.8;
+        const opacity = 0.5 + Math.sin(time * 2 + i) * 0.3;
+
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fillStyle = `${accentColors.secondary}${Math.floor(opacity * 255).toString(16).padStart(2, '0')}`;
+        ctx.fill();
+      }
+
+      animationRef.current = requestAnimationFrame(animationLoop);
+    };
+
+    animationLoop();
 
     return () => {
-      observer.disconnect();
+      isAnimating = false;
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
-      if (container && container.contains(canvas)) {
-        container.removeChild(canvas);
-      }
     };
-  }, [isDark, accentColors, animate, initializeStars, isVisible]);
-
-  // Start/stop animation based on visibility
-  useEffect(() => {
-    if (isVisible && !animationRef.current) {
-      animate();
-    } else if (!isVisible && animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-      animationRef.current = null;
-    }
-  }, [isVisible, animate]);
+  }, [isDark, accentColors, setupCanvas, drawGrid, drawPulse]);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="rounded-xl overflow-hidden shadow-lg border relative"
+      className="relative rounded-2xl backdrop-blur-sm border overflow-hidden theme-transition"
       style={{
-        backgroundColor: isDark ? "#0f0f14" : "#f0f0f5",
-        borderColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
+        backgroundColor: isDark
+          ? "rgba(255,255,255,0.05)"
+          : "rgba(255,255,255,0.8)",
+        borderColor: isDark
+          ? "rgba(255,255,255,0.1)"
+          : "rgba(0,0,0,0.1)",
       }}
     >
-      <div ref={mapContainerRef} className="w-full h-[195px] relative">
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-          <div
-            className="px-3 py-1.5 backdrop-blur-sm rounded-full text-sm flex items-center space-x-1"
+      {/* Ambient background elements */}
+      <div className="absolute inset-0 -z-10 opacity-30">
+        <div
+          className="absolute top-1/3 right-1/3 w-20 h-20 rounded-full blur-xl"
+          style={{ backgroundColor: `${accentColors.primary}40` }}
+        />
+        <div
+          className="absolute bottom-1/2 left-1/4 w-16 h-16 rounded-full blur-xl"
+          style={{ backgroundColor: `${accentColors.secondary}40` }}
+        />
+      </div>
+
+
+      {/* Canvas Map */}
+      <div className="relative rounded-xl overflow-hidden">
+        <canvas
+          ref={canvasRef}
+          className="w-full h-[200px] rounded-xl"
+          style={{
+            background: isDark
+              ? "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)"
+              : "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)"
+          }}
+        />
+
+        {/* Location indicator */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <motion.div
+            className="flex items-center gap-2 px-3 py-2 rounded-full backdrop-blur-md border"
             style={{
               backgroundColor: isDark
-                ? "rgba(0,0,0,0.5)"
-                : "rgba(255,255,255,0.5)",
+                ? "rgba(0,0,0,0.8)"
+                : "rgba(255,255,255,0.9)",
+              borderColor: `${accentColors.primary}80`,
+            }}
+            animate={{
+              scale: [1, 1.02, 1],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut",
             }}
           >
-            <span
-              className="w-2 h-2 rounded-full animate-pulse"
-              style={{ backgroundColor: accentColors.primary }}
+            <MapPin
+              size={14}
+              style={{ color: accentColors.primary }}
             />
-            <span>Kamrup, Assam</span>
-          </div>
+            <span className="text-xs font-medium">Kamrup, Assam</span>
+          </motion.div>
         </div>
       </div>
     </motion.div>
