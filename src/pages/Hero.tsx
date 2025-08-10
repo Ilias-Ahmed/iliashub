@@ -9,29 +9,16 @@ import {
   useMotionValue,
   useSpring,
 } from "framer-motion";
-import {
-  Code2,
-  Download,
-  ExternalLink,
-  Sparkles,
-  Terminal,
-  Zap,
-} from "lucide-react";
+import { Code2, Eye, Sparkles, Terminal, Zap } from "lucide-react";
 import React, {
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-
-interface SocialLink {
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  href?: string;
-  action?: () => void;
-  label: string;
-  description: string;
-}
+const ResumeViewer = React.lazy(() => import("@/components/ui/ResumeViewer"));
 
 // Constants - optimized for performance
 const ROTATING_ROLES = [
@@ -132,6 +119,7 @@ const FloatingIcon: React.FC<{
 const Hero: React.FC = () => {
   const [currentRole, setCurrentRole] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isResumeOpen, setIsResumeOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
   const { isDark, getAccentColors } = useTheme();
@@ -146,28 +134,6 @@ const Hero: React.FC = () => {
   const springConfig = useMemo(() => ({ stiffness: 100, damping: 30 }), []);
   const x = useSpring(mouseX, springConfig);
   const y = useSpring(mouseY, springConfig);
-
-  // Social links configuration
-  const socialLinks: SocialLink[] = useMemo(
-    () => [
-      {
-        icon: Download,
-        action: () => {
-          try {
-            const link = document.createElement("a");
-            link.href = "/resume.pdf";
-            link.download = "Ilias_Ahmed_Resume.pdf";
-            link.click();
-          } catch (error) {
-            console.error("Failed to download resume:", error);
-          }
-        },
-        label: "Resume",
-        description: "Download my CV",
-      },
-    ],
-    []
-  );
 
   // Optimized mouse tracking
   const handleMouseMove = useCallback(
@@ -187,21 +153,6 @@ const Hero: React.FC = () => {
     },
     [mouseX, mouseY, isMobile]
   );
-
-  // Handle social link clicks
-  const handleSocialClick = useCallback(
-    (social: SocialLink) => (e: React.MouseEvent) => {
-      e.preventDefault();
-
-      if (social.action) {
-        social.action();
-      } else if (social.href) {
-        window.open(social.href, "_blank", "noopener,noreferrer");
-      }
-    },
-    []
-  );
-
 
   // Role rotation effect - only when component is visible
   useEffect(() => {
@@ -356,44 +307,39 @@ const Hero: React.FC = () => {
               </span>
             </motion.div>
 
-            {/* Social links */}
-            <motion.div variants={itemVariants} className="flex gap-4">
-              {socialLinks.map((social) => (
-                <motion.button
-                  key={social.label}
-                  onClick={handleSocialClick(social)}
-                  className="group p-3 rounded-lg border-2 transition-all duration-300 backdrop-blur-sm relative"
-                  style={{
-                    borderColor: isDark
-                      ? "rgba(255, 255, 255, 0.1)"
-                      : "rgba(0, 0, 0, 0.1)",
-                    backgroundColor: isDark
-                      ? "rgba(255, 255, 255, 0.05)"
-                      : "rgba(0, 0, 0, 0.05)",
-                  }}
-                  whileHover={{
-                    scale: 1.1,
-                    y: -2,
-                    borderColor: accentColors.primary,
-                    backgroundColor: `${accentColors.primary}10`,
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  title={social.description}
-                  aria-label={social.description}
-                >
-                  <social.icon
-                    size={20}
-                    className="transition-colors duration-300 group-hover:text-current"
-                  />
-                  {social.href && (
-                    <ExternalLink
-                      size={12}
-                      className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      style={{ color: accentColors.primary }}
-                    />
-                  )}
-                </motion.button>
-              ))}
+            {/* Resume CTA */}
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-wrap gap-4"
+            >
+              <motion.button
+                onClick={() => setIsResumeOpen(true)}
+                onMouseEnter={() => {
+                  // Prefetch viewer chunk for snappier open
+                  import("@/components/ui/ResumeViewer");
+                }}
+                className="group inline-flex items-center gap-2 rounded-xl border-2 px-5 py-3 transition-all duration-300 backdrop-blur-sm"
+                style={{
+                  borderColor: `${accentColors.primary}66`,
+                  backgroundColor: isDark
+                    ? "rgba(255, 255, 255, 0.06)"
+                    : "rgba(0, 0, 0, 0.04)",
+                  color: accentColors.primary,
+                  boxShadow: `0 0 20px ${accentColors.glow}33`,
+                }}
+                whileHover={{
+                  scale: 1.03,
+                  y: -1,
+                  backgroundColor: `${accentColors.primary}14`,
+                }}
+                whileTap={{ scale: 0.97 }}
+                aria-label="View Resume"
+              >
+                <Eye size={18} />
+                <span className="font-semibold">View Resume</span>
+              </motion.button>
+
+              {/* Download removed per request */}
             </motion.div>
           </div>
 
@@ -433,6 +379,15 @@ const Hero: React.FC = () => {
           )}
         </motion.div>
       </div>
+      {/* Resume Viewer Modal (lazy-loaded only when opened) */}
+      {isResumeOpen && (
+        <Suspense fallback={null}>
+          <ResumeViewer
+            isOpen={isResumeOpen}
+            onClose={() => setIsResumeOpen(false)}
+          />
+        </Suspense>
+      )}
     </section>
   );
 };
