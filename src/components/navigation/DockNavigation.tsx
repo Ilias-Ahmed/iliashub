@@ -84,13 +84,32 @@ const DockNavigation: React.FC<DockNavigationProps> = ({
     sections = [],
   } = navigation || {};
 
+  type AccentColors = { primary: string; glow: string; border: string };
+  const fallbackGetAccentColors = (): AccentColors => ({
+    primary: "#8b5cf6",
+    glow: "rgba(139,92,246,0.4)",
+    border: "rgba(139,92,246,0.4)",
+  });
   const {
     mode = "dark",
     accent = "purple",
     setTheme = () => {},
     setAccent = () => {},
     isDark = true,
-  } = theme || {};
+    getAccentColors = fallbackGetAccentColors,
+  } = theme || {
+    mode: "dark",
+    accent: "purple",
+    setTheme: () => {},
+    setAccent: () => {},
+    isDark: true,
+    getAccentColors: fallbackGetAccentColors,
+  };
+  const accentColors = getAccentColors?.() ?? {
+    primary: "#8b5cf6",
+    glow: "rgba(139,92,246,0.4)",
+    border: "rgba(139,92,246,0.4)",
+  };
 
   // Memoized available sections to prevent unnecessary re-renders
   const availableSections = useMemo(() => {
@@ -99,49 +118,31 @@ const DockNavigation: React.FC<DockNavigationProps> = ({
     );
   }, [sections]);
 
-  // Memoized haptic feedback function
-  const hapticFeedback = useCallback(
-    (intensity: "light" | "medium" | "heavy" = "medium") => {
-      try {
-        if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-          const patterns = { light: 20, medium: 50, heavy: 100 };
-          navigator.vibrate(patterns[intensity]);
-        }
-      } catch (error) {
-        console.debug("Haptic feedback not available:", error);
-      }
-    },
-    []
-  );
-
   // Navigation handler
   const handleNavigation = useCallback(
     (sectionId: string) => {
       try {
         navigateToSection(sectionId);
-        hapticFeedback("light");
       } catch (error) {
         console.error("Navigation failed:", error);
       }
     },
-    [navigateToSection, hapticFeedback]
+    [navigateToSection]
   );
 
   // Theme handlers
   const handleThemeChange = useCallback(
     (newMode: ThemeMode) => {
       setTheme(newMode);
-      hapticFeedback("light");
     },
-    [setTheme, hapticFeedback]
+    [setTheme]
   );
 
   const handleAccentChange = useCallback(
     (newAccent: ThemeAccent) => {
       setAccent(newAccent);
-      hapticFeedback("light");
     },
-    [setAccent, hapticFeedback]
+    [setAccent]
   );
 
   // Time update effect
@@ -189,15 +190,31 @@ const DockNavigation: React.FC<DockNavigationProps> = ({
             <DockIcon>
               <div
                 className={`flex h-full w-full items-center justify-center rounded-xl transition-all duration-300 relative overflow-hidden`}
+                style={{
+                  boxShadow:
+                    activeSection === id
+                      ? `0 8px 24px ${accentColors.glow}`
+                      : undefined,
+                  borderColor:
+                    activeSection === id ? accentColors.border : undefined,
+                  borderWidth: activeSection === id ? 2 : undefined,
+                }}
               >
                 <IconComponent className="h-6 w-6 relative z-10" />
                 {/* Active indicator dot */}
                 {activeSection === id && (
                   <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-white rounded-full shadow-sm" />
                 )}
-                {/* Glow effect for active state */}
+                {/* Subtle overlay for active state using accent color */}
                 {activeSection === id && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/30 to-blue-600/30 rounded-xl" />
+                  <div
+                    className="absolute inset-0 rounded-xl"
+                    style={{
+                      background: isDark
+                        ? `linear-gradient(135deg, ${accentColors.primary}22, transparent)`
+                        : `linear-gradient(135deg, ${accentColors.primary}18, transparent)`,
+                    }}
+                  />
                 )}
               </div>
             </DockIcon>
@@ -306,12 +323,31 @@ const DockNavigation: React.FC<DockNavigationProps> = ({
                       <button
                         key={color.name}
                         onClick={() => handleAccentChange(color.name)}
-                        className={`relative w-8 h-8 rounded-full border-2 transition-all duration-200 hover:scale-110
-                          ${color.color} ${
+                        className={`relative w-8 h-8 rounded-full border-2 transition-all duration-200 hover:scale-110 ${
                           accent === color.name
-                            ? "border-foreground scale-110 shadow-lg"
-                            : "border-transparent hover:border-foreground/50"
+                            ? "scale-110 shadow-lg"
+                            : "border-transparent"
                         }`}
+                        style={{
+                          backgroundColor:
+                            color.name === "purple"
+                              ? "#8b5cf6"
+                              : color.name === "blue"
+                              ? "#3b82f6"
+                              : color.name === "pink"
+                              ? "#ec4899"
+                              : color.name === "green"
+                              ? "#22c55e"
+                              : "#f97316",
+                          borderColor:
+                            accent === color.name
+                              ? accentColors.border
+                              : "transparent",
+                          boxShadow:
+                            accent === color.name
+                              ? `0 8px 24px ${accentColors.glow}`
+                              : undefined,
+                        }}
                         aria-label={`Set accent color to ${color.label}`}
                       >
                         {accent === color.name && (
@@ -330,7 +366,6 @@ const DockNavigation: React.FC<DockNavigationProps> = ({
                         new CustomEvent("openCommandPalette")
                       );
                       setIsSystemTrayOpen(false);
-                      hapticFeedback("light");
                     }}
                     className="w-full flex items-center gap-3 p-3 rounded-lg
                       hover:bg-accent transition-all duration-200 text-left hover:scale-[1.02]"

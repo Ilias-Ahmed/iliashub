@@ -1,4 +1,4 @@
-import { useAudio } from "@/contexts/AudioContext";
+// AudioContext removed
 import { useDeviceDetection, useIsMobile } from "@/hooks/use-mobile";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -35,18 +35,19 @@ const AudioControls: React.FC<AudioControlsProps> = ({
   onVisualizerChange,
   currentVisualizer = "bars",
 }) => {
-  const {
-    isPlaying,
-    volume,
-    currentTime,
-    duration,
-    isLoading,
-    error,
-    play,
-    pause,
-    setVolume,
-    seek,
-  } = useAudio();
+  // Audio system removed: provide inert local state fallback
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [volume, setVolume] = React.useState(0.5);
+  const [currentTime, setCurrentTime] = React.useState(0);
+  const [duration] = React.useState(180);
+  const [isLoading] = React.useState(false);
+  const [error] = React.useState<string | null>(null);
+  const play = React.useCallback(async () => setIsPlaying(true), []);
+  const pause = React.useCallback(() => setIsPlaying(false), []);
+  const seek = React.useCallback(
+    (t: number) => setCurrentTime(Math.max(0, Math.min(duration, t))),
+    [duration]
+  );
 
   // Use your existing mobile detection hooks
   const isMobile = useIsMobile();

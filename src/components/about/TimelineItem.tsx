@@ -1,5 +1,5 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { AnimatePresence, motion } from "framer-motion";
 
 export interface TimelineItemProps {
@@ -86,7 +86,7 @@ const TimelineItem = ({
         }}
         onClick={() => {
           setActiveTimelineItem(activeTimelineItem === index ? null : index);
-          triggerHapticFeedback();
+          // haptics removed
         }}
       >
         <span

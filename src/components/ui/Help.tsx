@@ -1,17 +1,17 @@
-import React, { useMemo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Mic,
-  Keyboard,
-  Hand,
-  Menu,
-  Settings,
-  Info,
-  X,
-  HelpCircle,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { triggerHapticFeedback } from "@/utils/haptics";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Hand,
+  HelpCircle,
+  Info,
+  Keyboard,
+  Menu,
+  Mic,
+  Settings,
+  X,
+} from "lucide-react";
+import React, { useCallback, useMemo } from "react";
+// haptics removed
 
 interface HelpProps {
   activeTab: "menu" | "keyboard" | "gesture" | "voice" | "settings" | "about";
@@ -196,7 +196,9 @@ const Help: React.FC<HelpProps> = ({
       {/* Header with back button */}
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         <button
-          onClick={() => { onBack(); triggerHapticFeedback(); }}
+          onClick={() => {
+            onBack();
+          }}
           className="flex items-center text-white/70 hover:text-white"
         >
           <svg
@@ -216,12 +218,13 @@ const Help: React.FC<HelpProps> = ({
           Back
         </button>
         <h2 className="text-lg font-medium">Portfolio Guide</h2>
-        <button onClick={() => {
-          onClose();
-          triggerHapticFeedback();
-        }
-        }
-          className="text-white/70 hover:text-white">
+        <button
+          onClick={() => {
+            onClose();
+            // haptics removed
+          }}
+          className="text-white/70 hover:text-white"
+        >
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -243,8 +246,8 @@ const Help: React.FC<HelpProps> = ({
                 activeTab === tab ? `2px solid ${accentColor}` : "none",
             }}
             onClick={() => {
-              setActiveTab(tab)
-              triggerHapticFeedback();
+              setActiveTab(tab);
+              // haptics removed
             }}
           >
             {getTabIcon(tab)}

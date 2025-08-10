@@ -1,8 +1,8 @@
-import { motion } from "framer-motion";
-import { Grid3X3, Layers, Clock } from "lucide-react";
-import { ViewMode } from "./types";
 import { useTheme } from "@/contexts/ThemeContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
+import { motion } from "framer-motion";
+import { Clock, Grid3X3, Layers } from "lucide-react";
+import { ViewMode } from "./types";
+// haptics removed
 
 interface ProjectViewToggleProps {
   activeView: ViewMode;
@@ -54,7 +54,7 @@ const ProjectViewToggle = ({
             key={option.id}
             onClick={() => {
               onChange(option.id);
-              triggerHapticFeedback();
+              // haptics removed
             }}
             className="relative px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2"
             style={{

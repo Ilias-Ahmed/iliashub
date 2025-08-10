@@ -1,6 +1,6 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -48,7 +48,7 @@ const BackToTop: React.FC<BackToTopProps> = ({
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    triggerHapticFeedback();
+    // haptics removed
   };
 
   // Position classes - mobile gets closer to bottom/right edge

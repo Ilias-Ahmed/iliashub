@@ -1,18 +1,18 @@
-import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Send, Loader, CheckCircle, Sparkles } from "lucide-react";
-import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useTheme } from "@/contexts/ThemeContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
-import emailjs from '@emailjs/browser';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AnimatePresence, motion } from "framer-motion";
+import { CheckCircle, Loader, Send } from "lucide-react";
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+// haptics removed
+import emailjs from "@emailjs/browser";
 
 import {
+  EMAILJS_PUBLIC_KEY,
   EMAILJS_SERVICE_ID,
   EMAILJS_TEMPLATE_ID,
-  EMAILJS_PUBLIC_KEY,
 } from "@/utils/emailjs";
 
 // Define schema with Zod
@@ -58,7 +58,7 @@ const ContactForm = () => {
   });
 
   const onSubmit = async (data: ContactFormData) => {
-    triggerHapticFeedback();
+    // haptics removed
     setFormState((prev) => ({
       ...prev,
       isSubmitting: true,
@@ -141,7 +141,7 @@ const ContactForm = () => {
 
   return (
     <div
-      className="p-8 py-14 rounded-2xl backdrop-blur-sm border relative overflow-hidden theme-transition"
+      className="p-8 rounded-2xl backdrop-blur-sm border relative overflow-hidden theme-transition"
       style={{
         backgroundColor: isDark
           ? "rgba(255,255,255,0.05)"
@@ -210,7 +210,7 @@ const ContactForm = () => {
             <button
               onClick={() => {
                 setFormState((prev) => ({ ...prev, isSubmitted: false }));
-                triggerHapticFeedback();
+                // haptics removed
                 reset();
               }}
               className="px-6 py-2 rounded-lg transition-colors duration-300 border"
@@ -235,20 +235,7 @@ const ContactForm = () => {
             transition={{ duration: 0.3 }}
           >
             <h3 className="text-2xl font-bold mb-6 inline-flex items-center">
-              <span
-                className="p-2 rounded-lg mr-3"
-                style={{ backgroundColor: `${accentColors.primary}20` }}
-              >
-                <Send
-                  className="w-5 h-5"
-                  style={{ color: accentColors.primary }}
-                />
-              </span>
-              Send a Message
-              <Sparkles
-                className="w-5 h-5 ml-2 animate-pulse"
-                style={{ color: accentColors.primary }}
-              />
+            Connect with me
             </h3>
 
             <form
@@ -438,7 +425,7 @@ const ContactForm = () => {
                 </div>
               </div>
 
-              <motion.button
+                <motion.button
                 type="submit"
                 disabled={formState.isSubmitting}
                 className="w-full py-3 px-6 text-white font-medium rounded-lg transition-all hover:opacity-90 focus:outline-none focus:ring-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
@@ -448,7 +435,7 @@ const ContactForm = () => {
                 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => triggerHapticFeedback()}
+                onClick={() => {}}
               >
                 {formState.isSubmitting ? (
                   <>
@@ -463,17 +450,6 @@ const ContactForm = () => {
                 )}
               </motion.button>
 
-              <div className="text-center text-xs opacity-50 mt-4">
-                By submitting this form, you agree to our{" "}
-                <a
-                  href="#"
-                  className="hover:underline"
-                  style={{ color: accentColors.primary }}
-                >
-                  Privacy Policy
-                </a>
-                .
-              </div>
             </form>
           </motion.div>
         )}
@@ -483,4 +459,3 @@ const ContactForm = () => {
 };
 
 export default ContactForm;
-

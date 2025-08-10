@@ -1,5 +1,5 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { motion } from "framer-motion";
 import { useMemo } from "react";
 import SkillComparisonChart from "./SkillComparisonChart";
@@ -88,7 +88,7 @@ const ComparisonView = ({
                 key={skill.id}
                 onClick={() => {
                   toggleComparisonSkill(skill.id);
-                  triggerHapticFeedback();
+                  // haptics removed
                 }}
                 className="p-3 rounded-lg border transition-all duration-200 hover:shadow-md"
                 style={{
@@ -189,7 +189,7 @@ const ComparisonView = ({
                         <button
                           onClick={() => {
                             toggleComparisonSkill(skill.id);
-                            triggerHapticFeedback();
+                            // haptics removed
                           }}
                           className="mt-2 text-xs px-2 py-1 rounded-full transition-colors"
                           style={{
@@ -322,7 +322,7 @@ const ComparisonView = ({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center py-16"
+          className="text-center py-8"
         >
           <div
             className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center"

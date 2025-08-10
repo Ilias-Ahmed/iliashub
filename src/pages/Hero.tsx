@@ -1,6 +1,5 @@
 import styles from "@/components/ui/bubble.module.css";
-import ControlPanel from "@/components/ui/ControlPanel";
-import { useBackground } from "@/contexts/BackgroundContext";
+// BackgroundContext removed
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -125,7 +124,6 @@ const Hero: React.FC = () => {
   const { isDark, getAccentColors } = useTheme();
   const accentColors: AccentColors =
     getAccentColors() as unknown as AccentColors;
-  const { setCurrentSection } = useBackground();
   const isMobile = useIsMobile();
 
   // Mouse tracking for parallax
@@ -191,10 +189,7 @@ const Hero: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Set current section for background system
-  useEffect(() => {
-    setCurrentSection("hero");
-  }, [setCurrentSection]);
+  // Background system removed
 
   // Background styles
   const backgroundStyles = useMemo(
@@ -219,8 +214,6 @@ const Hero: React.FC = () => {
       id="hero"
       style={backgroundStyles}
     >
-      {/* Control Panel */}
-      <ControlPanel />
 
       {/* Main Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

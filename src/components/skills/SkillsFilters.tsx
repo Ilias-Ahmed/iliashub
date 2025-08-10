@@ -1,5 +1,5 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { motion } from "framer-motion";
 import { BarChart3, GitCompare, Grid3X3, Search, X } from "lucide-react";
 import { skills } from "./skillsData";
@@ -47,12 +47,12 @@ const SkillsFilters = ({
     if (mode !== "comparison") {
       setComparisonSkills([]);
     }
-    triggerHapticFeedback();
+    // haptics removed
   };
 
   const clearSearch = () => {
     setSearchQuery("");
-    triggerHapticFeedback();
+    // haptics removed
   };
 
   return (
@@ -106,7 +106,7 @@ const SkillsFilters = ({
               key={category}
               onClick={() => {
                 setSelectedCategory(category);
-                triggerHapticFeedback();
+                // haptics removed
               }}
               className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
               style={{
@@ -228,7 +228,7 @@ const SkillsFilters = ({
               <button
                 onClick={() => {
                   setSelectedCategory("All");
-                  triggerHapticFeedback();
+                  // haptics removed
                 }}
                 className="hover:opacity-70 transition-opacity"
               >

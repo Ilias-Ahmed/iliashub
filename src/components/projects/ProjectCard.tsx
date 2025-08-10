@@ -1,8 +1,13 @@
-import { useState, useRef } from "react";
-import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
-import { Github, ExternalLink, Info } from "lucide-react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
+import { ExternalLink, Github, Info } from "lucide-react";
+import { useRef, useState } from "react";
 import { Project } from "./types";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { useTheme } from "@/contexts/ThemeContext";
 
 interface ProjectCardProps {
@@ -122,7 +127,7 @@ const ProjectCard = ({
         />
 
         {/* Card content */}
-        <div className="relative h-full w-full p-6 flex flex-col justify-end">
+        <div className="relative h-full w-full p-4 md:p-6 flex flex-col justify-end">
           {/* Project tags */}
           <motion.div
             className="flex flex-wrap gap-2 mb-4"
@@ -153,7 +158,7 @@ const ProjectCard = ({
 
           {/* Project title */}
           <motion.h3
-            className="text-2xl font-bold mb-2"
+            className="text-xl md:text-2xl font-bold mb-2 line-clamp-2"
             style={{
               transform: "translateZ(60px)",
               color: isHovered ? accentColors.primary : "white",
@@ -166,7 +171,7 @@ const ProjectCard = ({
 
           {/* Project description */}
           <motion.p
-            className="text-sm text-gray-300 mb-6"
+            className="text-sm text-gray-300 mb-4 md:mb-6 line-clamp-3"
             style={{
               transform: "translateZ(40px)",
               opacity: isHovered ? 1 : 0.7,
@@ -177,17 +182,17 @@ const ProjectCard = ({
 
           {/* Action buttons */}
           <motion.div
-            className="flex space-x-3"
+            className="flex flex-wrap gap-2"
             style={{
               transform: "translateZ(70px)",
-              opacity: isHovered ? 1 : 0,
+              opacity: isHovered ? 1 : 0.95,
             }}
           >
             <motion.a
               href={project.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 rounded-full text-white flex items-center gap-2 text-sm font-medium"
+              className="px-3 md:px-4 py-2 rounded-full text-white flex items-center gap-2 text-sm font-medium"
               style={{
                 backgroundColor: accentColors.primary,
                 boxShadow: `0 4px 14px ${accentColors.shadow}`,
@@ -227,7 +232,7 @@ const ProjectCard = ({
             <motion.button
               onClick={() => {
                 setShowDetails(true);
-                triggerHapticFeedback();
+                // haptics removed
               }}
               className="w-9 h-9 flex items-center justify-center rounded-full transition-colors border"
               style={{
@@ -295,7 +300,7 @@ const ProjectCard = ({
             exit={{ opacity: 0 }}
             onClick={() => {
               setShowDetails(false);
-              triggerHapticFeedback();
+              // haptics removed
             }}
           >
             <motion.div
@@ -312,7 +317,7 @@ const ProjectCard = ({
               exit={{ scale: 0.9, y: 20 }}
               onClick={(e) => {
                 e.stopPropagation();
-                triggerHapticFeedback();
+                // haptics removed
               }}
             >
               <div className="relative h-64 rounded-xl overflow-hidden mb-6">
@@ -452,7 +457,7 @@ const ProjectCard = ({
                 <motion.button
                   onClick={() => {
                     setShowDetails(false);
-                    triggerHapticFeedback();
+                    // haptics removed
                   }}
                   className="px-6 py-3 rounded-lg font-medium border"
                   style={{

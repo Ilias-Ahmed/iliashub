@@ -15,14 +15,17 @@ import {
   Sun,
   User,
   Workflow,
+  X,
 } from "lucide-react";
 import React, { useEffect, useRef } from "react";
 
-interface NavigationMenuProps {
+interface MobileNavigationProps {
   className?: string;
 }
 
-const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
+const MobileNavigation: React.FC<MobileNavigationProps> = ({
+  className = "",
+}) => {
   const navigation = useNavigation();
   const theme = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -36,13 +39,27 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
     activeSection = "home",
   } = navigation || {};
 
+  type ThemeTokens = {
+    mode: ThemeMode;
+    setTheme: (m: ThemeMode) => void;
+    accent: ThemeAccent;
+    setAccent: (a: ThemeAccent) => void;
+    isDark: boolean;
+  };
+  const fallbackTheme: ThemeTokens = {
+    mode: "dark",
+    setTheme: () => {},
+    accent: "purple",
+    setAccent: () => {},
+    isDark: true,
+  };
   const {
     mode = "dark",
     setTheme = () => {},
     accent = "purple",
     setAccent = () => {},
     isDark = true,
-  } = theme || {};
+  } = (theme as unknown as ThemeTokens) || fallbackTheme;
 
   // Section icons
   const sectionIcons: Record<
@@ -87,7 +104,7 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
     },
   ];
 
-  // Navigation sections are always shown (no filtering)
+  // Sections to render (no search filter on mobile)
   const filteredSections = sections;
 
   // Handle navigation
@@ -118,6 +135,8 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
     }
   };
 
+  // No search field; keep keyboard escape to close
+
   // Keyboard handling
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -136,17 +155,28 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
   const menuVariants = {
     closed: {
       x: "100%",
-      transition: { type: "spring" as const, stiffness: 400, damping: 40 },
+      opacity: 0.8,
+      scale: 0.98,
+      transition: { type: "spring" as const, stiffness: 500, damping: 42 },
     },
     open: {
       x: "0%",
-      transition: { type: "spring" as const, stiffness: 400, damping: 40 },
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 500,
+        damping: 40,
+        bounce: 0.2,
+        staggerChildren: 0.06,
+        delayChildren: 0.08,
+      },
     },
   };
 
   const itemVariants = {
-    closed: { x: 20, opacity: 0 },
-    open: { x: 0, opacity: 1 },
+    closed: { y: 8, opacity: 0 },
+    open: { y: 0, opacity: 1 },
   };
 
   return (
@@ -158,7 +188,7 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-background/60 backdrop-blur-md z-40"
             onClick={closeMenu}
             aria-hidden="true"
           />
@@ -170,40 +200,39 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
             initial="closed"
             animate="open"
             exit="closed"
-            className={`fixed top-0 right-0 h-full w-full max-w-sm z-50 ${
+            className={`fixed top-0 right-0 h-full w-full max-w-sm sm:max-w-sm z-50 ${
               isDark
-                ? "bg-gray-950/95 border-l border-gray-800/50"
-                : "bg-white/95 border-l border-gray-200/50"
+                ? "bg-gray-950/90 border-l border-gray-800/40"
+                : "bg-white/90 border-l border-gray-200/40"
             } backdrop-blur-xl shadow-2xl ${className}`}
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
           >
             <div className="flex flex-col h-full">
-              {/* Header with close button */}
-              <motion.div variants={itemVariants} className="p-6 pt-4">
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={closeMenu}
-                    className={`p-2 rounded-lg transition-all duration-200 ${
-                      isDark
-                        ? "hover:bg-gray-800/50 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]"
-                        : "hover:bg-gray-100/50 hover:shadow-[0_0_15px_rgba(139,92,246,0.2)]"
-                    }`}
-                    aria-label="Close menu"
-                  >
-                    <div className="w-6 h-6 relative">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-4 h-0.5 bg-current transform rotate-45" />
-                        <div className="w-4 h-0.5 bg-current transform -rotate-45" />
-                      </div>
-                    </div>
-                  </button>
-                </div>
+              {/* Header */}
+              <motion.div
+                variants={itemVariants}
+                className={`flex items-center justify-between p-4 md:p-6 ${
+                  isDark
+                    ? "border-b border-gray-800/40"
+                    : "border-b border-gray-200/40"
+                }`}
+              >
+                <h1 className="text-xl font-semibold">Menu</h1>
+                <button
+                  onClick={closeMenu}
+                  className={`p-3 rounded-xl transition-colors touch-manipulation ${
+                    isDark ? "hover:bg-gray-800/50" : "hover:bg-gray-100/50"
+                  }`}
+                  aria-label="Close menu"
+                >
+                  <X size={24} />
+                </button>
               </motion.div>
 
               {/* Content */}
-              <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-8">
+              <div className="flex-1 overflow-y-auto px-4 md:px-6 pb-5 md:pb-6 space-y-6 md:space-y-8">
                 {/* Navigation Sections */}
                 <motion.div variants={itemVariants}>
                   <div className="space-y-2">
@@ -215,13 +244,13 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
                         <motion.button
                           key={section.id}
                           onClick={() => handleNavigation(section.id)}
-                          className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl
+                          className={`w-full flex items-center gap-4 px-4 py-3.5 md:py-4 rounded-xl
                             text-left transition-all duration-200 touch-manipulation ${
                               isActive
-                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                                ? "bg-primary text-primary-foreground shadow-lg"
                                 : isDark
-                                ? "hover:bg-gray-800/50 hover:shadow-[0_0_10px_rgba(139,92,246,0.2)]"
-                                : "hover:bg-gray-100/50 hover:shadow-[0_0_10px_rgba(139,92,246,0.15)]"
+                                ? "hover:bg-gray-800/50"
+                                : "hover:bg-gray-100/50"
                             }`}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
@@ -255,7 +284,7 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
                             </div>
                             {section.description && (
                               <div
-                                className={`text-sm mt-1 ${
+                                className={`text-sm mt-0.5 ${
                                   isActive
                                     ? "text-primary-foreground/70"
                                     : "text-muted-foreground"
@@ -281,12 +310,10 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
 
                 {/* Theme Settings */}
                 <motion.div variants={itemVariants}>
-                  <h2 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider">
-                    Appearance
-                  </h2>
 
                   {/* Theme Modes */}
-                  <div className="mb-6">
+                  <div className="mb-5 md:mb-6">
+                    <div className="text-sm font-medium mb-3">Theme</div>
                     <div className="grid grid-cols-3 gap-2">
                       {(["light", "dark", "system"] as ThemeMode[]).map(
                         (themeMode) => {
@@ -300,10 +327,10 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
                               className={`flex flex-col items-center gap-2 p-3 rounded-xl
                               transition-all duration-200 text-xs touch-manipulation ${
                                 isActive
-                                  ? "bg-primary/20 text-primary border border-primary/30 shadow-[0_0_15px_rgba(139,92,246,0.3)]"
+                                  ? "bg-primary/20 text-primary border border-primary/30"
                                   : isDark
-                                  ? "hover:bg-gray-800/50 hover:shadow-[0_0_10px_rgba(139,92,246,0.2)]"
-                                  : "hover:bg-gray-100/50 hover:shadow-[0_0_10px_rgba(139,92,246,0.15)]"
+                                  ? "hover:bg-gray-800/50"
+                                  : "hover:bg-gray-100/50"
                               }`}
                               aria-pressed={isActive}
                             >
@@ -326,13 +353,13 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
                         <button
                           key={option.color}
                           onClick={() => handleAccentChange(option.color)}
-                          className={`relative w-12 h-12 rounded-xl border-2 transition-all duration-200
+                          className={`relative w-11 h-11 md:w-12 md:h-12 rounded-xl border-2 transition-all duration-200
                             bg-gradient-to-br ${
                               option.gradient
                             } touch-manipulation ${
                             accent === option.color
-                              ? "border-foreground scale-110 shadow-lg shadow-primary/25"
-                              : "border-transparent hover:border-foreground/30 hover:shadow-[0_0_10px_rgba(139,92,246,0.2)]"
+                              ? "border-foreground scale-105 md:scale-110 shadow-lg"
+                              : "border-transparent hover:border-foreground/30"
                           }`}
                           aria-label={`Set accent color to ${option.label}`}
                           aria-pressed={accent === option.color}
@@ -356,4 +383,4 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ className = "" }) => {
   );
 };
 
-export default NavigationMenu;
+export default MobileNavigation;

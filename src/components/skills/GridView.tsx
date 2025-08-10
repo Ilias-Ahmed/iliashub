@@ -1,7 +1,7 @@
 import { Marquee } from "@/components/ui/Marque";
 import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { AnimatePresence, motion } from "framer-motion";
 import { memo, useMemo, useState } from "react";
 import { Skill, ViewMode } from "./types";
@@ -375,14 +375,14 @@ const GridView = ({
       setExpandedSkill(skill.id);
       setSelectedSkill(skill);
     }
-    triggerHapticFeedback();
+    // haptics removed
   };
 
   const handleCompareClick = (e: React.MouseEvent, skillId: string) => {
     e.stopPropagation();
     setViewMode("comparison");
     setComparisonSkills([skillId]);
-    triggerHapticFeedback();
+    // haptics removed
   };
 
   return (

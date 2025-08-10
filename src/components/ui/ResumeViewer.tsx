@@ -1,4 +1,4 @@
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { AnimatePresence, motion } from "framer-motion";
 import { Download, FileText, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -78,7 +78,7 @@ const ResumeViewer: React.FC<Props> = ({ isOpen, onClose }) => {
                   href="/resume.pdf"
                   download="Ilias_Ahmed_Resume.pdf"
                   className="px-3 py-1.5 rounded-full bg-primary/20 text-primary hover:bg-primary/30 transition-colors text-sm flex items-center gap-2"
-                  onClick={() => triggerHapticFeedback()}
+                  onClick={() => {}}
                 >
                   <Download size={16} />
                   <span>Download</span>
@@ -86,7 +86,7 @@ const ResumeViewer: React.FC<Props> = ({ isOpen, onClose }) => {
                 <button
                   onClick={() => {
                     onClose();
-                    triggerHapticFeedback();
+                    // haptics removed
                   }}
                   className="p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
                   aria-label="Close resume viewer"
