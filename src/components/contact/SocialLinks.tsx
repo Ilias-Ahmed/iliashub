@@ -2,7 +2,6 @@ import { OrbitingCircles } from "@/components/ui/OrbitingCircles";
 import { triggerHapticFeedback } from "@/utils/haptics";
 import { motion } from "framer-motion";
 import {
-  BookOpen,
   Facebook,
   Github,
   Instagram,
