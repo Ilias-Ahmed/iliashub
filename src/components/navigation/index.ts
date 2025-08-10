@@ -4,11 +4,9 @@ import {
 } from "@/contexts/NavigationContext";
 import CommandPalette from "../ui/CommandPalette";
 import DockNavigation from "./DockNavigation";
-import DotsNavigation from "./DotsNavigation";
 import { Dock, DockIcon, DockItem, DockLabel } from "./MacDock";
-import MobileNavigationMenu from "./MobileNavigationMenu";
+import MobileNavigation from "./MobileNavigation";
 import Navigation from "./Navigation";
-import NavigationMenu from "./NavigationMenu";
 import VoiceNavigation from "./VoiceNavigation";
 
 export {
@@ -18,10 +16,8 @@ export {
   DockItem,
   DockLabel,
   DockNavigation,
-  DotsNavigation,
-  MobileNavigationMenu,
+  MobileNavigation,
   Navigation,
-  NavigationMenu,
   NavigationProvider,
   useNavigation,
   VoiceNavigation,

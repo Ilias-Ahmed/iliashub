@@ -133,14 +133,6 @@ const SkillsSection = () => {
           className="text-center mb-12"
         >
           <motion.div variants={itemVariants} transition={{ duration: 0.6 }}>
-            <h2
-              className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r"
-              style={{
-                backgroundImage: `linear-gradient(to right, ${accentColors.primary}, ${accentColors.secondary}, #10b981)`,
-              }}
-            >
-              Skills & Expertise
-            </h2>
             <p
               className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed"
               style={{
