@@ -1,5 +1,4 @@
 import styles from "@/components/ui/bubble.module.css";
-import ControlPanel from "@/components/ui/ControlPanel";
 // BackgroundContext removed
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -215,8 +214,6 @@ const Hero: React.FC = () => {
       id="hero"
       style={backgroundStyles}
     >
-      {/* Control Panel */}
-      <ControlPanel />
 
       {/* Main Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

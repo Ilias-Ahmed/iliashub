@@ -66,7 +66,11 @@ const Navigation: React.FC<NavigationProps> = ({
           className="fixed right-4 top-4 z-50 rounded-md border border-border/60 bg-background/70 backdrop-blur-md p-2 shadow-sm hover:bg-background transition-colors"
           type="button"
         >
-          {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {isMenuOpen ? (
+            <X className="h-5 w-5" />
+          ) : (
+            <Menu className="h-5 w-5" />
+          )}
         </button>
       )}
 

@@ -76,13 +76,6 @@ export const certifications: CertificationItem[] = [
       "https://images.unsplash.com/photo-1565106430482-8f6e74349ca1?q=80&w=2670&auto=format&fit=crop",
   },
   {
-    title: "Google Cloud Professional Developer",
-    issuer: "Google",
-    date: "2021",
-    image:
-      "https://images.unsplash.com/photo-1573164713988-8665fc963095?q=80&w=2669&auto=format&fit=crop",
-  },
-  {
     title: "React Advanced Concepts",
     issuer: "Frontend Masters",
     date: "2020",

@@ -127,7 +127,7 @@ const ProjectCard = ({
         />
 
         {/* Card content */}
-        <div className="relative h-full w-full p-6 flex flex-col justify-end">
+        <div className="relative h-full w-full p-4 md:p-6 flex flex-col justify-end">
           {/* Project tags */}
           <motion.div
             className="flex flex-wrap gap-2 mb-4"
@@ -158,7 +158,7 @@ const ProjectCard = ({
 
           {/* Project title */}
           <motion.h3
-            className="text-2xl font-bold mb-2"
+            className="text-xl md:text-2xl font-bold mb-2 line-clamp-2"
             style={{
               transform: "translateZ(60px)",
               color: isHovered ? accentColors.primary : "white",
@@ -171,7 +171,7 @@ const ProjectCard = ({
 
           {/* Project description */}
           <motion.p
-            className="text-sm text-gray-300 mb-6"
+            className="text-sm text-gray-300 mb-4 md:mb-6 line-clamp-3"
             style={{
               transform: "translateZ(40px)",
               opacity: isHovered ? 1 : 0.7,
@@ -182,17 +182,17 @@ const ProjectCard = ({
 
           {/* Action buttons */}
           <motion.div
-            className="flex space-x-3"
+            className="flex flex-wrap gap-2"
             style={{
               transform: "translateZ(70px)",
-              opacity: isHovered ? 1 : 0,
+              opacity: isHovered ? 1 : 0.95,
             }}
           >
             <motion.a
               href={project.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 rounded-full text-white flex items-center gap-2 text-sm font-medium"
+              className="px-3 md:px-4 py-2 rounded-full text-white flex items-center gap-2 text-sm font-medium"
               style={{
                 backgroundColor: accentColors.primary,
                 boxShadow: `0 4px 14px ${accentColors.shadow}`,

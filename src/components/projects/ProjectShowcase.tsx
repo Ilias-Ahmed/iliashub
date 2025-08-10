@@ -159,7 +159,7 @@ const ProjectShowcase = ({
     >
       {/* Main showcase area */}
       <div
-        className="relative h-[600px] rounded-2xl overflow-hidden perspective-1000"
+        className="relative h-[420px] sm:h-[500px] md:h-[560px] lg:h-[600px] rounded-2xl overflow-hidden perspective-1000"
         onMouseMove={handleMouseMove}
         onMouseLeave={resetMouse}
       >
