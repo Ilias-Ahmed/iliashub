@@ -1,5 +1,5 @@
 import { useNavigation } from "@/contexts/NavigationContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { Command } from "cmdk";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp, HelpCircle, Search } from "lucide-react";
@@ -64,7 +64,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
             exit={{ opacity: 0 }}
             onClick={() => {
               onOpenChange(false);
-              triggerHapticFeedback();
+              // haptics removed
             }}
           />
 
@@ -94,7 +94,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
                     <button
                       onClick={() => {
                         setActiveView("help");
-                        triggerHapticFeedback();
+                        // haptics removed
                       }}
                       className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white"
                       title="Help"

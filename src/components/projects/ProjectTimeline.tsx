@@ -1,5 +1,5 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Calendar,
@@ -44,7 +44,7 @@ const ProjectTimeline = ({ projects }: ProjectTimelineProps) => {
 
   const toggleProject = (projectId: string) => {
     setExpandedProject(expandedProject === projectId ? null : projectId);
-    triggerHapticFeedback();
+    // haptics removed
   };
 
   return (

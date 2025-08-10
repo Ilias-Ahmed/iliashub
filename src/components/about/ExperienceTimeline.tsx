@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/contexts/ThemeContext";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
 import { timelineData } from "./aboutData";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 
 interface ExperienceTimelineProps {
   timelineData: typeof timelineData;
@@ -56,7 +56,7 @@ const ExperienceTimeline = ({ timelineData }: ExperienceTimelineProps) => {
                 }}
                 onClick={() => {
                   setActiveItem(index);
-                  triggerHapticFeedback();
+                  // haptics removed
                 }}
                 onMouseEnter={() => setHoveredItem(index)}
                 onMouseLeave={() => setHoveredItem(null)}

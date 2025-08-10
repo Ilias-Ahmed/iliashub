@@ -1,5 +1,5 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { motion } from "framer-motion";
 import { useMemo } from "react";
 import SkillRadarChart from "./SkillRadarChart";
@@ -151,7 +151,7 @@ const MasteryView = ({ skills, setSelectedSkill }: MasteryViewProps) => {
                     className="group "
                     onClick={() => {
                       setSelectedSkill(skill);
-                      triggerHapticFeedback();
+                      // haptics removed
                     }}
                   >
                     <div

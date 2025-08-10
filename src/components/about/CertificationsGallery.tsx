@@ -1,8 +1,8 @@
-import { useState, useRef } from "react";
-import { motion } from "framer-motion";
 import { useTheme } from "@/contexts/ThemeContext";
+import { motion } from "framer-motion";
+import { useRef, useState } from "react";
 import { CertificationItem } from "./aboutData";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 
 interface CertificationsGalleryProps {
   certifications: CertificationItem[];
@@ -148,7 +148,7 @@ const CertificationsGallery = ({
               transform: activeIndex === index ? "scale(1.25)" : "scale(1)",
             }}
             onClick={() => {
-              triggerHapticFeedback();
+              // haptics removed
               setActiveIndex(index);
               if (scrollRef.current) {
                 scrollRef.current.scrollTo({

@@ -1,6 +1,6 @@
 import { Tabs, TabsList } from "@/components/ui/tabs";
 import { useTheme } from "@/contexts/ThemeContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { animated, useSpring } from "@react-spring/web";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -239,7 +239,7 @@ const AboutSection = () => {
                         : "rgba(0,0,0,0.7)",
                   }}
                   onClick={() => {
-                    triggerHapticFeedback();
+                    // haptics removed
                     setActiveTab(tab.value);
                   }}
                   whileHover={{ scale: 1.04 }}

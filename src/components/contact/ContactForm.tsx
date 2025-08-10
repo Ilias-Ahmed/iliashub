@@ -1,18 +1,18 @@
-import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Send, Loader, CheckCircle, Sparkles } from "lucide-react";
-import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useTheme } from "@/contexts/ThemeContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
-import emailjs from '@emailjs/browser';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AnimatePresence, motion } from "framer-motion";
+import { CheckCircle, Loader, Send, Sparkles } from "lucide-react";
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+// haptics removed
+import emailjs from "@emailjs/browser";
 
 import {
+  EMAILJS_PUBLIC_KEY,
   EMAILJS_SERVICE_ID,
   EMAILJS_TEMPLATE_ID,
-  EMAILJS_PUBLIC_KEY,
 } from "@/utils/emailjs";
 
 // Define schema with Zod
@@ -58,7 +58,7 @@ const ContactForm = () => {
   });
 
   const onSubmit = async (data: ContactFormData) => {
-    triggerHapticFeedback();
+    // haptics removed
     setFormState((prev) => ({
       ...prev,
       isSubmitting: true,
@@ -210,7 +210,7 @@ const ContactForm = () => {
             <button
               onClick={() => {
                 setFormState((prev) => ({ ...prev, isSubmitted: false }));
-                triggerHapticFeedback();
+                // haptics removed
                 reset();
               }}
               className="px-6 py-2 rounded-lg transition-colors duration-300 border"
@@ -448,7 +448,7 @@ const ContactForm = () => {
                 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => triggerHapticFeedback()}
+                onClick={() => {}}
               >
                 {formState.isSubmitting ? (
                   <>
@@ -483,4 +483,3 @@ const ContactForm = () => {
 };
 
 export default ContactForm;
-

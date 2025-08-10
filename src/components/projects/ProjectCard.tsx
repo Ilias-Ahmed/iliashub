@@ -1,8 +1,13 @@
-import { useState, useRef } from "react";
-import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
-import { Github, ExternalLink, Info } from "lucide-react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
+import { ExternalLink, Github, Info } from "lucide-react";
+import { useRef, useState } from "react";
 import { Project } from "./types";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { useTheme } from "@/contexts/ThemeContext";
 
 interface ProjectCardProps {
@@ -227,7 +232,7 @@ const ProjectCard = ({
             <motion.button
               onClick={() => {
                 setShowDetails(true);
-                triggerHapticFeedback();
+                // haptics removed
               }}
               className="w-9 h-9 flex items-center justify-center rounded-full transition-colors border"
               style={{
@@ -295,7 +300,7 @@ const ProjectCard = ({
             exit={{ opacity: 0 }}
             onClick={() => {
               setShowDetails(false);
-              triggerHapticFeedback();
+              // haptics removed
             }}
           >
             <motion.div
@@ -312,7 +317,7 @@ const ProjectCard = ({
               exit={{ scale: 0.9, y: 20 }}
               onClick={(e) => {
                 e.stopPropagation();
-                triggerHapticFeedback();
+                // haptics removed
               }}
             >
               <div className="relative h-64 rounded-xl overflow-hidden mb-6">
@@ -452,7 +457,7 @@ const ProjectCard = ({
                 <motion.button
                   onClick={() => {
                     setShowDetails(false);
-                    triggerHapticFeedback();
+                    // haptics removed
                   }}
                   className="px-6 py-3 rounded-lg font-medium border"
                   style={{

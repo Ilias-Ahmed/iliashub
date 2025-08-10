@@ -1,8 +1,8 @@
+import { AnimatePresence, motion } from "framer-motion";
+import { Award, Clock, ExternalLink, GitBranch, X } from "lucide-react";
 import { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, ExternalLink, GitBranch, Clock, Award } from "lucide-react";
 import { Skill, ViewMode } from "./types";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { useTheme } from "@/contexts/ThemeContext";
 
 interface SkillDetailModalProps {
@@ -51,7 +51,7 @@ const SkillDetailModal = ({
       setViewMode("comparison");
       setComparisonSkills([selectedSkill.id]);
       setSelectedSkill(null);
-      triggerHapticFeedback();
+      // haptics removed
     }
   };
 
@@ -286,7 +286,7 @@ const SkillDetailModal = ({
                       key={skill.id}
                       onClick={() => {
                         setSelectedSkill(skill);
-                        triggerHapticFeedback();
+                        // haptics removed
                       }}
                       className="p-3 rounded-lg border transition-all duration-200 hover:shadow-md"
                       style={{
@@ -357,7 +357,7 @@ const SkillDetailModal = ({
                     `https://developer.mozilla.org/en-US/search?q=${selectedSkill.name}`,
                     "_blank"
                   );
-                  triggerHapticFeedback();
+                  // haptics removed
                 }}
                 className="py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 border"
                 style={{

@@ -1,5 +1,5 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import {
   AnimatePresence,
   motion,
@@ -105,24 +105,24 @@ const ProjectShowcase = ({
   const goToNext = () => {
     setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % projects.length);
-    triggerHapticFeedback();
+    // haptics removed
   };
 
   const goToPrevious = () => {
     setDirection(-1);
     setCurrentIndex((prev) => (prev - 1 + projects.length) % projects.length);
-    triggerHapticFeedback();
+    // haptics removed
   };
 
   const goToSlide = (index: number) => {
     setDirection(index > currentIndex ? 1 : -1);
     setCurrentIndex(index);
-    triggerHapticFeedback();
+    // haptics removed
   };
 
   const togglePlayPause = () => {
     setIsPlaying(!isPlaying);
-    triggerHapticFeedback();
+    // haptics removed
   };
 
   const currentProject = projects[currentIndex];

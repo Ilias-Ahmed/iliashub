@@ -27,21 +27,6 @@ interface SectionMapping {
   [key: string]: string;
 }
 
-// Utility function for haptic feedback with proper error handling
-const triggerHapticFeedback = (
-  intensity: "light" | "medium" | "heavy" = "medium"
-): void => {
-  try {
-    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-      const patterns = { light: 20, medium: 50, heavy: 100 };
-      navigator.vibrate(patterns[intensity]);
-    }
-  } catch (error) {
-    // Silently fail - haptic feedback is optional
-    console.debug("Haptic feedback not available:", error);
-  }
-};
-
 // Main Navigation Component
 const Navigation: React.FC<NavigationProps> = ({
   enableDots = true,
@@ -79,13 +64,7 @@ const Navigation: React.FC<NavigationProps> = ({
   }, []);
 
   // Enhanced haptic feedback with proper error boundaries
-  const safeHapticFeedback = useCallback(
-    (intensity: "light" | "medium" | "heavy" = "medium") => {
-      if (!isInitialized) return;
-      triggerHapticFeedback(intensity);
-    },
-    [isInitialized]
-  );
+  const safeHapticFeedback = useCallback(() => {}, []);
 
   // Menu toggle handler with error boundaries
   const handleMenuToggle = useCallback(() => {
@@ -403,9 +382,7 @@ const Navigation: React.FC<NavigationProps> = ({
       )}
 
       {/* Enhanced Navigation Menu Component */}
-      {navigationFlags.showHamburgerMenu && enableMenu && (
-        <NavigationMenu />
-      )}
+      {navigationFlags.showHamburgerMenu && enableMenu && <NavigationMenu />}
 
       {/* Fallback Traditional Menu */}
       {navigationFlags.showHamburgerMenu && !enableMenu && (
@@ -428,7 +405,6 @@ const Navigation: React.FC<NavigationProps> = ({
               }}
             >
               <div className="h-full flex flex-col justify-center max-w-screen-lg mx-auto px-6 py-10">
-
                 {/* Navigation Links */}
                 <nav
                   className="space-y-3 mb-12"

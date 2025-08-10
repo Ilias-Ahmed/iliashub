@@ -1,5 +1,5 @@
 import { OrbitingCircles } from "@/components/ui/OrbitingCircles";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 import { motion } from "framer-motion";
 import {
   Facebook,
@@ -9,8 +9,8 @@ import {
   X,
   Youtube,
 } from "lucide-react";
-import { FaWhatsapp } from "react-icons/fa";// Import WhatsApp icon from react-icons
 import React from "react";
+import { FaWhatsapp } from "react-icons/fa"; // Import WhatsApp icon from react-icons
 
 type SocialLink = {
   icon: React.ReactNode;
@@ -45,7 +45,7 @@ const SocialIcon = ({
         borderColor: `${social.hoverColor}60`,
       }}
       whileTap={{ scale: 0.9 }}
-      onClick={() => triggerHapticFeedback()}
+      onClick={() => {}}
     >
       <span style={{ color: social.hoverColor, fontSize: size }}>
         {social.icon}
@@ -101,7 +101,6 @@ const SocialLinks = () => {
       label: "Facebook",
       hoverColor: "#1877f2",
     },
-
   ];
 
   return (

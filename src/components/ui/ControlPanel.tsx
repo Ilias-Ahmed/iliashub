@@ -1,9 +1,12 @@
-import { useAudio } from "@/contexts/AudioContext";
-import {
-  BackgroundMode,
-  IntensityLevel,
-  useBackground,
-} from "@/contexts/BackgroundContext";
+// Audio and Background contexts removed
+type BackgroundMode =
+  | "adaptive"
+  | "particles"
+  | "neural"
+  | "hologram"
+  | "matrix"
+  | "minimal";
+type IntensityLevel = "low" | "medium" | "high";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -64,22 +67,51 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ className = "" }) => {
   const isMobile = useIsMobile();
 
   // Audio Controls
-  const {
-    isPlaying,
-    volume,
-    currentTime,
-    duration,
-    isLoading,
-    error,
-    play,
-    pause,
-    setVolume,
-    seek,
-  } = useAudio();
+  // Audio placeholder state
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.5);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration] = useState(180);
+  const [isLoading] = useState(false);
+  const [error] = useState<string | null>(null);
+  const play = useCallback(async () => setIsPlaying(true), []);
+  const pause = useCallback(() => setIsPlaying(false), []);
+  const seek = useCallback(
+    (t: number) => setCurrentTime(Math.max(0, Math.min(duration, t))),
+    [duration]
+  );
 
   // Background Controls
-  const { config, updateConfig, resetToDefaults, isPerformanceMode } =
-    useBackground();
+  // Background placeholder config
+  const [config, setConfig] = useState({
+    mode: "minimal" as BackgroundMode,
+    intensity: "low" as IntensityLevel,
+    performanceMode: "low" as const,
+    enableInteractivity: false,
+    enableAudioVisualization: false,
+    enableParallax: false,
+    adaptToSection: false,
+    opacity: 0.6,
+    particleCount: 10,
+    animationSpeed: 0.7,
+  });
+  const updateConfig = useCallback(
+    (u: Partial<typeof config>) => setConfig((p) => ({ ...p, ...u })),
+    []
+  );
+  const resetToDefaults = useCallback(
+    () =>
+      setConfig((p) => ({
+        ...p,
+        mode: "minimal",
+        intensity: "low",
+        opacity: 0.6,
+        particleCount: 10,
+        animationSpeed: 0.7,
+      })),
+    []
+  );
+  const isPerformanceMode = false;
 
   // Dragging functionality (desktop only)
   const x = useMotionValue(0);

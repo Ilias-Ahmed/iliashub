@@ -1,7 +1,7 @@
 import Navigation from "@/components/navigation/Navigation";
 import ScrollProgressBar from "@/components/ui/ScrollProgressBar";
 import { SmoothCursor } from "@/components/ui/SmoothCursor";
-import { useBackground } from "@/contexts/BackgroundContext";
+// Background disabled: removed BackgroundContext
 import { NavigationProvider } from "@/contexts/NavigationContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Hero from "@/pages/Hero";
@@ -33,7 +33,7 @@ const Index = () => {
   const scrollingRef = useRef(false);
 
   // Background context integration
-  const { setCurrentSection } = useBackground();
+  const setCurrentSection = React.useCallback(() => {}, []);
 
   // Define navigation sections
   const navSections = useMemo(
@@ -96,8 +96,8 @@ const Index = () => {
       targetSection = matchingSection ? matchingSection.id : "home";
     }
 
-    // Update background context
-    setCurrentSection(targetSection);
+    // Background disabled: no-op
+    setCurrentSection();
 
     const element = document.getElementById(targetSection);
     if (element) {
@@ -142,8 +142,8 @@ const Index = () => {
 
           // If viewport middle is within this section
           if (viewportMid >= sectionTop && viewportMid <= sectionBottom) {
-            // Update background context
-            setCurrentSection(section.id);
+            // Background disabled: no-op
+            setCurrentSection();
 
             // Only update URL if it's different from current path
             const targetPath = section.id === "home" ? "/" : `/${section.id}`;

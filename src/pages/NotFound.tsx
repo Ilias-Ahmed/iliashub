@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { triggerHapticFeedback } from "@/utils/haptics";
-import { useTheme } from "@/contexts/ThemeContext";
+// haptics removed
 import { CoolMode } from "@/components/ui/CoolMode";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface Particle {
   id: string;
@@ -579,63 +579,63 @@ const NotFound: React.FC = () => {
           >
             <Link to="/">
               <CoolMode
-                      options={{
-                        particle:
-                          "https://pbs.twimg.com/profile_images/1782811051504885763/YR5-kWOI_400x400.jpg",
-                      }}
-                    >
-              <motion.button
-                className="px-8 py-3 rounded-lg font-medium border-2 relative overflow-hidden group"
-                style={{
-                  backgroundColor: showPortal
-                    ? themeColors.primary
-                    : themeColors.primary,
-                  color: "#ffffff",
-                  borderColor: themeColors.primaryAlpha(0.5),
-                  boxShadow: `0 4px 20px ${themeColors.primaryAlpha(0.25)}`,
+                options={{
+                  particle:
+                    "https://pbs.twimg.com/profile_images/1782811051504885763/YR5-kWOI_400x400.jpg",
                 }}
-                whileHover={{
-                  scale: 1.02,
-                  boxShadow: `0 6px 25px ${themeColors.primaryAlpha(0.4)}`,
-                }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => triggerHapticFeedback()}
               >
-                <span className="relative z-10 flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                    />
-                  </svg>
-                  <span>{showPortal ? "Enter Portal" : "Return Home"}</span>
-                </span>
-
-                {/* Button glow effect */}
-                <motion.span
-                  className="absolute inset-0 w-full h-full rounded-lg"
+                <motion.button
+                  className="px-8 py-3 rounded-lg font-medium border-2 relative overflow-hidden group"
                   style={{
-                    background: `linear-gradient(90deg, transparent, ${themeColors.primaryAlpha(
-                      0.3
-                    )}, transparent)`,
+                    backgroundColor: showPortal
+                      ? themeColors.primary
+                      : themeColors.primary,
+                    color: "#ffffff",
+                    borderColor: themeColors.primaryAlpha(0.5),
+                    boxShadow: `0 4px 20px ${themeColors.primaryAlpha(0.25)}`,
                   }}
-                  animate={{
-                    x: ["-100%", "100%"],
+                  whileHover={{
+                    scale: 1.02,
+                    boxShadow: `0 6px 25px ${themeColors.primaryAlpha(0.4)}`,
                   }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                />
-              </motion.button>
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {}}
+                >
+                  <span className="relative z-10 flex items-center justify-center">
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                      />
+                    </svg>
+                    <span>{showPortal ? "Enter Portal" : "Return Home"}</span>
+                  </span>
+
+                  {/* Button glow effect */}
+                  <motion.span
+                    className="absolute inset-0 w-full h-full rounded-lg"
+                    style={{
+                      background: `linear-gradient(90deg, transparent, ${themeColors.primaryAlpha(
+                        0.3
+                      )}, transparent)`,
+                    }}
+                    animate={{
+                      x: ["-100%", "100%"],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  />
+                </motion.button>
               </CoolMode>
             </Link>
 
@@ -654,7 +654,7 @@ const NotFound: React.FC = () => {
               whileTap={{ scale: 0.98 }}
               onClick={() => {
                 window.history.back();
-                triggerHapticFeedback();
+                // haptics removed
               }}
             >
               <span className="flex items-center justify-center">
@@ -923,4 +923,3 @@ const NotFound: React.FC = () => {
 };
 
 export default NotFound;
-

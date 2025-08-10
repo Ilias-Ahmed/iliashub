@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "@/contexts/ThemeContext";
+import { AnimatePresence, motion } from "framer-motion";
 import { Filter, Search, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import ProjectCard from "./ProjectCard";
 import { Project, ProjectFilter } from "./types";
-import { useTheme } from "@/contexts/ThemeContext";
-import { triggerHapticFeedback } from "@/utils/haptics";
+// haptics removed
 
 interface ProjectGridProps {
   projects: Project[];
@@ -108,7 +108,7 @@ const ProjectGrid = ({ projects, columns = 3 }: ProjectGridProps) => {
         <motion.button
           onClick={() => {
             setShowFilters(!showFilters);
-            triggerHapticFeedback();
+            // haptics removed
           }}
           className="flex items-center gap-2 px-4 py-3 rounded-lg border transition-all duration-200"
           style={{
@@ -261,7 +261,7 @@ const ProjectGrid = ({ projects, columns = 3 }: ProjectGridProps) => {
                 <motion.button
                   onClick={() => {
                     setFilter({});
-                    triggerHapticFeedback();
+                    // haptics removed
                   }}
                   className="mt-4 flex items-center gap-2 px-3 py-1 rounded-lg text-sm transition-all duration-200"
                   style={{
@@ -294,7 +294,7 @@ const ProjectGrid = ({ projects, columns = 3 }: ProjectGridProps) => {
           <motion.button
             onClick={() => {
               setSearchTerm("");
-              triggerHapticFeedback();
+              // haptics removed
             }}
             className="flex items-center gap-2 px-3 py-1 rounded-lg text-sm transition-all duration-200"
             style={{
@@ -355,7 +355,7 @@ const ProjectGrid = ({ projects, columns = 3 }: ProjectGridProps) => {
             onClick={() => {
               setSearchTerm("");
               setFilter({});
-              triggerHapticFeedback();
+              // haptics removed
             }}
             className="px-4 py-2 rounded-lg transition-all duration-200"
             style={{
@@ -374,4 +374,3 @@ const ProjectGrid = ({ projects, columns = 3 }: ProjectGridProps) => {
 };
 
 export default ProjectGrid;
-
