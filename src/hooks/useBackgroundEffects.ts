@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { useBackground } from '@/contexts/BackgroundContext';
-import { useAudio } from '@/contexts/AudioContext';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useAudio } from "@/contexts/AudioContext";
+import { useBackground } from "@/contexts/BackgroundContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // Define proper types for the background effects
 interface Particle {
@@ -73,11 +73,11 @@ class AnimationFrameManager {
     const animate = () => {
       if (!this.isRunning) return;
 
-      this.callbacks.forEach(callback => {
+      this.callbacks.forEach((callback) => {
         try {
           callback();
         } catch (error) {
-          console.error('Animation callback error:', error);
+          console.error("Animation callback error:", error);
         }
       });
 
@@ -111,7 +111,10 @@ class AnimationFrameManager {
 }
 
 // Utility Functions
-const createParticleSystem = (canvas: HTMLCanvasElement, count: number): Particle[] => {
+const createParticleSystem = (
+  canvas: HTMLCanvasElement,
+  count: number
+): Particle[] => {
   const particles: Particle[] = [];
 
   for (let i = 0; i < count; i++) {
@@ -142,7 +145,7 @@ const updateParticles = (
   deltaTime: number,
   mousePosition?: { x: number; y: number }
 ) => {
-  particles.forEach(particle => {
+  particles.forEach((particle) => {
     // Update position
     particle.x += particle.vx * deltaTime * 0.01;
     particle.y += particle.vy * deltaTime * 0.01;
@@ -185,7 +188,7 @@ const renderParticles = (
   particles: Particle[],
   opacity: number = 1
 ) => {
-  particles.forEach(particle => {
+  particles.forEach((particle) => {
     ctx.save();
     ctx.globalAlpha = particle.opacity * opacity;
     ctx.fillStyle = particle.color;
@@ -196,7 +199,10 @@ const renderParticles = (
   });
 };
 
-const createNeuralNetwork = (canvas: HTMLCanvasElement, nodeCount: number): NeuralNode[] => {
+const createNeuralNetwork = (
+  canvas: HTMLCanvasElement,
+  nodeCount: number
+): NeuralNode[] => {
   const nodes: NeuralNode[] = [];
 
   // Create nodes
@@ -273,7 +279,7 @@ const renderNeuralNetwork = (
   ctx.save();
   ctx.globalAlpha = opacity * 0.3;
   nodes.forEach((node, index) => {
-    node.connections.forEach(connectionIndex => {
+    node.connections.forEach((connectionIndex) => {
       if (connectionIndex < index) return; // Avoid duplicate lines
 
       const connectedNode = nodes[connectionIndex];
@@ -281,7 +287,7 @@ const renderNeuralNetwork = (
 
       const activity = (node.activity + connectedNode.activity) / 2;
 
-      ctx.strokeStyle = `rgba(${colors.primary.join(',')}, ${activity})`;
+      ctx.strokeStyle = `rgba(${colors.primary.join(",")}, ${activity})`;
       ctx.lineWidth = activity * 2;
       ctx.beginPath();
       ctx.moveTo(node.x, node.y);
@@ -291,16 +297,23 @@ const renderNeuralNetwork = (
   });
 
   // Render nodes
-  nodes.forEach(node => {
+  nodes.forEach((node) => {
     ctx.globalAlpha = opacity * (0.5 + node.activity * 0.5);
 
     // Node glow
     const gradient = ctx.createRadialGradient(
-      node.x, node.y, 0,
-      node.x, node.y, node.size * 2
+      node.x,
+      node.y,
+      0,
+      node.x,
+      node.y,
+      node.size * 2
     );
-    gradient.addColorStop(0, `rgba(${colors.secondary.join(',')}, ${node.activity})`);
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    gradient.addColorStop(
+      0,
+      `rgba(${colors.secondary.join(",")}, ${node.activity})`
+    );
+    gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
 
     ctx.fillStyle = gradient;
     ctx.beginPath();
@@ -308,7 +321,9 @@ const renderNeuralNetwork = (
     ctx.fill();
 
     // Node core
-    ctx.fillStyle = `rgba(${colors.primary.join(',')}, ${0.8 + node.activity * 0.2})`;
+    ctx.fillStyle = `rgba(${colors.primary.join(",")}, ${
+      0.8 + node.activity * 0.2
+    })`;
     ctx.beginPath();
     ctx.arc(node.x, node.y, node.size, 0, Math.PI * 2);
     ctx.fill();
@@ -375,9 +390,9 @@ const renderHologramGrid = (
 ) => {
   ctx.save();
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     ctx.globalAlpha = opacity * Math.max(0, line.opacity);
-    ctx.strokeStyle = `rgba(${colors.primary.join(',')}, 1)`;
+    ctx.strokeStyle = `rgba(${colors.primary.join(",")}, 1)`;
     ctx.lineWidth = 1;
     ctx.setLineDash([5, 5]);
     ctx.beginPath();
@@ -393,7 +408,8 @@ const createMatrixRain = (canvas: HTMLCanvasElement): MatrixDrop[] => {
   const columns = Math.floor(canvas.width / 20);
   const drops: MatrixDrop[] = [];
 
-  const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+  const chars =
+    "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
 
   for (let i = 0; i < columns; i++) {
     drops.push({
@@ -413,9 +429,10 @@ const updateMatrixRain = (
   canvas: HTMLCanvasElement,
   deltaTime: number
 ) => {
-  const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+  const chars =
+    "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
 
-  drops.forEach(drop => {
+  drops.forEach((drop) => {
     drop.y += drop.speed * deltaTime * 0.1;
 
     if (drop.y > canvas.height) {
@@ -613,6 +630,11 @@ export const useBackgroundEffects = (
 
   const [isInitialized, setIsInitialized] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isInViewport, setIsInViewport] = useState(true);
+  const [isDocumentVisible, setIsDocumentVisible] = useState(true);
+  const [targetFPS, setTargetFPS] = useState<number>(
+    config.performanceMode === "low" ? 30 : 60
+  );
 
   const animationManagerRef = useRef<AnimationFrameManager | null>(null);
   const particlesRef = useRef<Particle[]>([]);
@@ -620,6 +642,7 @@ export const useBackgroundEffects = (
   const hologramLinesRef = useRef<HologramLine[]>([]);
   const matrixDropsRef = useRef<MatrixDrop[]>([]);
   const lastTimeRef = useRef(performance.now());
+  const lastFrameTimeRef = useRef(0);
 
   // Initialize animation systems
   useEffect(() => {
@@ -684,7 +707,7 @@ export const useBackgroundEffects = (
         animationManagerRef.current.stop();
       }
     };
-  }, [config.mode, config.particleCount, canvasRef]);
+  }, [config.mode, config.particleCount, config.performanceMode, canvasRef]);
 
   // Handle mouse movement for interactivity
   useEffect(() => {
@@ -707,12 +730,22 @@ export const useBackgroundEffects = (
   // Animation callback
   const animate = useCallback(() => {
     if (!canvasRef.current) return;
+    // Skip rendering if tab hidden or canvas offscreen
+    if (!isDocumentVisible || !isInViewport) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const currentTime = performance.now();
+    // FPS cap
+    const minFrameTime = 1000 / targetFPS;
+    const elapsedSinceLast = currentTime - lastFrameTimeRef.current;
+    if (elapsedSinceLast < minFrameTime) {
+      return;
+    }
+    lastFrameTimeRef.current = currentTime;
+
     const deltaTime =
       (currentTime - lastTimeRef.current) * config.animationSpeed;
     lastTimeRef.current = currentTime;
@@ -754,6 +787,8 @@ export const useBackgroundEffects = (
         }
       }
     }
+
+    // No pixel ratio scaling to keep drawing coordinates consistent
 
     const colors = getThemeColors(accent, isDark);
 
@@ -832,7 +867,9 @@ export const useBackgroundEffects = (
           neuralNodesRef.current,
           canvas,
           deltaTime,
-          config.enableAudioVisualization && audioData != null ? audioData : undefined
+          config.enableAudioVisualization && audioData != null
+            ? audioData
+            : undefined
         );
 
         if (audioAnalysis) {
@@ -881,7 +918,19 @@ export const useBackgroundEffects = (
         renderParticles(ctx, particlesRef.current, config.opacity);
         break;
     }
-  }, [config, accent, isDark, mousePosition, audioData, canvasRef]);
+
+    // No additional restore needed
+  }, [
+    config,
+    accent,
+    isDark,
+    mousePosition,
+    audioData,
+    canvasRef,
+    isDocumentVisible,
+    isInViewport,
+    targetFPS,
+  ]);
 
   // Main animation loop
   useEffect(() => {
@@ -893,6 +942,46 @@ export const useBackgroundEffects = (
 
     return removeCallback;
   }, [isInitialized, animate]);
+
+  // Observe document visibility to pause when the tab is hidden
+  useEffect(() => {
+    const handleVisibility = () =>
+      setIsDocumentVisible(document.visibilityState === "visible");
+    handleVisibility();
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibility as EventListener
+    );
+    return () =>
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibility as EventListener
+      );
+  }, []);
+
+  // Observe canvas visibility within viewport to skip offscreen work
+  useEffect(() => {
+    if (!canvasRef.current || typeof IntersectionObserver === "undefined")
+      return;
+    const el = canvasRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.target === el) {
+            setIsInViewport(entry.isIntersecting);
+          }
+        }
+      },
+      { root: null, threshold: 0.01 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [canvasRef]);
+
+  // Adjust FPS target reactively when performance mode changes
+  useEffect(() => {
+    setTargetFPS(config.performanceMode === "low" ? 30 : 60);
+  }, [config.performanceMode]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -908,4 +997,3 @@ export const useBackgroundEffects = (
     mousePosition,
   };
 };
-

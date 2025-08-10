@@ -82,6 +82,7 @@ const BackgroundContext = createContext<BackgroundContextType | undefined>(
   undefined
 );
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useBackground(): BackgroundContextType {
   const context = useContext(BackgroundContext);
   if (!context) {
@@ -129,6 +130,33 @@ export function BackgroundProvider({
   const [currentSection, setCurrentSectionState] = useState<string>("home");
   const [backgroundOpacity, setBackgroundOpacityState] = useState<number>(0.8);
   const [isPerformanceMode, setIsPerformanceMode] = useState<boolean>(false);
+
+  // Respect prefers-reduced-motion by forcing a minimal, low-performance configuration
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const applyReducedMotion = (reduce: boolean) => {
+      if (reduce) {
+        setConfig((prev) => ({
+          ...prev,
+          mode: "minimal",
+          intensity: "low",
+          performanceMode: "low",
+          enableInteractivity: false,
+          enableAudioVisualization: false,
+          enableParallax: false,
+          particleCount: Math.min(prev.particleCount, 12),
+          animationSpeed: Math.min(prev.animationSpeed, 0.4),
+        }));
+      }
+    };
+
+    applyReducedMotion(mql.matches);
+    const listener = (e: MediaQueryListEvent) => applyReducedMotion(e.matches);
+    mql.addEventListener?.("change", listener);
+    return () => mql.removeEventListener?.("change", listener);
+  }, []);
 
   useEffect(() => {
     if (config.performanceMode !== "auto") return;
