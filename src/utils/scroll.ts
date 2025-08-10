@@ -1,181 +1,112 @@
 import Lenis from "lenis";
 
-/**
- * Enhanced scroll utility with improved error handling and mobile optimization
- */
-
 export interface ScrollOptions {
   offset?: number;
-  duration?: number;
-  immediate?: boolean;
-  easing?: (t: number) => number;
+  behavior?: ScrollBehavior; // 'smooth' | 'auto'
+}
+
+declare global {
+  // Augment window to store a shared Lenis instance
+  interface Window {
+    __lenis?: Lenis;
+  }
 }
 
 /**
- * Detects if the user is on a mobile device
+ * Initializes a single Lenis instance for smooth scrolling and stores it on window.__lenis.
+ * If running in a non-DOM environment, returns null.
  */
-export const isMobileDevice = (): boolean => {
-  if (typeof window === "undefined") return false;
-
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
-  ) || window.innerWidth < 768;
-};
-
-/**
- * Scroll to a specific element with enhanced error handling
- */
-export const scrollToElement = async (
-  element: HTMLElement | null,
-  options: ScrollOptions = {}
-): Promise<void> => {
-  if (!element) {
-    console.warn("Element not found for scrolling");
-    return Promise.resolve();
-  }
-
-  const {
-    offset = -100,
-    duration = isMobileDevice() ? 0.8 : 1.2,
-    immediate = false,
-    easing = (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
-  } = options;
-
-  // Get Lenis instance from window if available
-  interface LenisWindow extends Window {
-    __lenis?: Lenis;
-  }
-  const lenis = (window as LenisWindow).__lenis;
-
-  if (lenis && !immediate) {
-    try {
-      return new Promise<void>((resolve) => {
-        lenis.scrollTo(element, {
-          offset,
-          duration,
-          easing,
-          onComplete: () => resolve(),
-        });
-      });
-    } catch (error) {
-      console.error("Lenis scroll failed:", error);
-      // Fallback to native scroll
-    }
-  }
-
-  // Native scroll fallback
-  try {
-    const elementTop = element.getBoundingClientRect().top + window.scrollY;
-    const targetPosition = elementTop + offset;
-
-    if (immediate || !("scrollBehavior" in document.documentElement.style)) {
-      window.scrollTo(0, targetPosition);
-      return Promise.resolve();
-    }
-
-    window.scrollTo({
-      top: targetPosition,
-      behavior: "smooth"
-    });
-
-    return Promise.resolve();
-  } catch (error) {
-    console.error("Native scroll failed:", error);
-    return Promise.resolve();
-  }
-};
-
-/**
- * Scroll to a section by ID with improved error handling
- */
-export const scrollToSection = async (
-  sectionId: string,
-  options: ScrollOptions = {}
-): Promise<void> => {
-  if (!sectionId) {
-    console.warn("No section ID provided for scrolling");
-    return Promise.resolve();
-  }
-
-  const section = document.getElementById(sectionId);
-  if (!section) {
-    console.warn(`Section with ID "${sectionId}" not found`);
-    return Promise.resolve();
-  }
-
-  return scrollToElement(section, options);
-};
-
-/**
- * Get the currently visible section based on scroll position
- */
-export const getCurrentSection = (
-  sections: string[],
-  offset: number = 100
-): string | null => {
-  if (typeof window === "undefined" || !sections.length) return null;
-
-  const scrollPosition = window.scrollY + offset;
-  const viewportHeight = window.innerHeight;
-
-  // Find section that is most visible in viewport
-  let maxVisibleArea = 0;
-  let currentSection: string | null = null;
-
-  sections.forEach((sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (!element) return;
-
-    const rect = element.getBoundingClientRect();
-    const elementTop = rect.top + window.scrollY;
-    const elementBottom = elementTop + rect.height;
-
-    // Calculate visible area, considering offset
-    const visibleTop = Math.max(elementTop, scrollPosition);
-    const visibleBottom = Math.min(elementBottom, scrollPosition + viewportHeight);
-    const visibleArea = Math.max(0, visibleBottom - visibleTop);
-
-    if (visibleArea > maxVisibleArea) {
-      maxVisibleArea = visibleArea;
-      currentSection = sectionId;
-    }
-  });
-
-  return currentSection;
-};
-
-/**
- * Initialize smooth scrolling with Lenis
- */
-export const initSmoothScrolling = (): Lenis | null => {
-  if (typeof window === "undefined") return null;
-
-  try {
-    const lenis = new Lenis({
-      duration: isMobileDevice() ? 1.0 : 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      wheelMultiplier: isMobileDevice() ? 1.0 : 0.8,
-      touchMultiplier: 1.5,
-      infinite: false,
-    });
-
-    // Store globally for access
-    interface LenisWindow extends Window {
-      __lenis?: Lenis;
-    }
-    (window as LenisWindow).__lenis = lenis;
-
-    const raf = (time: number): void => {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    };
-
-    requestAnimationFrame(raf);
-
-    return lenis;
-  } catch (error) {
-    console.error("Failed to initialize Lenis:", error);
+export function initSmoothScrolling(): Lenis | null {
+  if (typeof window === "undefined" || typeof document === "undefined") {
     return null;
   }
-};
+
+  // Reuse existing instance if present
+  if (window.__lenis) return window.__lenis;
+
+  const lenis = new Lenis({
+    // Tweak as needed
+    duration: 1.2,
+    easing: (t: number) => 1 - Math.pow(1 - t, 3),
+    smoothWheel: true,
+    syncTouch: true,
+  });
+
+  function raf(time: number) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+
+  window.__lenis = lenis;
+  return lenis;
+}
+
+/**
+ * Scroll to a section by id using Lenis when available, or native scroll behavior as fallback.
+ */
+export async function scrollToSection(
+  sectionId: string,
+  options: ScrollOptions = {}
+): Promise<void> {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return;
+  }
+
+  const target = document.getElementById(sectionId);
+  if (!target) return;
+
+  const { offset = 0, behavior = "smooth" } = options;
+
+  const lenis = window.__lenis;
+  if (lenis) {
+    // Lenis supports HTMLElement or number with options
+    await lenis.scrollTo(target, { offset });
+  } else {
+    const rect = target.getBoundingClientRect();
+    const y = window.scrollY + rect.top + offset;
+    window.scrollTo({ top: y, behavior });
+  }
+}
+
+/**
+ * Determine which section id is currently in view.
+ * Returns the id with the closest top to the viewport top, preferring those on-screen.
+ */
+export function getCurrentSection(sectionIds: string[]): string | null {
+  if (typeof document === "undefined") return null;
+
+  let bestId: string | null = null;
+  let bestScore = Number.POSITIVE_INFINITY;
+
+  const viewportHeight =
+    window.innerHeight || document.documentElement.clientHeight;
+
+  for (const id of sectionIds) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    const rect = el.getBoundingClientRect();
+
+    // Consider within viewport if at least partly visible
+    const visible =
+      rect.top < viewportHeight * 0.6 && rect.bottom > viewportHeight * 0.2;
+    const score = Math.abs(rect.top); // distance from top of viewport
+
+    if (visible && score < bestScore) {
+      bestScore = score;
+      bestId = id;
+    }
+  }
+
+  // Fallback: choose the section whose top has passed the viewport top most recently
+  if (!bestId) {
+    for (const id of sectionIds) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      const rect = el.getBoundingClientRect();
+      if (rect.top <= 120) bestId = id; // header offset heuristic
+    }
+  }
+
+  return bestId;
+}

@@ -1,7 +1,16 @@
 import { OrbitingCircles } from "@/components/ui/OrbitingCircles";
 import { triggerHapticFeedback } from "@/utils/haptics";
 import { motion } from "framer-motion";
-import { BookOpen, Github, Instagram, Linkedin, Twitter } from "lucide-react";
+import {
+  Facebook,
+  Github,
+  Instagram,
+  Linkedin,
+  X,
+  Youtube,
+} from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";// Import WhatsApp icon from react-icons
+import React from "react";
 
 type SocialLink = {
   icon: React.ReactNode;
@@ -18,7 +27,6 @@ const SocialIcon = ({
   social: SocialLink;
   size?: number;
 }) => {
-
   return (
     <motion.a
       href={social.url}
@@ -47,53 +55,70 @@ const SocialIcon = ({
 };
 
 const SocialLinks = () => {
+  // Pause orbits on hover
+  const [isHovered, setIsHovered] = React.useState(false);
+
   const socialLinks: SocialLink[] = [
     {
-      icon: <Github size={18} />,
+      icon: <Github size={18} />, // Keep GitHub
       url: "https://github.com/Ilias-Ahmed",
       label: "GitHub",
       hoverColor: "#ffffff",
     },
     {
-      icon: <Linkedin size={18} />,
+      icon: <Linkedin size={18} />, // LinkedIn
       url: "https://www.linkedin.com/in/ilias-ahmed9613/",
       label: "LinkedIn",
       hoverColor: "#0077b5",
     },
     {
-      icon: <Twitter size={18} />,
-      url: "https://twitter.com/your-handle",
-      label: "Twitter",
-      hoverColor: "#1da1f2",
+      icon: <X size={18} />, // Use Twitter icon for X
+      url: "https://x.com/Ilias_Ahmd",
+      label: "X",
+      hoverColor: "#000000",
     },
     {
-      icon: <Instagram size={18} />,
-      url: "https://instagram.com/your-handle",
+      icon: <Instagram size={18} />, // Instagram
+      url: "https://www.instagram.com/mipedia9613/",
       label: "Instagram",
       hoverColor: "#e4405f",
     },
     {
-      icon: <BookOpen size={18} />,
-      url: "https://medium.com/@your-handle",
-      label: "Medium",
-      hoverColor: "#00ab6c",
+      icon: <FaWhatsapp size={18} />, // WhatsApp channel
+      url: "https://whatsapp.com/channel/0029Vb8Vs0sISTkSqPAFHi0p",
+      label: "WhatsApp",
+      hoverColor: "#25D366",
     },
+    {
+      icon: <Youtube size={18} />, // YouTube
+      url: "https://www.youtube.com/@mipedia9613",
+      label: "YouTube",
+      hoverColor: "#ff0000",
+    },
+    {
+      icon: <Facebook size={18} />, // Facebook
+      url: "https://www.facebook.com/profile.php?id=61576714851069",
+      label: "Facebook",
+      hoverColor: "#1877f2",
+    },
+
   ];
 
   return (
-    <motion.div
-      className="rounded-2xl backdrop-blur-sm border relative overflow-hidden theme-transition"
-
-    >
-
-
+    <motion.div className="rounded-2xl backdrop-blur-sm border relative overflow-hidden theme-transition">
       {/* Orbiting Circles Container */}
-      <div className="relative flex h-[400px] w-full items-center justify-center overflow-hidden">
+      <div
+        className={`relative flex h-[400px] w-full items-center justify-center overflow-hidden ${
+          isHovered ? "marquee-paused" : ""
+        }`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         {/* Outer Orbit - Normal Direction */}
         <OrbitingCircles radius={140} duration={20} iconSize={50}>
-          <SocialIcon social={socialLinks[0]} size={20} />
-          <SocialIcon social={socialLinks[1]} size={20} />
-          <SocialIcon social={socialLinks[2]} size={20} />
+          {socialLinks.slice(0, 4).map((s) => (
+            <SocialIcon key={s.label} social={s} size={20} />
+          ))}
         </OrbitingCircles>
 
         {/* Inner Orbit - Reverse Direction */}
@@ -104,8 +129,9 @@ const SocialLinks = () => {
           speed={2}
           iconSize={40}
         >
-          <SocialIcon social={socialLinks[3]} size={18} />
-          <SocialIcon social={socialLinks[4]} size={18} />
+          {socialLinks.slice(4, 8).map((s) => (
+            <SocialIcon key={s.label} social={s} size={18} />
+          ))}
         </OrbitingCircles>
       </div>
     </motion.div>
