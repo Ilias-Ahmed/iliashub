@@ -20,19 +20,35 @@ const ScrollProgressBar: React.FC<ScrollProgressBarProps> = ({
   const accentColors = getAccentColors();
 
   useEffect(() => {
-    const handleScroll = () => {
-      const height =
-        document.documentElement.scrollHeight -
-        document.documentElement.clientHeight;
-      const current = window.scrollY;
-      const percentage = Math.round((current / height) * 100);
+    let ticking = false;
+    const lastValues = { percent: -1, visible: false };
 
-      setScrollPercentage(percentage);
-      setVisible(current > 100);
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const height =
+          document.documentElement.scrollHeight -
+          document.documentElement.clientHeight;
+        const current = window.scrollY;
+        const percent = height > 0 ? Math.round((current / height) * 100) : 0;
+        const vis = current > 100;
+
+        if (percent !== lastValues.percent) {
+          lastValues.percent = percent;
+          setScrollPercentage(percent);
+        }
+        if (vis !== lastValues.visible) {
+          lastValues.visible = vis;
+          setVisible(vis);
+        }
+        ticking = false;
+      });
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+  window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   // If progress is provided externally, use it

@@ -5,10 +5,17 @@ import { useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 
 // Configure the PDF.js worker for react-pdf (Vite/ESM)
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url
-).toString();
+// Use the worker shipped by the installed pdfjs-dist to avoid version mismatches
+try {
+  // This path is resolved by Vite at build-time
+  // NOTE: Keep it in sync with the installed pdfjs-dist version
+  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+    "pdfjs-dist/build/pdf.worker.min.mjs",
+    import.meta.url
+  ).toString();
+} catch (e) {
+  console.warn("PDF worker setup warning:", e);
+}
 
 type Props = { isOpen: boolean; onClose: () => void };
 
@@ -95,8 +102,8 @@ const ResumeViewer: React.FC<Props> = ({ isOpen, onClose }) => {
                 <Document
                   file={pdfUrl}
                   onLoadSuccess={onDocumentLoadSuccess}
-                  onLoadError={() => {
-                    // Provide a graceful fallback hint
+                  onLoadError={(err) => {
+                    console.warn("PDF load error:", err);
                     console.error("Failed to load PDF file:", pdfUrl);
                   }}
                   loading={
