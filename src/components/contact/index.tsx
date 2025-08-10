@@ -4,7 +4,6 @@ import { useMemo, useRef } from "react";
 
 import AvailabilityBadges from "@/components/contact/AvailabilityBadges";
 import ContactForm from "@/components/contact/ContactForm";
-import ContactInfo from "@/components/contact/ContactInfo";
 import InteractiveMap from "@/components/contact/InteractiveMap";
 import SocialLinks from "@/components/contact/SocialLinks";
 
@@ -86,9 +85,6 @@ const ContactSection = () => {
             animate={isSectionInView ? "visible" : "hidden"}
             className="lg:col-span-2 space-y-8"
           >
-            <motion.div variants={itemVariants}>
-              <ContactInfo />
-            </motion.div>
 
             <motion.div variants={itemVariants}>
               <SocialLinks />

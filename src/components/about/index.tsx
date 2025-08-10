@@ -89,7 +89,7 @@ const AboutSection = () => {
 
   return (
     <section
-      className="py-16  relative overflow-hidden theme-transition"
+      className="py-8  relative overflow-hidden theme-transition"
       id="about"
       onMouseMove={handleMouseMove}
       aria-label="About Section"
