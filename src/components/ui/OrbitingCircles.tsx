@@ -25,7 +25,8 @@ export function OrbitingCircles({
   speed = 1,
   ...props
 }: OrbitingCirclesProps) {
-  const calculatedDuration = duration / speed;
+  const safeRadius = Math.max(0, Number.isFinite(radius) ? radius : 0);
+  const calculatedDuration = duration / (speed || 1);
   return (
     <>
       {path && (
@@ -38,7 +39,7 @@ export function OrbitingCircles({
             className="stroke-black/80 stroke-1 dark:stroke-white/20"
             cx="50%"
             cy="50%"
-            r={radius}
+            r={safeRadius}
             fill="none"
           />
         </svg>
@@ -49,8 +50,8 @@ export function OrbitingCircles({
           <div
             style={
               {
-                "--duration": calculatedDuration,
-                "--radius": radius,
+                "--duration": `${calculatedDuration}`,
+                "--radius": `${safeRadius}`,
                 "--angle": angle,
                 "--icon-size": `${iconSize}px`,
               } as React.CSSProperties

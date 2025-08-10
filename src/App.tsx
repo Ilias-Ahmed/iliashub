@@ -1,13 +1,12 @@
-import { Suspense } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Toaster } from "@/components/ui/sonner";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { AudioProvider } from "@/contexts/AudioContext";
-import { BackgroundProvider } from "@/contexts/BackgroundContext";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import GlobalBackground from "@/components/ui/GlobalBackground";
-import Index from "@/pages/index";
-import NotFound from "@/pages/NotFound";
+import { AudioProvider } from "@/contexts/AudioContext";
+import { BackgroundProvider } from "@/contexts/BackgroundContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { Suspense, lazy } from "react";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+const Index = lazy(() => import("@/pages/index"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
 
 function App() {
   return (
@@ -40,8 +39,6 @@ function App() {
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
-
-              <Toaster />
             </Router>
           </BackgroundProvider>
         </AudioProvider>
