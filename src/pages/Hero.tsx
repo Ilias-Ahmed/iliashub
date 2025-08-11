@@ -1,22 +1,13 @@
-import styles from "@/components/ui/bubble.module.css";
-// BackgroundContext removed
+import {
+  AnimatedSpan,
+  TypingAnimation,
+  Terminal as TypingTerminal,
+} from "@/components/ui/TypingAnimation";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useSpring,
-} from "framer-motion";
-import { Code2, Eye, Sparkles, Terminal, Zap } from "lucide-react";
-import React, {
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Eye } from "lucide-react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 const ResumeViewer = React.lazy(() => import("@/components/ui/ResumeViewer"));
 
 // Constants - optimized for performance
@@ -27,8 +18,6 @@ const ROTATING_ROLES = [
 ]; // Reduced array size
 
 const ROLE_ROTATION_INTERVAL = 4000; // Slower rotation to reduce CPU usage
-const FLOATING_ANIMATION_DURATION = 4000;
-const MOUSE_MOVE_MULTIPLIER = 0.05;
 
 // Animation variants
 const containerVariants = {
@@ -75,44 +64,7 @@ interface AccentColors {
   glow: string;
 }
 
-// Floating Icon Component
-const FloatingIcon: React.FC<{
-  Icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>;
-  index: number;
-  accentColors: AccentColors;
-}> = ({ Icon, index, accentColors }) => {
-  const positions = [
-    { left: "10%", top: "15%" },
-    { left: "30%", top: "30%" },
-    { left: "50%", top: "45%" },
-    { left: "70%", top: "60%" },
-  ];
-
-  const position = positions[index] || positions[0];
-
-  return (
-    <motion.div
-      className="absolute p-2 rounded-lg backdrop-blur-sm border"
-      style={{
-        ...position,
-        backgroundColor: `${accentColors.primary}20`,
-        borderColor: `${accentColors.primary}30`,
-      }}
-      animate={{
-        y: [0, -10, 0],
-        rotate: [0, index % 2 === 0 ? 5 : -5, 0],
-      }}
-      transition={{
-        duration: FLOATING_ANIMATION_DURATION / 1000,
-        repeat: Infinity,
-        delay: index * 0.5,
-      }}
-      whileHover={{ scale: 1.2 }}
-    >
-      <Icon size={16} style={{ color: accentColors.primary }} />
-    </motion.div>
-  );
-};
+// Floating elements removed for a cleaner hero
 
 // Main Hero Component
 const Hero: React.FC = () => {
@@ -126,149 +78,91 @@ const Hero: React.FC = () => {
     getAccentColors() as unknown as AccentColors;
   const isMobile = useIsMobile();
 
-  // Mouse tracking for parallax
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const springConfig = useMemo(() => ({ stiffness: 100, damping: 30 }), []);
-  const x = useSpring(mouseX, springConfig);
-  const y = useSpring(mouseY, springConfig);
-
-  // Optimized mouse tracking
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (isMobile || !heroRef.current) return;
-
-      const rect = heroRef.current.getBoundingClientRect();
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const mouseXPos =
-        (e.clientX - rect.left - centerX) * MOUSE_MOVE_MULTIPLIER;
-      const mouseYPos =
-        (e.clientY - rect.top - centerY) * MOUSE_MOVE_MULTIPLIER;
-
-      mouseX.set(mouseXPos);
-      mouseY.set(mouseYPos);
-    },
-    [mouseX, mouseY, isMobile]
-  );
-
-  // Role rotation effect - only when component is visible
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    // Use intersection observer to only animate when visible
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            interval = setInterval(() => {
-              setCurrentRole((prev) => (prev + 1) % ROTATING_ROLES.length);
-            }, ROLE_ROTATION_INTERVAL);
-          } else {
-            if (interval) clearInterval(interval);
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    const heroElement = document.getElementById("hero");
-    if (heroElement) {
-      observer.observe(heroElement);
-    }
-
-    return () => {
-      observer.disconnect();
-      if (interval) clearInterval(interval);
-    };
-  }, []);
-
   // Component mount effect
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 500);
     return () => clearTimeout(timer);
   }, []);
 
-  // Background system removed
-
-  // Background styles
-  const backgroundStyles = useMemo(
-    () => ({
-      backgroundImage: isMobile
-        ? `url('https://cdn.pixabay.com/photo/2019/10/09/07/28/development-4536630_1280.png')`
-        : "none",
-      backgroundSize: "contain",
-      backgroundRepeat: "no-repeat",
-      backgroundPosition: "center right",
-    }),
-    [isMobile]
-  );
-
-  const floatingIcons = [Code2, Terminal, Zap, Sparkles];
+  // Rotate role text to avoid unused setter warning and add subtle dynamism
+  useEffect(() => {
+    if (ROTATING_ROLES.length <= 1) return;
+    const id = setInterval(() => {
+      setCurrentRole((r) => (r + 1) % ROTATING_ROLES.length);
+    }, ROLE_ROTATION_INTERVAL);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <section
       ref={heroRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      onMouseMove={handleMouseMove}
       id="hero"
-      style={backgroundStyles}
     >
-
       {/* Main Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate={isLoaded ? "visible" : "hidden"}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-screen"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center py-14 lg:py-20"
         >
           {/* Left Column - Content */}
-          <div className="space-y-8">
-            {/* Terminal greeting */}
-            <motion.div variants={itemVariants}>
-              <div
-                className="flex items-center gap-2 font-mono text-sm"
-                style={{ color: accentColors.primary }}
-              >
-                <Terminal size={16} />
-                <span>$ whoami</span>
-              </div>
-            </motion.div>
-
-            {/* Main title */}
+          <div className="space-y-8 order-2 lg:order-1">
+            {/* Title*/}
             <motion.div variants={titleVariants} className="space-y-4">
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                <span className="block" style={{ color: accentColors.primary }}>
-                  {"Ilias Ahmed".split("").map((char, index) => (
-                    <span key={index} className={styles.hoverText}>
-                      {char === " " ? "\u00A0" : char}
-                    </span>
-                  ))}
-                </span>
+              <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold leading-tight tracking-tight">
+                {isMobile ? (
+                  <span
+                    className="block"
+                    style={{ color: accentColors.primary }}
+                  >
+                    Ilias Ahmed
+                  </span>
+                ) : (
+                  <span
+                    className="block"
+                    style={{ color: accentColors.primary }}
+                  >
+                    {"Ilias Ahmed".split("").map((char, index) => (
+                      <span
+                        key={index}
+                        className="inline-block transition-transform duration-200 hover:-translate-y-1"
+                      >
+                        {char === " " ? "\u00A0" : char}
+                      </span>
+                    ))}
+                  </span>
+                )}
               </h1>
 
               {/* Dynamic role */}
-              <div className="h-12 flex items-center">
-                <AnimatePresence mode="wait">
-                  <motion.h2
-                    key={currentRole}
-                    initial={{ opacity: 0, y: 20, rotateX: 90 }}
-                    animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                    exit={{ opacity: 0, y: -20, rotateX: -90 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="text-xl md:text-2xl lg:text-3xl font-medium opacity-70"
-                  >
-                    {ROTATING_ROLES[currentRole]}
-                  </motion.h2>
-                </AnimatePresence>
+              <div className="h-9 sm:h-12 flex items-center">
+                {isMobile ? (
+                  <h2 className="text-lg sm:text-2xl font-medium opacity-80">
+                    {ROTATING_ROLES[0]}
+                  </h2>
+                ) : (
+                  <AnimatePresence mode="wait">
+                    <motion.h2
+                      key={currentRole}
+                      initial={{ opacity: 0, y: 20, rotateX: 90 }}
+                      animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                      exit={{ opacity: 0, y: -20, rotateX: -90 }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      className="text-xl md:text-2xl lg:text-3xl font-medium opacity-80"
+                    >
+                      {ROTATING_ROLES[currentRole]}
+                    </motion.h2>
+                  </AnimatePresence>
+                )}
               </div>
             </motion.div>
 
             {/* Description */}
             <motion.div
               variants={itemVariants}
-              className="text-lg md:text-xl opacity-80 max-w-2xl leading-relaxed"
+              className="text-base sm:text-lg md:text-xl opacity-80 max-w-2xl leading-relaxed"
             >
               <span>Crafting exceptional </span>
               <span className="relative">
@@ -276,7 +170,7 @@ const Hero: React.FC = () => {
                 <svg
                   viewBox="0 0 286 73"
                   fill="none"
-                  className="absolute -left-2 -right-2 -top-2 bottom-0 translate-y-1"
+                  className="hidden md:block absolute -left-2 -right-2 -top-2 bottom-0 translate-y-1"
                 >
                   <motion.path
                     initial={{ pathLength: 0 }}
@@ -300,7 +194,7 @@ const Hero: React.FC = () => {
               </span>
             </motion.div>
 
-            {/* Resume CTA */}
+            {/* Resume viewer button */}
             <motion.div
               variants={itemVariants}
               className="flex flex-wrap gap-4"
@@ -311,7 +205,7 @@ const Hero: React.FC = () => {
                   // Prefetch viewer chunk for snappier open
                   import("@/components/ui/ResumeViewer");
                 }}
-                className="group inline-flex items-center gap-2 rounded-xl border-2 px-5 py-3 transition-all duration-300 backdrop-blur-sm"
+                className="group inline-flex items-center gap-2 rounded-xl border-2 px-4 py-2 sm:px-5 sm:py-3 transition-all duration-300 backdrop-blur-sm"
                 style={{
                   borderColor: `${accentColors.primary}66`,
                   backgroundColor: isDark
@@ -336,40 +230,52 @@ const Hero: React.FC = () => {
             </motion.div>
           </div>
 
-          {/* Right Column - Visual (Desktop only) */}
-          {!isMobile && (
+          {/* Right Column - Terminal */}
+          <motion.div
+            variants={itemVariants}
+            className="relative flex items-center justify-center order-1 lg:order-2"
+          >
             <motion.div
-              variants={itemVariants}
-              className="relative flex items-center justify-center"
-              style={{ x, y }}
+              className="relative w-full max-w-[22rem] sm:max-w-md md:max-w-xl h-[420px] sm:h-[480px] lg:h-[560px]"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.25 }}
             >
-              <motion.div
-                className="relative w-full max-w-lg"
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
+              <TypingTerminal
+                className="max-w-full h-full max-h-[560px] sm:max-h-[600px] lg:max-h-[640px] shadow-sm backdrop-blur-md"
+                startOnView
+                sequence
+                loop
+                loopDelay={1000}
               >
-                <img
-                  src="https://cdn.pixabay.com/photo/2019/10/09/07/28/development-4536630_1280.png"
-                  alt="Development Illustration"
-                  className="w-full h-auto object-contain opacity-90"
-                  style={{
-                    filter: `drop-shadow(0 0 40px ${accentColors.glow})`,
-                  }}
-                  loading="lazy"
-                />
-
-                {/* Floating elements around the image */}
-                {floatingIcons.map((Icon, index) => (
-                  <FloatingIcon
-                    key={index}
-                    Icon={Icon}
-                    index={index}
-                    accentColors={accentColors}
-                  />
-                ))}
-              </motion.div>
+                <TypingAnimation
+                  className="text-muted-foreground"
+                  duration={35}
+                >
+                  &gt; whoami
+                </TypingAnimation>
+                <AnimatedSpan style={{ color: accentColors.primary }}>
+                  <span>✔ Name: Ilias Ahmed</span>
+                </AnimatedSpan>
+                <AnimatedSpan style={{ color: accentColors.primary }}>
+                  <span>✔ Role: Fullstack Developer</span>
+                </AnimatedSpan>
+                <AnimatedSpan className="text-foreground/70">
+                  <span>› Stack: React • TypeScript • Node</span>
+                </AnimatedSpan>
+                {!isMobile && (
+                  <AnimatedSpan className="text-foreground/70">
+                    <span>› Status: Open to opportunities</span>
+                  </AnimatedSpan>
+                )}
+                <TypingAnimation
+                  className="text-muted-foreground"
+                  duration={28}
+                >
+                  Ready to build something great?
+                </TypingAnimation>
+              </TypingTerminal>
             </motion.div>
-          )}
+          </motion.div>
         </motion.div>
       </div>
       {/* Resume Viewer Modal (lazy-loaded only when opened) */}

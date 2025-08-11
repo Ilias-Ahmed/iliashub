@@ -91,6 +91,7 @@ const AboutSection = () => {
     <section
       className="py-8  relative overflow-hidden theme-transition"
       id="about"
+      ref={ref}
       onMouseMove={handleMouseMove}
       aria-label="About Section"
     >
@@ -155,25 +156,6 @@ const AboutSection = () => {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-        <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="text-center mb-16 md:mb-24"
-        >
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
-            <span
-              className="bg-clip-text text-transparent"
-              style={{
-                backgroundImage: `linear-gradient(135deg, ${accentColors.primary} 0%, ${accentColors.secondary} 50%, ${accentColors.tertiary} 100%)`,
-              }}
-            >
-              My Journey & Expertise
-            </span>
-          </h2>
-        </motion.div>
-
         {/* Interactive Tabs with Enhanced Animations */}
         <Tabs
           defaultValue="profile"

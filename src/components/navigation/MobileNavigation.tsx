@@ -45,6 +45,13 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     accent: ThemeAccent;
     setAccent: (a: ThemeAccent) => void;
     isDark: boolean;
+    getAccentColors: () => {
+      primary: string;
+      secondary: string;
+      tertiary: string;
+      glow?: string;
+      shadow?: string;
+    };
   };
   const fallbackTheme: ThemeTokens = {
     mode: "dark",
@@ -52,6 +59,13 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     accent: "purple",
     setAccent: () => {},
     isDark: true,
+    getAccentColors: () => ({
+      primary: "#8b5cf6",
+      secondary: "#3b82f6",
+      tertiary: "#ec4899",
+      glow: "rgba(139, 92, 246, 0.6)",
+      shadow: "rgba(139, 92, 246, 0.25)",
+    }),
   };
   const {
     mode = "dark",
@@ -59,7 +73,9 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     accent = "purple",
     setAccent = () => {},
     isDark = true,
+    getAccentColors = fallbackTheme.getAccentColors,
   } = (theme as unknown as ThemeTokens) || fallbackTheme;
+  const accentPalette = getAccentColors();
 
   // Section icons
   const sectionIcons: Record<
@@ -84,7 +100,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   };
 
   // Accent colors
-  const accentColors: Array<{
+  const accentOptions: Array<{
     color: ThemeAccent;
     gradient: string;
     label: string;
@@ -189,6 +205,11 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-background/60 backdrop-blur-md z-40"
+            style={{
+              background: isDark
+                ? `linear-gradient(135deg, ${accentPalette.primary}20, transparent 60%)`
+                : `linear-gradient(135deg, ${accentPalette.primary}15, transparent 60%)`,
+            }}
             onClick={closeMenu}
             aria-hidden="true"
           />
@@ -208,6 +229,12 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
+            style={{
+              borderColor: `${accentPalette.primary}25`,
+              boxShadow: `0 15px 45px ${
+                accentPalette.shadow || "rgba(0,0,0,0.25)"
+              }`,
+            }}
           >
             <div className="flex flex-col h-full">
               {/* Header */}
@@ -226,6 +253,9 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
                     isDark ? "hover:bg-gray-800/50" : "hover:bg-gray-100/50"
                   }`}
                   aria-label="Close menu"
+                  style={{
+                    boxShadow: `0 0 0 0 rgba(0,0,0,0)`,
+                  }}
                 >
                   <X size={24} />
                 </button>
@@ -255,6 +285,16 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           aria-current={isActive ? "page" : undefined}
+                          style={{
+                            boxShadow: isActive
+                              ? `0 8px 24px ${
+                                  accentPalette.shadow || "rgba(0,0,0,0.25)"
+                                }`
+                              : undefined,
+                            border: isActive
+                              ? `1px solid ${accentPalette.primary}40`
+                              : undefined,
+                          }}
                         >
                           <div
                             className={`p-2 rounded-lg ${
@@ -264,6 +304,11 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
                                 ? "bg-gray-800/50"
                                 : "bg-gray-100/50"
                             }`}
+                            style={{
+                              border: isActive
+                                ? `1px solid ${accentPalette.primary}40`
+                                : undefined,
+                            }}
                           >
                             <IconComponent
                               size={20}
@@ -298,9 +343,10 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
                             size={16}
                             className={
                               isActive
-                                ? "text-primary-foreground/60"
+                                ? "text-primary-foreground/80"
                                 : "text-muted-foreground/50"
                             }
+                            style={{ color: isActive ? undefined : undefined }}
                           />
                         </motion.button>
                       );
@@ -310,7 +356,6 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
 
                 {/* Theme Settings */}
                 <motion.div variants={itemVariants}>
-
                   {/* Theme Modes */}
                   <div className="mb-5 md:mb-6">
                     <div className="text-sm font-medium mb-3">Theme</div>
@@ -333,6 +378,13 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
                                   : "hover:bg-gray-100/50"
                               }`}
                               aria-pressed={isActive}
+                              style={{
+                                boxShadow: isActive
+                                  ? `0 6px 18px ${
+                                      accentPalette.shadow || "rgba(0,0,0,0.2)"
+                                    }`
+                                  : undefined,
+                              }}
                             >
                               <ThemeIcon size={20} />
                               <span className="capitalize font-medium">
@@ -349,7 +401,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
                   <div>
                     <div className="text-sm font-medium mb-3">Accent Color</div>
                     <div className="flex gap-3">
-                      {accentColors.map((option) => (
+                      {accentOptions.map((option) => (
                         <button
                           key={option.color}
                           onClick={() => handleAccentChange(option.color)}
@@ -363,6 +415,14 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
                           }`}
                           aria-label={`Set accent color to ${option.label}`}
                           aria-pressed={accent === option.color}
+                          style={{
+                            boxShadow:
+                              accent === option.color
+                                ? `0 8px 22px ${
+                                    accentPalette.shadow || "rgba(0,0,0,0.2)"
+                                  }`
+                                : undefined,
+                          }}
                         >
                           {accent === option.color && (
                             <div className="absolute inset-0 flex items-center justify-center">
