@@ -156,6 +156,29 @@ const AboutSection = () => {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mb-12 md:mb-16"
+        >
+          <div>
+            <p
+              className="heading-eyebrow"
+              style={{ color: accentColors.primary }}
+            >
+              About
+            </p>
+            <span className="accent-rule mt-3 block" aria-hidden="true" />
+          </div>
+          <h2
+            className="heading-display-sm use-display-on-lg mt-5 text-letterpress"
+            style={{ color: accentColors.primary }}
+          >
+            Beyond The Code
+          </h2>
+        </motion.div>
         {/* Interactive Tabs with Enhanced Animations */}
         <Tabs
           defaultValue="profile"
@@ -257,7 +280,7 @@ const AboutSection = () => {
                     >
                       {tab.icon}
                     </motion.span>
-                    <span>{tab.label}</span>
+                    <span className="uppercase tracking-wide">{tab.label}</span>
                   </span>
 
                   {/* Tooltip */}

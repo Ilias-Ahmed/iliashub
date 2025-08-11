@@ -4,6 +4,8 @@ export interface Project {
   description: string;
   longDescription?: string;
   image: string;
+  videoUrl?: string; // optional case study video
+  demoUrl?: string; // optional live demo iframe
   tags: string[];
   link: string;
   github?: string;
