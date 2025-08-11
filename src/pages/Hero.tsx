@@ -5,8 +5,7 @@ import {
 } from "@/components/ui/TypingAnimation";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { AnimatePresence, motion } from "framer-motion";
-import { Eye } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import React, { Suspense, useEffect, useRef, useState } from "react";
 const ResumeViewer = React.lazy(() => import("@/components/ui/ResumeViewer"));
 
@@ -64,8 +63,6 @@ interface AccentColors {
   glow: string;
 }
 
-// Floating elements removed for a cleaner hero
-
 // Main Hero Component
 const Hero: React.FC = () => {
   const [currentRole, setCurrentRole] = useState(0);
@@ -73,10 +70,11 @@ const Hero: React.FC = () => {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
-  const { isDark, getAccentColors } = useTheme();
+  const { getAccentColors } = useTheme();
   const accentColors: AccentColors =
     getAccentColors() as unknown as AccentColors;
   const isMobile = useIsMobile();
+  const prefersReducedMotion = useReducedMotion();
 
   // Component mount effect
   useEffect(() => {
@@ -84,14 +82,38 @@ const Hero: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Rotate role text to avoid unused setter warning and add subtle dynamism
+  // Rotate role text; pause when tab hidden; respect reduced motion
   useEffect(() => {
-    if (ROTATING_ROLES.length <= 1) return;
-    const id = setInterval(() => {
-      setCurrentRole((r) => (r + 1) % ROTATING_ROLES.length);
-    }, ROLE_ROTATION_INTERVAL);
-    return () => clearInterval(id);
-  }, []);
+    if (prefersReducedMotion || ROTATING_ROLES.length <= 1) return;
+
+    let intervalId: number | null = null;
+
+    const start = () => {
+      if (intervalId !== null) return;
+      intervalId = window.setInterval(() => {
+        setCurrentRole((r) => (r + 1) % ROTATING_ROLES.length);
+      }, ROLE_ROTATION_INTERVAL);
+    };
+
+    const stop = () => {
+      if (intervalId !== null) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibility = () => {
+      if (document.hidden) stop();
+      else start();
+    };
+
+    start();
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [prefersReducedMotion]);
 
   return (
     <section
@@ -102,32 +124,47 @@ const Hero: React.FC = () => {
       {/* Main Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate={isLoaded ? "visible" : "hidden"}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center py-14 lg:py-20"
+          variants={prefersReducedMotion ? undefined : containerVariants}
+          initial={prefersReducedMotion ? false : "hidden"}
+          animate={
+            prefersReducedMotion ? undefined : isLoaded ? "visible" : "hidden"
+          }
+          className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center py-16 lg:py-24"
         >
           {/* Left Column - Content */}
-          <div className="space-y-8 order-2 lg:order-1">
+          <div className="space-y-8 order-1 lg:order-1 lg:self-start">
             {/* Title*/}
-            <motion.div variants={titleVariants} className="space-y-4">
-              <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold leading-tight tracking-tight">
+            <motion.div
+              variants={prefersReducedMotion ? undefined : titleVariants}
+              className="space-y-4"
+            >
+              {/* Eyebrow label */}
+              <div>
+                <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-foreground/60">
+                  Frontend Developer • React • TypeScript
+                </p>
+                <span className="accent-rule mt-3 block" aria-hidden="true" />
+              </div>
+              <h1 className="use-display-on-lg text-[2rem] sm:text-[2.75rem] lg:text-[4.25rem] font-extrabold leading-[1.05] tracking-tight uppercase text-letterpress">
                 {isMobile ? (
                   <span
                     className="block"
                     style={{ color: accentColors.primary }}
                   >
-                    Ilias Ahmed
+                    ILIAS AHMED
                   </span>
                 ) : (
                   <span
                     className="block"
-                    style={{ color: accentColors.primary }}
+                    style={{
+                      color: accentColors.primary,
+                      letterSpacing: "-0.02em",
+                    }}
                   >
-                    {"Ilias Ahmed".split("").map((char, index) => (
+                    {"ILIAS AHMED".split("").map((char, index) => (
                       <span
                         key={index}
-                        className="inline-block transition-transform duration-200 hover:-translate-y-1"
+                        className="inline-block transition-transform duration-200 hover:-translate-y-1 will-change-transform"
                       >
                         {char === " " ? "\u00A0" : char}
                       </span>
@@ -139,18 +176,30 @@ const Hero: React.FC = () => {
               {/* Dynamic role */}
               <div className="h-9 sm:h-12 flex items-center">
                 {isMobile ? (
-                  <h2 className="text-lg sm:text-2xl font-medium opacity-80">
+                  <h2 className="text-lg sm:text-2xl font-semibold lg:font-medium uppercase tracking-wide text-foreground/80">
                     {ROTATING_ROLES[0]}
                   </h2>
                 ) : (
                   <AnimatePresence mode="wait">
                     <motion.h2
                       key={currentRole}
-                      initial={{ opacity: 0, y: 20, rotateX: 90 }}
-                      animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                      exit={{ opacity: 0, y: -20, rotateX: -90 }}
+                      initial={
+                        prefersReducedMotion
+                          ? false
+                          : { opacity: 0, y: 20, rotateX: 90 }
+                      }
+                      animate={
+                        prefersReducedMotion
+                          ? undefined
+                          : { opacity: 1, y: 0, rotateX: 0 }
+                      }
+                      exit={
+                        prefersReducedMotion
+                          ? undefined
+                          : { opacity: 0, y: -20, rotateX: -90 }
+                      }
                       transition={{ duration: 0.5, ease: "easeOut" }}
-                      className="text-xl md:text-2xl lg:text-3xl font-medium opacity-80"
+                      className="text-xl md:text-2xl lg:text-3xl font-semibold lg:font-medium uppercase tracking-wide text-foreground/80"
                     >
                       {ROTATING_ROLES[currentRole]}
                     </motion.h2>
@@ -161,8 +210,8 @@ const Hero: React.FC = () => {
 
             {/* Description */}
             <motion.div
-              variants={itemVariants}
-              className="text-base sm:text-lg md:text-xl opacity-80 max-w-2xl leading-relaxed"
+              variants={prefersReducedMotion ? undefined : itemVariants}
+              className="text-[1rem] sm:text-lg md:text-xl text-foreground/85 max-w-xl md:max-w-2xl leading-relaxed"
             >
               <span>Crafting exceptional </span>
               <span className="relative">
@@ -173,8 +222,12 @@ const Hero: React.FC = () => {
                   className="hidden md:block absolute -left-2 -right-2 -top-2 bottom-0 translate-y-1"
                 >
                   <motion.path
-                    initial={{ pathLength: 0 }}
-                    whileInView={{ pathLength: 1 }}
+                    initial={
+                      prefersReducedMotion ? undefined : { pathLength: 0 }
+                    }
+                    whileInView={
+                      prefersReducedMotion ? undefined : { pathLength: 1 }
+                    }
                     transition={{
                       duration: 1.25,
                       ease: "easeInOut",
@@ -196,8 +249,8 @@ const Hero: React.FC = () => {
 
             {/* Resume viewer button */}
             <motion.div
-              variants={itemVariants}
-              className="flex flex-wrap gap-4"
+              variants={prefersReducedMotion ? undefined : itemVariants}
+              className="flex flex-wrap gap-6"
             >
               <motion.button
                 onClick={() => setIsResumeOpen(true)}
@@ -205,25 +258,13 @@ const Hero: React.FC = () => {
                   // Prefetch viewer chunk for snappier open
                   import("@/components/ui/ResumeViewer");
                 }}
-                className="group inline-flex items-center gap-2 rounded-xl border-2 px-4 py-2 sm:px-5 sm:py-3 transition-all duration-300 backdrop-blur-sm"
-                style={{
-                  borderColor: `${accentColors.primary}66`,
-                  backgroundColor: isDark
-                    ? "rgba(255, 255, 255, 0.06)"
-                    : "rgba(0, 0, 0, 0.04)",
-                  color: accentColors.primary,
-                  boxShadow: `0 0 20px ${accentColors.glow}33`,
-                }}
-                whileHover={{
-                  scale: 1.03,
-                  y: -1,
-                  backgroundColor: `${accentColors.primary}14`,
-                }}
-                whileTap={{ scale: 0.97 }}
+                className="group inline-flex items-center gap-2 px-0 py-1 text-base sm:text-lg font-medium tracking-wide link-underline focus-visible:outline-none"
+                style={{ color: accentColors.primary }}
+                whileHover={{ opacity: 1 }}
+                whileTap={{ scale: 0.98 }}
                 aria-label="View Resume"
               >
-                <Eye size={18} />
-                <span className="font-semibold">View Resume</span>
+                <span>View Resume</span>
               </motion.button>
 
               {/* Download removed per request */}
@@ -233,42 +274,48 @@ const Hero: React.FC = () => {
           {/* Right Column - Terminal */}
           <motion.div
             variants={itemVariants}
-            className="relative flex items-center justify-center order-1 lg:order-2"
+            className="relative flex items-center justify-center order-2 lg:order-2"
           >
             <motion.div
-              className="relative w-full max-w-[22rem] sm:max-w-md md:max-w-xl h-[420px] sm:h-[480px] lg:h-[560px]"
+              className="relative w-full max-w-[22rem] sm:max-w-md md:max-w-xl h-[280px] sm:h-[460px]"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.25 }}
             >
               <TypingTerminal
-                className="max-w-full h-full max-h-[560px] sm:max-h-[600px] lg:max-h-[640px] shadow-sm backdrop-blur-md"
+                className="max-w-full h-full max-h-[320px] sm:max-h-[520px] lg:max-h-[700px] shadow-sm backdrop-blur-md text-[13px] sm:text-sm"
                 startOnView
                 sequence
                 loop
                 loopDelay={1000}
               >
                 <TypingAnimation
-                  className="text-muted-foreground"
+                  className="text-[13px] sm:text-sm text-muted-foreground"
                   duration={35}
                 >
                   &gt; whoami
                 </TypingAnimation>
-                <AnimatedSpan style={{ color: accentColors.primary }}>
+                <AnimatedSpan
+                  className="text-[13px] sm:text-sm"
+                  style={{ color: accentColors.primary }}
+                >
                   <span>✔ Name: Ilias Ahmed</span>
                 </AnimatedSpan>
-                <AnimatedSpan style={{ color: accentColors.primary }}>
+                <AnimatedSpan
+                  className="text-[13px] sm:text-sm"
+                  style={{ color: accentColors.primary }}
+                >
                   <span>✔ Role: Fullstack Developer</span>
                 </AnimatedSpan>
-                <AnimatedSpan className="text-foreground/70">
+                <AnimatedSpan className="text-[13px] sm:text-sm text-foreground/70">
                   <span>› Stack: React • TypeScript • Node</span>
                 </AnimatedSpan>
                 {!isMobile && (
-                  <AnimatedSpan className="text-foreground/70">
+                  <AnimatedSpan className="text-[13px] sm:text-sm text-foreground/70">
                     <span>› Status: Open to opportunities</span>
                   </AnimatedSpan>
                 )}
                 <TypingAnimation
-                  className="text-muted-foreground"
+                  className="text-[13px] sm:text-sm text-muted-foreground"
                   duration={28}
                 >
                   Ready to build something great?

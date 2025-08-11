@@ -2,6 +2,7 @@ import {
   AnimatePresence,
   motion,
   useMotionValue,
+  useReducedMotion,
   useTransform,
 } from "framer-motion";
 import { ExternalLink, Github, Info } from "lucide-react";
@@ -25,15 +26,15 @@ const ProjectCard = ({
   const [showDetails, setShowDetails] = useState(false);
   const { isDark, getAccentColors } = useTheme();
   const accentColors = getAccentColors();
+  const prefersReducedMotion = useReducedMotion();
 
   // Mouse rotation effect
   const cardRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  const rotateX = useTransform(y, [-100, 100], [8, -8]);
-  const rotateY = useTransform(x, [-100, 100], [-8, 8]);
-  const brightness = useTransform(y, [-100, 0, 100], [1.1, 1, 0.9]);
+  const rotateX = useTransform(y, [-100, 100], [6, -6]);
+  const rotateY = useTransform(x, [-100, 100], [-6, 6]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -79,7 +80,7 @@ const ProjectCard = ({
       variants={cardVariants}
       initial="hidden"
       animate="visible"
-      onMouseMove={handleMouseMove}
+      onMouseMove={prefersReducedMotion ? undefined : handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -87,16 +88,16 @@ const ProjectCard = ({
       }}
     >
       <motion.div
-        className="relative w-full h-full rounded-xl overflow-hidden"
+        className="relative w-full h-full rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-offset-2"
         style={{
-          rotateX,
-          rotateY,
+          rotateX: prefersReducedMotion ? 0 : rotateX,
+          rotateY: prefersReducedMotion ? 0 : rotateY,
           transformStyle: "preserve-3d",
           boxShadow: isHovered
-            ? `0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px ${accentColors.glow}`
-            : "0 10px 30px rgba(0, 0, 0, 0.3)",
-          filter: `brightness(${brightness})`,
-          transition: "box-shadow 0.3s ease",
+            ? `0 12px 28px rgba(0, 0, 0, 0.35), 0 0 18px ${accentColors.glow}`
+            : "0 8px 22px rgba(0, 0, 0, 0.28)",
+          filter: prefersReducedMotion ? "none" : undefined,
+          transition: "box-shadow 0.25s ease",
         }}
       >
         {/* Background image with parallax effect */}
@@ -107,9 +108,9 @@ const ProjectCard = ({
             backgroundSize: "cover",
             backgroundPosition: "center",
             transformStyle: "preserve-3d",
-            transform: "translateZ(-20px)",
-            scale: isHovered ? 1.05 : 1,
-            transition: "scale 0.5s ease-out",
+            transform: prefersReducedMotion ? undefined : "translateZ(-16px)",
+            scale: prefersReducedMotion ? 1 : isHovered ? 1.03 : 1,
+            transition: "scale 0.35s ease-out",
           }}
         />
 
@@ -122,9 +123,22 @@ const ProjectCard = ({
               : "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.2) 100%)",
             opacity: isHovered ? 0.85 : 0.7,
             transformStyle: "preserve-3d",
-            transform: "translateZ(-10px)",
+            transform: prefersReducedMotion ? undefined : "translateZ(-8px)",
           }}
         />
+
+        {/* Subtle spotlight on hover */}
+        {isHovered && !prefersReducedMotion && (
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(220px 220px at 50% 30%, rgba(255,255,255,0.12), transparent 65%)",
+              mixBlendMode: "overlay",
+            }}
+            aria-hidden="true"
+          />
+        )}
 
         {/* Card content */}
         <div className="relative h-full w-full p-4 md:p-6 flex flex-col justify-end">
@@ -192,13 +206,14 @@ const ProjectCard = ({
               href={project.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 md:px-4 py-2 rounded-full text-white flex items-center gap-2 text-sm font-medium"
+              className="px-3 md:px-4 py-2 rounded-full text-white flex items-center gap-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
               style={{
                 backgroundColor: accentColors.primary,
                 boxShadow: `0 4px 14px ${accentColors.shadow}`,
               }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              aria-label={`Open ${project.title}`}
             >
               <ExternalLink size={14} />
               View Project
@@ -209,7 +224,7 @@ const ProjectCard = ({
                 href={project.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 flex items-center justify-center rounded-full transition-colors border"
+                className="w-9 h-9 flex items-center justify-center rounded-full transition-colors border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                 style={{
                   backgroundColor: isDark
                     ? "rgba(255,255,255,0.1)"
@@ -224,6 +239,7 @@ const ProjectCard = ({
                   borderColor: accentColors.primary,
                 }}
                 whileTap={{ scale: 0.9 }}
+                aria-label={`Open source code for ${project.title}`}
               >
                 <Github size={16} />
               </motion.a>
@@ -234,7 +250,7 @@ const ProjectCard = ({
                 setShowDetails(true);
                 // haptics removed
               }}
-              className="w-9 h-9 flex items-center justify-center rounded-full transition-colors border"
+              className="w-9 h-9 flex items-center justify-center rounded-full transition-colors border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
               style={{
                 backgroundColor: isDark
                   ? "rgba(255,255,255,0.1)"
@@ -249,6 +265,7 @@ const ProjectCard = ({
                 borderColor: accentColors.primary,
               }}
               whileTap={{ scale: 0.9 }}
+              aria-label={`More details about ${project.title}`}
             >
               <Info size={16} />
             </motion.button>
@@ -256,7 +273,7 @@ const ProjectCard = ({
         </div>
 
         {/* Floating particles effect */}
-        {isHovered && (
+        {isHovered && !prefersReducedMotion && (
           <div className="absolute inset-0 pointer-events-none">
             {[...Array(10)].map((_, i) => (
               <motion.div
@@ -319,6 +336,9 @@ const ProjectCard = ({
                 e.stopPropagation();
                 // haptics removed
               }}
+              role="dialog"
+              aria-modal="true"
+              aria-label={`${project.title} details`}
             >
               <div className="relative h-64 rounded-xl overflow-hidden mb-6">
                 <img

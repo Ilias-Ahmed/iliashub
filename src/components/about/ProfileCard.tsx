@@ -151,14 +151,6 @@ const ProfileCard = () => {
                 </motion.div>
 
                 <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 md:mb-3">
-                  <span
-                    className="bg-clip-text text-transparent"
-                    style={{
-                      backgroundImage: `linear-gradient(135deg, ${accentColors.primary} 0%, ${accentColors.secondary} 100%)`,
-                    }}
-                  >
-                    Beyond the Code
-                  </span>
                 </h3>
                 <p className="text-sm md:text-base lg:text-lg opacity-80 leading-relaxed">
                   I'm not just a developer—I'm a digital architect who believes

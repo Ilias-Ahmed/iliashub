@@ -56,7 +56,7 @@ const ProjectViewToggle = ({
               onChange(option.id);
               // haptics removed
             }}
-            className="relative px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2"
+            className="relative px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             style={{
               color:
                 activeView === option.id
@@ -67,6 +67,19 @@ const ProjectViewToggle = ({
             }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            aria-pressed={activeView === option.id}
+            onMouseMove={(e) => {
+              const el = e.currentTarget;
+              const rect = el.getBoundingClientRect();
+              const relX = e.clientX - rect.left - rect.width / 2;
+              const relY = e.clientY - rect.top - rect.height / 2;
+              el.style.transform = `translate(${relX * 0.05}px, ${
+                relY * 0.05
+              }px)`;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translate(0,0)";
+            }}
           >
             {/* Active background */}
             {activeView === option.id && (

@@ -4,6 +4,7 @@ import {
   AnimatePresence,
   motion,
   useMotionValue,
+  useReducedMotion,
   useTransform,
 } from "framer-motion";
 import {
@@ -14,7 +15,7 @@ import {
   Pause,
   Play,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Project } from "./types";
 
 interface ProjectShowcaseProps {
@@ -29,7 +30,8 @@ const ProjectShowcase = ({
   showNavigation = true,
 }: ProjectShowcaseProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(autoplay);
+  const prefersReducedMotion = useReducedMotion();
+  const [isPlaying, setIsPlaying] = useState(autoplay && !prefersReducedMotion);
   const [direction, setDirection] = useState(0);
   const { isDark, getAccentColors } = useTheme();
   const accentColors = getAccentColors();
@@ -152,14 +154,24 @@ const ProjectShowcase = ({
     return Math.abs(offset) * velocity;
   };
 
+  const formattedIndex = useMemo(() => {
+    const total = projects.length;
+    const current = currentIndex + 1;
+    const pad = total >= 100 ? 3 : 2;
+    return `${String(current).padStart(pad, "0")} / ${String(total).padStart(
+      pad,
+      "0"
+    )}`;
+  }, [currentIndex, projects.length]);
+
   return (
     <div
-      className="relative w-full max-w-6xl mx-auto"
+      className="relative w-full max-w-7xl mx-auto"
       data-testid="project-showcase"
     >
-      {/* Main showcase area */}
+      {/* Main canvas */}
       <div
-        className="relative h-[420px] sm:h-[500px] md:h-[560px] lg:h-[600px] rounded-2xl overflow-hidden perspective-1000"
+        className="relative h-[420px] sm:h-[520px] md:h-[580px] lg:h-[620px] rounded-2xl overflow-hidden bg-[oklch(0.18_0_0)] border border-white/10 backdrop-blur-md"
         onMouseMove={handleMouseMove}
         onMouseLeave={resetMouse}
       >
@@ -176,7 +188,7 @@ const ProjectShowcase = ({
               opacity: { duration: 0.2 },
               scale: { duration: 0.4 },
             }}
-            drag="x"
+            drag={prefersReducedMotion ? false : "x"}
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={1}
             onDragEnd={(_, { offset, velocity }) => {
@@ -190,186 +202,117 @@ const ProjectShowcase = ({
             }}
             className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
             style={{
-              rotateX,
-              rotateY,
+              rotateX: prefersReducedMotion ? 0 : rotateX,
+              rotateY: prefersReducedMotion ? 0 : rotateY,
               transformStyle: "preserve-3d",
             }}
           >
-            {/* Project background */}
-            <div
-              className="absolute inset-0 w-full h-full bg-cover bg-center"
-              style={{
-                backgroundImage: `url(${currentProject.image})`,
-                transform: "translateZ(-50px) scale(1.1)",
-              }}
-            />
+            {/* Content: editorial, minimal */}
+            <div className="relative h-full grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-8 p-6 md:p-10">
+              {/* Media area: supports video, iframe demo, or image */}
+              <div className="relative rounded-2xl overflow-hidden bg-black/40 border border-white/10 group/preview">
+                {currentProject.videoUrl ? (
+                  <video
+                    className="w-full h-full object-cover"
+                    src={currentProject.videoUrl}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                ) : currentProject.demoUrl ? (
+                  <iframe
+                    className="w-full h-full"
+                    src={currentProject.demoUrl}
+                    title={`${currentProject.title} demo`}
+                    loading="lazy"
+                  />
+                ) : (
+                  <img
+                    src={currentProject.image}
+                    alt={currentProject.title}
+                    className="w-full h-full object-cover"
+                  />
+                )}
+                {!prefersReducedMotion && (
+                  <div
+                    className="shine-sweep pointer-events-none"
+                    aria-hidden="true"
+                  />
+                )}
+              </div>
 
-            {/* Gradient overlay */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background: isDark
-                  ? "linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.8) 100%)"
-                  : "linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.7) 100%)",
-                transform: "translateZ(-25px)",
-              }}
-            />
-
-            {/* Content */}
-            <div className="relative h-full flex items-center justify-center p-8 md:p-12">
-              <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                {/* Project info */}
-                <motion.div
-                  className="space-y-6"
-                  style={{ transform: "translateZ(50px)" }}
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.6 }}
-                >
-                  {/* Category badge */}
-                  <motion.div
-                    className="inline-block"
-                    whileHover={{ scale: 1.05 }}
-                  >
+              {/* Info area */}
+              <div
+                className="flex flex-col justify-between"
+                style={{ transform: "translateZ(30px)" }}
+              >
+                <div className="space-y-4">
+                  <div>
                     <span
-                      className="px-4 py-2 rounded-full text-sm font-medium"
+                      className="px-3 py-1 rounded-full text-xs font-medium"
                       style={{
                         backgroundColor: `${accentColors.primary}20`,
                         color: accentColors.primary,
                         border: `1px solid ${accentColors.primary}40`,
                       }}
                     >
-                      {currentProject.category || "Featured Project"}
+                      {currentProject.category || "Case Study"}
                     </span>
-                  </motion.div>
-
-                  {/* Title */}
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+                  </div>
+                  <h3 className="use-display-on-lg text-3xl md:text-4xl lg:text-5xl font-extrabold text-white uppercase leading-[1.05]">
                     {currentProject.title}
-                  </h1>
-
-                  {/* Description */}
-                  <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
+                  </h3>
+                  <p className="text-base md:text-lg text-white/80 max-w-prose">
                     {currentProject.description}
                   </p>
-
-                  {/* Tags */}
                   <div className="flex flex-wrap gap-2">
                     {currentProject.tags.slice(0, 6).map((tag, i) => (
-                      <motion.span
+                      <span
                         key={i}
-                        className="px-3 py-1 text-sm rounded-full text-white/80"
-                        style={{
-                          backgroundColor: "rgba(255,255,255,0.1)",
-                          border: "1px solid rgba(255,255,255,0.2)",
-                        }}
-                        whileHover={{
-                          backgroundColor: `${accentColors.primary}30`,
-                          borderColor: accentColors.primary,
-                          scale: 1.05,
-                        }}
+                        className="px-2.5 py-1 text-xs rounded-full text-white/90 border border-white/20"
                       >
                         {tag}
-                      </motion.span>
+                      </span>
                     ))}
                   </div>
+                </div>
 
-                  {/* Action buttons */}
-                  <div className="flex flex-wrap gap-4">
+                <div className="flex items-center gap-3 pt-4">
+                  <motion.a
+                    href={currentProject.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 rounded-lg text-white font-medium inline-flex items-center gap-2"
+                    style={{
+                      backgroundColor: accentColors.primary,
+                      boxShadow: `0 8px 25px ${accentColors.shadow}`,
+                    }}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <ExternalLink size={16} /> View Project
+                  </motion.a>
+                  {currentProject.github && (
                     <motion.a
-                      href={currentProject.link}
+                      href={currentProject.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-6 py-3 rounded-lg text-white font-medium flex items-center gap-2"
+                      className="px-5 py-2.5 rounded-lg font-medium inline-flex items-center gap-2 border text-white"
                       style={{
-                        backgroundColor: accentColors.primary,
-                        boxShadow: `0 8px 25px ${accentColors.shadow}`,
+                        backgroundColor: "rgba(255,255,255,0.06)",
+                        borderColor: "rgba(255,255,255,0.25)",
                       }}
                       whileHover={{
-                        scale: 1.05,
-                        boxShadow: `0 12px 35px ${accentColors.shadow}`,
+                        scale: 1.03,
+                        backgroundColor: "rgba(255,255,255,0.1)",
                       }}
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={{ scale: 0.97 }}
                     >
-                      <ExternalLink size={18} />
-                      View Project
+                      <Github size={16} /> View Code
                     </motion.a>
-
-                    {currentProject.github && (
-                      <motion.a
-                        href={currentProject.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-6 py-3 rounded-lg font-medium flex items-center gap-2 border text-white"
-                        style={{
-                          backgroundColor: "rgba(255,255,255,0.1)",
-                          borderColor: "rgba(255,255,255,0.3)",
-                        }}
-                        whileHover={{
-                          scale: 1.05,
-                          backgroundColor: "rgba(255,255,255,0.2)",
-                          borderColor: "rgba(255,255,255,0.5)",
-                        }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Github size={18} />
-                        View Code
-                      </motion.a>
-                    )}
-                  </div>
-                </motion.div>
-
-                {/* Project preview */}
-                <motion.div
-                  className="relative"
-                  style={{ transform: "translateZ(30px)" }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.4, duration: 0.6 }}
-                >
-                  <div className="relative rounded-xl overflow-hidden shadow-2xl">
-                    <img
-                      src={currentProject.image}
-                      alt={currentProject.title}
-                      className="w-full h-64 md:h-80 object-cover"
-                    />
-                    <div
-                      className="absolute inset-0 ring-2 ring-opacity-50 rounded-xl"
-                      style={{
-                        boxShadow: `0 0 0 2px ${accentColors.primary}80`,
-                      }}
-                    />
-                  </div>
-
-                  {/* Floating elements */}
-                  <motion.div
-                    className="absolute -top-4 -right-4 w-8 h-8 rounded-full"
-                    style={{ backgroundColor: accentColors.primary }}
-                    animate={{
-                      y: [0, -10, 0],
-                      scale: [1, 1.1, 1],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  />
-                  <motion.div
-                    className="absolute -bottom-4 -left-4 w-6 h-6 rounded-full"
-                    style={{ backgroundColor: `${accentColors.secondary}80` }}
-                    animate={{
-                      y: [0, 10, 0],
-                      scale: [1, 0.9, 1],
-                    }}
-                    transition={{
-                      duration: 2.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: 0.5,
-                    }}
-                  />
-                </motion.div>
+                  )}
+                </div>
               </div>
             </div>
           </motion.div>
@@ -380,7 +323,7 @@ const ProjectShowcase = ({
           <>
             <motion.button
               onClick={goToPrevious}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center z-10"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-11 h-11 rounded-full flex items-center justify-center z-10"
               style={{
                 backgroundColor: "rgba(0,0,0,0.5)",
                 backdropFilter: "blur(10px)",
@@ -397,7 +340,7 @@ const ProjectShowcase = ({
 
             <motion.button
               onClick={goToNext}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center z-10"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 w-11 h-11 rounded-full flex items-center justify-center z-10"
               style={{
                 backgroundColor: "rgba(0,0,0,0.5)",
                 backdropFilter: "blur(10px)",
@@ -441,27 +384,35 @@ const ProjectShowcase = ({
 
       {/* Dots indicator */}
       {projects.length > 1 && (
-        <div className="flex justify-center mt-8 space-x-2">
-          {projects.map((_, index) => (
-            <motion.button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className="w-3 h-3 rounded-full transition-all duration-300"
-              style={{
-                backgroundColor:
-                  index === currentIndex
-                    ? accentColors.primary
-                    : isDark
-                    ? "rgba(255,255,255,0.3)"
-                    : "rgba(0,0,0,0.3)",
-              }}
-              whileHover={{
-                scale: 1.2,
-                backgroundColor: accentColors.primary,
-              }}
-              whileTap={{ scale: 0.9 }}
-            />
-          ))}
+        <div className="flex items-center justify-between mt-6">
+          {/* Minimal index indicator */}
+          <div className="text-white/70 text-sm tracking-[0.3em] uppercase pl-1">
+            {formattedIndex}
+          </div>
+          {/* Dots */}
+          <div className="flex justify-center space-x-2">
+            {projects.map((_, index) => (
+              <motion.button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className="w-2.5 h-2.5 rounded-full transition-all duration-300"
+                style={{
+                  backgroundColor:
+                    index === currentIndex
+                      ? accentColors.primary
+                      : isDark
+                      ? "rgba(255,255,255,0.3)"
+                      : "rgba(0,0,0,0.3)",
+                }}
+                whileHover={{
+                  scale: 1.15,
+                  backgroundColor: accentColors.primary,
+                }}
+                whileTap={{ scale: 0.9 }}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
       )}
 
@@ -479,18 +430,9 @@ const ProjectShowcase = ({
         </div>
       )}
 
-      {/* Project counter */}
-      <div className="absolute bottom-4 left-4 z-10">
-        <div
-          className="px-3 py-1 rounded-full text-sm font-medium text-white"
-          style={{
-            backgroundColor: "rgba(0,0,0,0.5)",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255,255,255,0.2)",
-          }}
-        >
-          {currentIndex + 1} / {projects.length}
-        </div>
+      {/* Corner index badge */}
+      <div className="absolute bottom-4 left-4 z-10 text-white/80 text-xs tracking-[0.2em]">
+        {formattedIndex}
       </div>
     </div>
   );
