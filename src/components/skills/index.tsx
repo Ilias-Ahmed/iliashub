@@ -85,17 +85,6 @@ const SkillsSection = () => {
     setSearchQuery("");
   }, []);
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -127,36 +116,48 @@ const SkillsSection = () => {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
         <motion.div
-          variants={containerVariants}
+          variants={itemVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
-          className="text-center mb-12"
+          transition={{ duration: 0.6 }}
+          className="mb-10 text-center"
         >
-          <motion.div variants={itemVariants} transition={{ duration: 0.6 }}>
-            <p
-              className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed"
-              style={{
-                color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
-              }}
-            >
-              A comprehensive overview of my technical skills, proficiency
-              levels, and experience across various technologies and domains.
-            </p>
-          </motion.div>
+
+          <h2
+        className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight mb-3"
+        style={{
+          backgroundImage: `linear-gradient(90deg, ${accentColors.primary}, ${accentColors.secondary}, #10b981)`,
+          WebkitBackgroundClip: "text",
+          backgroundClip: "text",
+          color: "transparent",
+        }}
+          >
+        A Modern Overview of My Technical Expertise
+          </h2>
+
+          <motion.div
+        initial={{ width: 0, opacity: 0 }}
+        animate={{ width: 160, opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.15 }}
+        className="h-1 rounded-full mx-auto mt-6"
+        style={{
+          background: `linear-gradient(90deg, ${accentColors.primary}, ${accentColors.secondary}, #10b981)`,
+        }}
+          />
         </motion.div>
 
         {/* Skills Visualization - Only render if skills are not filtered for performance */}
         {selectedCategory === "All" && !searchQuery && (
           <motion.div
-            variants={itemVariants}
-            initial="hidden"
-            animate={isInView ? "visible" : "hidden"}
-            transition={{ duration: 0.6 }}
-            className="mb-8 px-2 sm:px-4 md:px-0"
+        variants={itemVariants}
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
+        transition={{ duration: 0.6 }}
+        className="mb-8 px-2 sm:px-4 md:px-0"
           >
-            <Suspense fallback={<LoadingFallback height="300px" />}>
-              <VisxSkillsVisualization skills={skills.slice(0, 8)} />
-            </Suspense>
+        <Suspense fallback={<LoadingFallback height="300px" />}>
+          <VisxSkillsVisualization skills={skills.slice(0, 8)} />
+        </Suspense>
           </motion.div>
         )}
 
@@ -180,95 +181,95 @@ const SkillsSection = () => {
           className="min-h-[600px]"
         >
           <Suspense fallback={<LoadingFallback height="600px" />}>
-            {viewMode === "grid" && (
-              <GridView
-                skills={filteredSkills}
-                setSelectedSkill={setSelectedSkill}
-                hoveredSkill={hoveredSkill}
-                setHoveredSkill={setHoveredSkill}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                setComparisonSkills={setComparisonSkills}
-              />
-            )}
+        {viewMode === "grid" && (
+          <GridView
+            skills={filteredSkills}
+            setSelectedSkill={setSelectedSkill}
+            hoveredSkill={hoveredSkill}
+            setHoveredSkill={setHoveredSkill}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            setComparisonSkills={setComparisonSkills}
+          />
+        )}
 
-            {viewMode === "mastery" && (
-              <MasteryView
-                skills={filteredSkills}
-                setSelectedSkill={setSelectedSkill}
-              />
-            )}
+        {viewMode === "mastery" && (
+          <MasteryView
+            skills={filteredSkills}
+            setSelectedSkill={setSelectedSkill}
+          />
+        )}
 
-            {viewMode === "comparison" && (
-              <ComparisonView
-                comparisonSkills={comparisonSkills}
-                toggleComparisonSkill={toggleComparisonSkill}
-                skills={skills}
-              />
-            )}
+        {viewMode === "comparison" && (
+          <ComparisonView
+            comparisonSkills={comparisonSkills}
+            toggleComparisonSkill={toggleComparisonSkill}
+            skills={skills}
+          />
+        )}
           </Suspense>
         </motion.div>
 
         {/* Results Summary */}
         {(selectedCategory !== "All" || searchQuery) && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-8 text-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-8 text-center"
           >
-            <p
-              className="text-lg"
-              style={{
-                color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)",
-              }}
-            >
-              Showing {filteredSkills.length} of {skills.length} skills
-              {selectedCategory !== "All" && ` in ${selectedCategory}`}
-              {searchQuery && ` matching "${searchQuery}"`}
-            </p>
+        <p
+          className="text-lg"
+          style={{
+            color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)",
+          }}
+        >
+          Showing {filteredSkills.length} of {skills.length} skills
+          {selectedCategory !== "All" && ` in ${selectedCategory}`}
+          {searchQuery && ` matching "${searchQuery}"`}
+        </p>
           </motion.div>
         )}
 
         {/* Empty State */}
         {filteredSkills.length === 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center py-8"
           >
-            <div
-              className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center"
-              style={{ backgroundColor: `${accentColors.primary}20` }}
-            >
-              <span className="text-3xl">🔍</span>
-            </div>
-            <h3
-              className="text-xl font-semibold mb-4"
-              style={{ color: isDark ? "#ffffff" : "#1f2937" }}
-            >
-              No Skills Found
-            </h3>
-            <p
-              className="max-w-md mx-auto"
-              style={{
-                color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)",
-              }}
-            >
-              Try adjusting your search criteria or category filter to find the
-              skills you're looking for.
-            </p>
-            <motion.button
-              onClick={resetFilters}
-              className="mt-6 px-6 py-3 rounded-lg font-medium transition-all duration-200"
-              style={{
-                backgroundColor: accentColors.primary,
-                color: "white",
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Clear Filters
-            </motion.button>
+        <div
+          className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center"
+          style={{ backgroundColor: `${accentColors.primary}20` }}
+        >
+          <span className="text-3xl">🔍</span>
+        </div>
+        <h3
+          className="text-xl font-semibold mb-4"
+          style={{ color: isDark ? "#ffffff" : "#1f2937" }}
+        >
+          No Skills Found
+        </h3>
+        <p
+          className="max-w-md mx-auto"
+          style={{
+            color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)",
+          }}
+        >
+          Try adjusting your search criteria or category filter to find the
+          skills you're looking for.
+        </p>
+        <motion.button
+          onClick={resetFilters}
+          className="mt-6 px-6 py-3 rounded-lg font-medium transition-all duration-200"
+          style={{
+            backgroundColor: accentColors.primary,
+            color: "white",
+          }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Clear Filters
+        </motion.button>
           </motion.div>
         )}
       </div>
