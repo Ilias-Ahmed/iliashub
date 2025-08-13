@@ -1,12 +1,10 @@
 import Navigation from "@/components/navigation/Navigation";
 import ScrollProgressBar from "@/components/ui/ScrollProgressBar";
 import { SmoothCursor } from "@/components/ui/SmoothCursor";
-// Background disabled: removed BackgroundContext
 import { NavigationProvider } from "@/contexts/NavigationContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Hero from "@/pages/Hero";
-import { enforceCustomCursor } from "@/utils/cursorUtils";
-import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Toaster = React.lazy(() =>
@@ -14,14 +12,21 @@ const Toaster = React.lazy(() =>
 );
 const LoadingScreen = React.lazy(() => import("@/components/ui/LoadingScreen"));
 
-// Lazy-loaded sections
+// Lazy-loaded sections with chunk names for better loading
 const AboutSection = React.lazy(() => import("@/components/about"));
 const SkillsSection = React.lazy(() => import("@/components/skills"));
 const ProjectsSection = React.lazy(() => import("@/components/projects"));
 const ContactSection = React.lazy(() => import("@/components/contact"));
 
+// Optimized loading fallback
+const SectionFallback = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
+
 /**
- * Main Index component - Optimized for performance with background integration
+ * Optimized Main Index component with reduced complexity
  */
 const Index = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,9 +36,7 @@ const Index = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const scrollingRef = useRef(false);
-
-  // Background context integration
-  const setCurrentSection = React.useCallback(() => {}, []);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Define navigation sections
   const navSections = useMemo(
@@ -79,7 +82,6 @@ const Index = () => {
 
   // Handle URL-based navigation on initial load and URL changes
   useEffect(() => {
-    // Don't process if we're already scrolling programmatically
     if (scrollingRef.current) return;
 
     const path = location.pathname;
@@ -88,7 +90,6 @@ const Index = () => {
     if (path === "/") {
       targetSection = "home";
     } else {
-      // Remove leading slash and find matching section
       const sectionId = path.substring(1);
       const matchingSection = navSections.find(
         (section) => section.id === sectionId
@@ -96,98 +97,74 @@ const Index = () => {
       targetSection = matchingSection ? matchingSection.id : "home";
     }
 
-    // Background disabled: no-op
-    setCurrentSection();
-
     const element = document.getElementById(targetSection);
     if (element) {
-      // Set flag to prevent scroll handler from firing during programmatic scroll
       scrollingRef.current = true;
       element.scrollIntoView({ behavior: "smooth" });
 
-      // Reset flag after animation completes
       setTimeout(() => {
         scrollingRef.current = false;
-      }, 1000);
+      }, 800);
     }
-  }, [location.pathname, navSections, setCurrentSection]);
+  }, [location.pathname, navSections]);
 
-  // Track scroll progress and update URL
-  useEffect(() => {
-    let scrollTimeout: NodeJS.Timeout;
+  // Optimized scroll handler with better throttling
+  const handleScroll = useCallback(() => {
+    if (scrollingRef.current) return;
 
-    const handleScroll = () => {
-      if (typeof window === "undefined" || scrollingRef.current) return;
-      // Calculate scroll progress
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrollTop = window.scrollY;
-      const progress = scrollTop / (documentHeight - windowHeight);
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    const scrollTop = window.scrollY;
+    const progress = Math.min(1, Math.max(0, scrollTop / (documentHeight - windowHeight)));
 
-      setScrollProgress(Math.min(1, Math.max(0, progress)));
+    setScrollProgress(progress);
 
-      // Debounce URL updates to avoid excessive history entries
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        // Find which section is most visible
-        const viewportMid = scrollTop + windowHeight / 2;
+    // Debounced URL updates
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
 
-        for (const section of navSections) {
-          const element = document.getElementById(section.id);
-          if (!element) continue;
+    scrollTimeoutRef.current = setTimeout(() => {
+      const viewportMid = scrollTop + windowHeight / 2;
 
-          const rect = element.getBoundingClientRect();
-          const sectionTop = scrollTop + rect.top;
-          const sectionBottom = sectionTop + rect.height;
+      for (const section of navSections) {
+        const element = document.getElementById(section.id);
+        if (!element) continue;
 
-          // If viewport middle is within this section
-          if (viewportMid >= sectionTop && viewportMid <= sectionBottom) {
-            // Background disabled: no-op
-            setCurrentSection();
+        const rect = element.getBoundingClientRect();
+        const sectionTop = scrollTop + rect.top;
+        const sectionBottom = sectionTop + rect.height;
 
-            // Only update URL if it's different from current path
-            const targetPath = section.id === "home" ? "/" : `/${section.id}`;
-            if (location.pathname !== targetPath) {
-              navigate(targetPath, { replace: true });
-            }
-            break;
+        if (viewportMid >= sectionTop && viewportMid <= sectionBottom) {
+          const targetPath = section.id === "home" ? "/" : `/${section.id}`;
+          if (location.pathname !== targetPath) {
+            navigate(targetPath, { replace: true });
           }
+          break;
         }
-      }, 200);
-    };
+      }
+    }, 150);
+  }, [navSections, navigate, location.pathname]);
 
+  useEffect(() => {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      clearTimeout(scrollTimeout);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
     };
-  }, [navSections, navigate, location.pathname, setCurrentSection]);
+  }, [handleScroll]);
 
-  // Handle loading completion from LoadingScreen component
-  const handleLoadingComplete = () => {
+  // Handle loading completion
+  const handleLoadingComplete = useCallback(() => {
     setIsLoading(false);
-  };
-
-  // Enforce custom cursor throughout the app
-  useEffect(() => {
-    enforceCustomCursor();
-
-    // Re-enforce after page loads
-    const timeouts = [
-      setTimeout(() => enforceCustomCursor(), 100),
-      setTimeout(() => enforceCustomCursor(), 500),
-      setTimeout(() => enforceCustomCursor(), 1000),
-    ];
-
-    return () => {
-      timeouts.forEach((timeout) => clearTimeout(timeout));
-    };
   }, []);
 
   return (
     <>
-      {/* Add CustomCursor component */}
-      {!isMobile && <SmoothCursor />}
+      {/* Simplified cursor with option to disable */}
+      {!isMobile && <SmoothCursor enabled={!isLoading} />}
 
       <Suspense fallback={null}>
         {isLoading && (
@@ -200,67 +177,36 @@ const Index = () => {
           className="relative w-full min-h-screen overflow-hidden"
           ref={containerRef}
         >
-          {/* Main content with standard scrolling */}
+          {/* Main content */}
           <main className="relative z-10">
-            <section
-              id="home"
-              data-section-name="Home"
-              data-keywords="start,landing,main"
-              className="relative"
-            >
+            <section id="home" className="relative">
               <Hero />
             </section>
 
-            <Suspense
-              fallback={
-                <div className="min-h-screen flex items-center justify-center">
-                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              }
-            >
-              <section
-                id="about"
-                data-section-name="About"
-                data-keywords="me,bio,profile"
-                className="relative"
-              >
+            <Suspense fallback={<SectionFallback />}>
+              <section id="about" className="relative">
                 <AboutSection />
               </section>
 
-              <section
-                id="skills"
-                data-section-name="Skills"
-                data-keywords="abilities,expertise,tech stack"
-                className="relative"
-              >
+              <section id="skills" className="relative">
                 <SkillsSection />
               </section>
 
-              <section
-                id="projects"
-                data-section-name="Projects"
-                data-keywords="work,portfolio,showcase"
-                className="relative"
-              >
+              <section id="projects" className="relative">
                 <ProjectsSection />
               </section>
 
-              <section
-                id="contact"
-                data-section-name="Contact"
-                data-keywords="message,get in touch,email"
-                className="relative"
-              >
+              <section id="contact" className="relative">
                 <ContactSection />
               </section>
             </Suspense>
           </main>
 
-          {/* Integrated Navigation System */}
+          {/* Navigation System */}
           <Navigation
-            enableDots={!isMobile}
+            enableDots={false}
             enableVoice={!isMobile}
-            enableCommandPalette={true}
+            enableCommandPalette={false}
             enableBackToTop={true}
           />
 

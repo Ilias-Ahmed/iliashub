@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { motion, MotionProps, useInView } from "motion/react";
+import { useInView } from "motion/react";
 import {
   Children,
   createContext,
@@ -19,17 +19,16 @@ interface SequenceContextValue {
 }
 
 const SequenceContext = createContext<SequenceContextValue | null>(null);
-
 const useSequence = () => useContext(SequenceContext);
-
 const ItemIndexContext = createContext<number | null>(null);
 const useItemIndex = () => useContext(ItemIndexContext);
 
-interface AnimatedSpanProps extends MotionProps {
+interface AnimatedSpanProps {
   children: React.ReactNode;
   delay?: number;
   className?: string;
   startOnView?: boolean;
+  style?: React.CSSProperties;
 }
 
 export const AnimatedSpan = ({
@@ -37,7 +36,7 @@ export const AnimatedSpan = ({
   delay = 0,
   className,
   startOnView = false,
-  ...props
+  style,
 }: AnimatedSpanProps) => {
   const elementRef = useRef<HTMLDivElement | null>(null);
   const isInView = useInView(elementRef as React.RefObject<Element>, {
@@ -48,6 +47,7 @@ export const AnimatedSpan = ({
   const sequence = useSequence();
   const itemIndex = useItemIndex();
   const [hasStarted, setHasStarted] = useState(false);
+
   useEffect(() => {
     if (!sequence || itemIndex === null) return;
     if (!sequence.sequenceStarted) return;
@@ -66,25 +66,28 @@ export const AnimatedSpan = ({
   const shouldAnimate = sequence ? hasStarted : startOnView ? isInView : true;
 
   return (
-    <motion.div
+    <div
       ref={elementRef}
-      initial={{ opacity: 0, y: -5 }}
-      animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: -5 }}
-      transition={{ duration: 0.3, delay: sequence ? 0 : delay / 1000 }}
-      className={cn("grid text-sm font-normal tracking-tight", className)}
-      onAnimationComplete={() => {
-        if (!sequence) return;
-        if (itemIndex === null) return;
+      className={cn(
+        "grid text-sm font-normal tracking-tight transition-all duration-300",
+        shouldAnimate ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1",
+        className
+      )}
+      style={{
+        transitionDelay: sequence ? "0ms" : `${delay}ms`,
+        ...style,
+      }}
+      onTransitionEnd={() => {
+        if (!sequence || !shouldAnimate || itemIndex === null) return;
         sequence.completeItem(itemIndex);
       }}
-      {...props}
     >
       {children}
-    </motion.div>
+    </div>
   );
 };
 
-interface TypingAnimationProps extends MotionProps {
+interface TypingAnimationProps {
   children: string;
   className?: string;
   duration?: number;
@@ -100,19 +103,10 @@ export const TypingAnimation = ({
   delay = 0,
   as: Component = "span",
   startOnView = true,
-  ...props
 }: TypingAnimationProps) => {
   if (typeof children !== "string") {
-    throw new Error("TypingAnimation: children must be a string. Received:");
+    throw new Error("TypingAnimation: children must be a string");
   }
-
-  const MotionComponent = useMemo(
-    () =>
-      motion.create(Component, {
-        forwardMotionProps: true,
-      }),
-    [Component]
-  );
 
   const [displayedText, setDisplayedText] = useState<string>("");
   const [started, setStarted] = useState(false);
@@ -127,8 +121,7 @@ export const TypingAnimation = ({
 
   useEffect(() => {
     if (sequence && itemIndex !== null) {
-      if (!sequence.sequenceStarted) return;
-      if (started) return;
+      if (!sequence.sequenceStarted || started) return;
       if (sequence.activeIndex === itemIndex) {
         setStarted(true);
       }
@@ -144,16 +137,7 @@ export const TypingAnimation = ({
 
     const startTimeout = setTimeout(() => setStarted(true), delay);
     return () => clearTimeout(startTimeout);
-  }, [
-    delay,
-    startOnView,
-    isInView,
-    started,
-    sequence,
-    sequence?.activeIndex,
-    sequence?.sequenceStarted,
-    itemIndex,
-  ]);
+  }, [delay, startOnView, isInView, started, sequence, sequence?.activeIndex, sequence?.sequenceStarted, itemIndex]);
 
   useEffect(() => {
     if (!started) return;
@@ -171,19 +155,18 @@ export const TypingAnimation = ({
       }
     }, duration);
 
-    return () => {
-      clearInterval(typingEffect);
-    };
+    return () => clearInterval(typingEffect);
   }, [children, duration, started, sequence, itemIndex]);
 
+  const FinalComponent = Component as React.ElementType;
+
   return (
-    <MotionComponent
+    <FinalComponent
       ref={elementRef}
       className={cn("text-sm font-normal tracking-tight", className)}
-      {...props}
     >
       {displayedText}
-    </MotionComponent>
+    </FinalComponent>
   );
 };
 
@@ -193,7 +176,7 @@ interface TerminalProps {
   sequence?: boolean;
   startOnView?: boolean;
   loop?: boolean;
-  loopDelay?: number; // ms to wait before restarting sequence
+  loopDelay?: number;
 }
 
 export const Terminal = ({
@@ -216,28 +199,23 @@ export const Terminal = ({
   const childArray = useMemo(() => Children.toArray(children), [children]);
   const childCount = childArray.length;
 
-  // When the sequence reaches the end, optionally loop
   useEffect(() => {
     if (!sequence || !loop) return;
     if (activeIndex < childCount) return;
 
     const t = setTimeout(() => {
       setActiveIndex(0);
-      setCycle((c) => c + 1); // remount children so inner animations reset
+      setCycle((c) => c + 1);
     }, Math.max(0, loopDelay));
 
-    return () => {
-      if (t) clearTimeout(t);
-    };
+    return () => clearTimeout(t);
   }, [activeIndex, childCount, loop, loopDelay, sequence]);
 
   const contextValue = useMemo<SequenceContextValue | null>(() => {
     if (!sequence) return null;
     return {
       completeItem: (index: number) => {
-        setActiveIndex((current) =>
-          index === current ? current + 1 : current
-        );
+        setActiveIndex((current) => (index === current ? current + 1 : current));
       },
       activeIndex,
       sequenceStarted: sequenceHasStarted,
@@ -247,7 +225,6 @@ export const Terminal = ({
   const wrappedChildren = useMemo(() => {
     if (!sequence) return children;
     return childArray.map((child, index) => (
-      // include cycle in key to remount children when looping
       <ItemIndexContext.Provider key={`${cycle}-${index}`} value={index}>
         {child as React.ReactNode}
       </ItemIndexContext.Provider>

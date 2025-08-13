@@ -1,25 +1,18 @@
 import { Tabs, TabsList } from "@/components/ui/tabs";
 import { useTheme } from "@/contexts/ThemeContext";
-// haptics removed
-import { animated, useSpring } from "@react-spring/web";
-import { AnimatePresence, motion, useInView } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { certifications, timelineData } from "./aboutData";
 import CertificationsGallery from "./CertificationsGallery";
 import ExperienceTimeline from "./ExperienceTimeline";
 import ProfileCard from "./ProfileCard";
 
-const AboutSection = () => {
+const AboutSection = memo(() => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [activeTab, setActiveTab] = useState("profile");
   const [scrollY, setScrollY] = useState(0);
 
   const { isDark, getAccentColors } = useTheme();
   const accentColors = getAccentColors();
-
-  // Parallax effect for background elements
-  const [{ offset }, api] = useSpring(() => ({ offset: [0, 0] }));
 
   // Track scroll position for parallax effects - throttled for performance
   const handleScroll = useCallback(() => {
@@ -48,121 +41,34 @@ const AboutSection = () => {
     return () => window.removeEventListener("scroll", scrollHandler);
   }, [throttledScrollHandler]);
 
-  // Debounced mouse move handler for better performance
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
-      if (!e || !isInView) return; // Only handle when in view
-
-      const x = (e.clientX / window.innerWidth) * 2 - 1;
-      const y = (e.clientY / window.innerHeight) * 2 - 1;
-
-      // Debounce the animation
-      const throttledUpdate = () => {
-        api.start({ offset: [x * 15, y * 15] });
-      };
-
-      requestAnimationFrame(throttledUpdate);
-    },
-    [api, isInView]
-  );
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: "spring" as const, stiffness: 100 },
-    },
-  };
-
   return (
     <section
-      className="py-8  relative overflow-hidden theme-transition"
+      className="py-8 relative overflow-hidden theme-transition"
       id="about"
       ref={ref}
-      onMouseMove={handleMouseMove}
       aria-label="About Section"
     >
-      {/* Floating gradient orbs with mouse parallax effect */}
-      <animated.div
+      {/* Simplified floating gradient orbs */}
+      <div
+        className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full blur-3xl opacity-10"
         style={{
-          position: "absolute",
-          top: "25%",
-          left: "25%",
-          width: "16rem",
-          height: "16rem",
-          borderRadius: "9999px",
-          backgroundColor: `${accentColors.primary}10`,
-          filter: "blur(100px)",
-          opacity: 0.6,
-          transform: offset.to(
-            (x, y) =>
-              `translate(${scrollY * 0.05 + x}px, ${-scrollY * 0.02 + y}px)`
-          ),
+          backgroundColor: accentColors.primary,
+          transform: `translateY(${scrollY * 0.02}px)`,
         }}
         aria-hidden="true"
       />
-      <animated.div
+      <div
+        className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full blur-3xl opacity-5"
         style={{
-          position: "absolute",
-          bottom: "33.333%",
-          right: "25%",
-          width: "20rem",
-          height: "20rem",
-          borderRadius: "9999px",
-          background: `${accentColors.secondary}10`,
-          filter: "blur(120px)",
-          opacity: 0.5,
-          transform: offset.to(
-            (x, y) =>
-              `translate(${-scrollY * 0.03 - x * 0.8}px, ${
-                scrollY * 0.04 - y * 0.8
-              }px)`
-          ),
-        }}
-        aria-hidden="true"
-      />
-      <animated.div
-        style={{
-          position: "absolute",
-          top: "66.6667%",
-          right: "33.3333%",
-          width: "12rem",
-          height: "12rem",
-          borderRadius: "9999px",
-          backgroundColor: `${accentColors.primary}10`,
-          filter: "blur(80px)",
-          opacity: 0.6,
-          transform: offset.to(
-            (x, y) =>
-              `translate(${scrollY * 0.02 + x * 1.2}px, ${
-                -scrollY * 0.05 + y * 1.2
-              }px)`
-          ),
+          backgroundColor: accentColors.secondary,
+          transform: `translateY(${-scrollY * 0.03}px)`,
         }}
         aria-hidden="true"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-12 md:mb-16"
-        >
+        <div className="mb-12 md:mb-16">
           <div>
             <p
               className="heading-eyebrow"
@@ -178,20 +84,16 @@ const AboutSection = () => {
           >
             Beyond The Code
           </h2>
-        </motion.div>
-        {/* Interactive Tabs with Enhanced Animations */}
+        </div>
+
+        {/* Interactive Tabs */}
         <Tabs
           defaultValue="profile"
           value={activeTab}
           onValueChange={setActiveTab}
           className="mb-20"
         >
-          <motion.div
-            className="flex justify-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
+          <div className="flex justify-center mb-16">
             <TabsList className="relative inline-flex items-center p-1 theme-transition">
               {[
                 {
@@ -231,10 +133,10 @@ const AboutSection = () => {
                   description: "Work history and timeline",
                 },
               ].map((tab) => (
-                <motion.button
+                <button
                   key={tab.value}
                   type="button"
-                  className="relative px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 overflow-visible"
+                  className="relative px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 overflow-visible hover:scale-105"
                   style={{
                     color:
                       activeTab === tab.value
@@ -242,187 +144,45 @@ const AboutSection = () => {
                         : isDark
                         ? "rgba(255,255,255,0.7)"
                         : "rgba(0,0,0,0.7)",
+                    backgroundColor:
+                      activeTab === tab.value ? accentColors.primary : "transparent",
                   }}
-                  onClick={() => {
-                    // haptics removed
-                    setActiveTab(tab.value);
-                  }}
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setActiveTab(tab.value)}
                   aria-label={tab.label}
                 >
-                  {/* Active background */}
-                  {activeTab === tab.value && (
-                    <motion.div
-                      layoutId="activeTabBackground"
-                      className="absolute inset-0 rounded-lg"
-                      style={{
-                        background: `linear-gradient(135deg, ${accentColors.primary} 0%, ${accentColors.secondary} 100%)`,
-                        boxShadow: `0 4px 12px ${accentColors.shadow}`,
-                      }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-
-                  {/* Content */}
                   <span className="relative z-10 flex items-center gap-2">
-                    <motion.span
-                      className="text-lg"
-                      animate={{
-                        scale: activeTab === tab.value ? 1.15 : 1,
-                        rotate: activeTab === tab.value ? 5 : 0,
-                      }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {tab.icon}
-                    </motion.span>
+                    <span className="text-lg">{tab.icon}</span>
                     <span className="uppercase tracking-wide">{tab.label}</span>
                   </span>
-
-                  {/* Tooltip */}
-                  <motion.div
-                    className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-lg text-xs whitespace-nowrap opacity-0 pointer-events-none"
-                    style={{
-                      backgroundColor: isDark
-                        ? "rgba(0,0,0,0.8)"
-                        : "rgba(255,255,255,0.9)",
-                      color: isDark ? "white" : "black",
-                      border: `1px solid ${
-                        isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"
-                      }`,
-                      zIndex: 20,
-                    }}
-                    whileHover={{ opacity: 1 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {tab.description}
-                    <div
-                      className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0"
-                      style={{
-                        borderLeft: "4px solid transparent",
-                        borderRight: "4px solid transparent",
-                        borderBottom: `4px solid ${
-                          isDark ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.9)"
-                        }`,
-                      }}
-                    />
-                  </motion.div>
-                </motion.button>
+                </button>
               ))}
             </TabsList>
-          </motion.div>
+          </div>
 
-          {/* Enhanced Tab Content with Sliding Animations */}
+          {/* Tab Content */}
           <div className="relative overflow-hidden">
-            <AnimatePresence mode="wait">
-              {activeTab === "profile" && (
-                <motion.div
-                  key="profile"
-                  initial={{
-                    opacity: 0,
-                    y: 60,
-                    rotateX: -15,
-                    scale: 0.95,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                    rotateX: 0,
-                    scale: 1,
-                  }}
-                  exit={{
-                    opacity: 0,
-                    y: -60,
-                    rotateX: 15,
-                    scale: 0.95,
-                  }}
-                  transition={{
-                    duration: 0.6,
-                    type: "spring",
-                    stiffness: 100,
-                    damping: 20,
-                    opacity: { duration: 0.4 },
-                  }}
-                  style={{
-                    perspective: "1000px",
-                    transformStyle: "preserve-3d",
-                  }}
-                  className="relative"
-                >
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2, duration: 0.4 }}
-                  >
-                    <ProfileCard />
-                  </motion.div>
-                </motion.div>
-              )}
-              {activeTab === "experience" && (
-                <motion.div
-                  key="experience"
-                  initial={{
-                    opacity: 0,
-                    y: 60,
-                    rotateX: -15,
-                    scale: 0.95,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                    rotateX: 0,
-                    scale: 1,
-                  }}
-                  exit={{
-                    opacity: 0,
-                    y: -60,
-                    rotateX: 15,
-                    scale: 0.95,
-                  }}
-                  transition={{
-                    duration: 0.6,
-                    type: "spring",
-                    stiffness: 100,
-                    damping: 20,
-                    opacity: { duration: 0.4 },
-                  }}
-                  style={{
-                    perspective: "1000px",
-                    transformStyle: "preserve-3d",
-                  }}
-                  className="relative"
-                >
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2, duration: 0.4 }}
-                  >
-                    <ExperienceTimeline timelineData={timelineData} />
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {activeTab === "profile" && (
+              <div className="relative">
+                <ProfileCard />
+              </div>
+            )}
+            {activeTab === "experience" && (
+              <div className="relative">
+                <ExperienceTimeline timelineData={timelineData} />
+              </div>
+            )}
           </div>
         </Tabs>
 
         {/* Certifications Section */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="mt-24"
-        >
-          <motion.div variants={itemVariants}>
-            <CertificationsGallery certifications={certifications} />
-          </motion.div>
-        </motion.div>
+        <div className="mt-24">
+          <CertificationsGallery certifications={certifications} />
+        </div>
       </div>
     </section>
   );
-};
+});
+
+AboutSection.displayName = "AboutSection";
 
 export default AboutSection;

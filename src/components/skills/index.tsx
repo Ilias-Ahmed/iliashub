@@ -123,18 +123,6 @@ const SkillsSection = () => {
           className="mb-10 text-center"
         >
 
-          <h2
-        className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight mb-3"
-        style={{
-          backgroundImage: `linear-gradient(90deg, ${accentColors.primary}, ${accentColors.secondary}, #10b981)`,
-          WebkitBackgroundClip: "text",
-          backgroundClip: "text",
-          color: "transparent",
-        }}
-          >
-        A Modern Overview of My Technical Expertise
-          </h2>
-
           <motion.div
         initial={{ width: 0, opacity: 0 }}
         animate={{ width: 160, opacity: 1 }}
