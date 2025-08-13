@@ -106,12 +106,6 @@ const ProjectsSection = memo(() => {
           aria-labelledby="projects-title"
         >
           <div className="text-left">
-            <p
-              className="heading-eyebrow opacity-70 mb-3"
-              style={{ color: accentColors.primary }}
-            >
-              Case Studies
-            </p>
             <h2
               id="projects-title"
               className="heading-display use-display-on-lg text-letterpress"
