@@ -3,6 +3,7 @@ import { motion, useInView } from "framer-motion";
 import { useMemo, useRef } from "react";
 
 import AvailabilityBadges from "@/components/contact/AvailabilityBadges";
+import BuyMeCoffeeButton from "@/components/contact/BuyMeCoffeeButton";
 import ContactForm from "@/components/contact/ContactForm";
 import InteractiveMap from "@/components/contact/InteractiveMap";
 import SocialLinks from "@/components/contact/SocialLinks";
@@ -76,7 +77,6 @@ const ContactSection = () => {
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Contact info and social links */}
           <motion.div
@@ -85,7 +85,6 @@ const ContactSection = () => {
             animate={isSectionInView ? "visible" : "hidden"}
             className="lg:col-span-2 space-y-8"
           >
-
             <motion.div variants={itemVariants}>
               <SocialLinks />
             </motion.div>
@@ -95,7 +94,7 @@ const ContactSection = () => {
             </motion.div>
           </motion.div>
 
-          {/* Contact form */}
+          {/* Contact form + map + BuyMeCoffee */}
           <motion.div
             ref={formRef}
             initial={{ opacity: 0, x: 30 }}
@@ -111,7 +110,13 @@ const ContactSection = () => {
               variants={itemVariants}
               className="hidden md:block mt-8"
             >
-              <InteractiveMap />
+              <div className="relative">
+                <InteractiveMap />
+                {/* Buy me a coffee on the right side of the map */}
+                <div className="pointer-events-auto absolute right-4 top-1/2 -translate-y-1/2 hidden sm:block">
+                  <BuyMeCoffeeButton size="default" />
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         </div>
