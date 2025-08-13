@@ -6,22 +6,13 @@ import ProjectTimeline from "@/components/projects/ProjectTimeline";
 import ProjectViewToggle from "@/components/projects/ProjectViewToggle";
 import { Project, ViewMode } from "@/components/projects/types";
 import { useTheme } from "@/contexts/ThemeContext";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { useMemo, useRef, useState } from "react";
+import { memo, useMemo, useRef, useState } from "react";
 
-const ProjectsSection = () => {
+const ProjectsSection = memo(() => {
   const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [viewMode, setViewMode] = useState<ViewMode>("showcase");
   const { getAccentColors } = useTheme();
   const accentColors = getAccentColors();
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const orbY1 = useTransform(scrollYProgress, [0, 1], [0, -60]);
-  const orbY2 = useTransform(scrollYProgress, [0, 1], [0, 80]);
-  const orbY3 = useTransform(scrollYProgress, [0, 1], [0, -40]);
 
   // Ensure projectsData is properly typed and exists
   const safeProjectsData: Project[] = useMemo(() => {
@@ -86,19 +77,15 @@ const ProjectsSection = () => {
       ref={ref}
       onMouseMove={handleSectionMouseMove}
     >
-      {/* Background Elements */}
+      {/* Simplified Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full opacity-20 blur-3xl"
-          style={{ backgroundColor: accentColors.primary, y: orbY1 }}
+        <div
+          className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full opacity-10 blur-3xl"
+          style={{ backgroundColor: accentColors.primary }}
         />
-        <motion.div
-          className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full opacity-15 blur-3xl"
-          style={{ backgroundColor: accentColors.secondary, y: orbY2 }}
-        />
-        <motion.div
-          className="absolute top-2/3 right-1/3 w-48 h-48 rounded-full opacity-10 blur-3xl"
-          style={{ backgroundColor: accentColors.primary, y: orbY3 }}
+        <div
+          className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full opacity-5 blur-3xl"
+          style={{ backgroundColor: accentColors.secondary }}
         />
       </div>
 
@@ -114,10 +101,7 @@ const ProjectsSection = () => {
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <motion.header
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.7 }}
+        <header
           className="mb-12 md:mb-16"
           aria-labelledby="projects-title"
         >
@@ -134,19 +118,12 @@ const ProjectsSection = () => {
               aria-label={title}
             >
               {titleChars.map((ch, i) => (
-                <motion.span
+                <span
                   key={i + ch}
-                  initial={{ y: 20, opacity: 0, rotateX: -15 }}
-                  animate={isInView ? { y: 0, opacity: 1, rotateX: 0 } : {}}
-                  transition={{
-                    duration: 0.5,
-                    delay: 0.02 * i,
-                    ease: "easeOut",
-                  }}
                   className="inline-block will-change-transform"
                 >
                   {ch === " " ? "\u00A0" : ch}
-                </motion.span>
+                </span>
               ))}
             </h2>
             <div
@@ -158,12 +135,12 @@ const ProjectsSection = () => {
               performant builds, and considerate motion — crafted end to end.
             </p>
           </div>
-        </motion.header>
+        </header>
 
         {/* View Toggle */}
         <ProjectViewToggle activeView={viewMode} onChange={setViewMode} />
 
-        {/* Cinematic thumbnail reel */}
+        {/* Simplified thumbnail reel */}
         {safeProjectsData.length > 0 && (
           <div className="relative mb-10">
             <div className="project-reel mask-fade-x">
@@ -189,11 +166,7 @@ const ProjectsSection = () => {
         )}
 
         {/* Project Views */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div>
           {viewMode === "showcase" && (
             <ProjectShowcase
               projects={
@@ -207,13 +180,15 @@ const ProjectsSection = () => {
           {viewMode === "timeline" && (
             <ProjectTimeline projects={safeProjectsData} />
           )}
-        </motion.div>
+        </div>
 
         {/* Project Stats */}
         <ProjectStats />
       </div>
     </section>
   );
-};
+});
+
+ProjectsSection.displayName = "ProjectsSection";
 
 export default ProjectsSection;
