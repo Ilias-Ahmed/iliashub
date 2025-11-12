@@ -1,475 +1,433 @@
-import { Marquee } from "@/components/ui/Marque";
 import { useTheme } from "@/contexts/ThemeContext";
-import { cn } from "@/lib/utils";
-// haptics removed
-import { AnimatePresence, motion } from "framer-motion";
-import { memo, useMemo, useState } from "react";
-import { Skill, ViewMode } from "./types";
+import { motion } from "framer-motion";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type KeyboardEvent,
+  type MouseEvent,
+} from "react";
+import { Skill } from "./types";
 
 interface GridViewProps {
   skills: Skill[];
   setSelectedSkill: (skill: Skill | null) => void;
   setHoveredSkill: (skillId: string | null) => void;
   hoveredSkill: string | null;
-  setViewMode: (mode: ViewMode) => void;
-  setComparisonSkills: (skills: string[]) => void;
-  viewMode: ViewMode;
+  onCompareSkill: (skillId: string) => void;
 }
 
-// Enhanced Skill Card Component with optimized sizing and expandable content
-const SkillCard = memo(
+interface SkillChipProps {
+  skill: Skill;
+  isActive: boolean;
+  onActivate: () => void;
+  onHover: () => void;
+  onLeave: () => void;
+  onCompare: (event: MouseEvent<HTMLButtonElement>) => void;
+  isDark: boolean;
+  accentColors: Record<string, string>;
+}
+
+const SkillChip = memo(
   ({
     skill,
-    isHovered,
-    isExpanded,
+    isActive,
+    onActivate,
     onHover,
     onLeave,
-    onSelect,
     onCompare,
+    isDark,
     accentColors,
-  }: {
-    skill: Skill;
-    isHovered: boolean;
-    isExpanded: boolean;
-    onHover: () => void;
-    onLeave: () => void;
-    onSelect: () => void;
-    onCompare: (e: React.MouseEvent) => void;
-    accentColors: Record<string, string>;
-  }) => {
-    const { isDark } = useTheme();
+  }: SkillChipProps) => {
+    const handleKeyDown = useCallback(
+      (event: KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onActivate();
+        }
+      },
+      [onActivate]
+    );
 
     return (
       <motion.div
-        className={cn(
-          "relative overflow-hidden rounded-xl border group skill-card",
-          "transition-all duration-300 backdrop-blur-sm skill-card-glow",
-          isExpanded ? "w-80 h-96" : "w-full max-w-64 h-40 sm:h-40 md:h-42"
-        )}
-        style={{
-          backgroundColor: isDark
-            ? "rgba(255,255,255,0.05)"
-            : "rgba(255,255,255,0.8)",
-          borderColor: isHovered
-            ? accentColors.primary
-            : isDark
-            ? "rgba(255,255,255,0.1)"
-            : "rgba(0,0,0,0.1)",
-          boxShadow: isHovered
-            ? `0 15px 30px ${skill.color}20`
-            : "0 4px 15px rgba(0,0,0,0.1)",
-        }}
+        role="button"
+        tabIndex={0}
+        onClick={onActivate}
         onMouseEnter={onHover}
         onMouseLeave={onLeave}
-        onClick={onSelect}
-        whileHover={{
-          scale: isExpanded ? 1 : 1.02,
-          y: isExpanded ? 0 : -2,
+        onFocus={onHover}
+        onBlur={onLeave}
+        onKeyDown={handleKeyDown}
+        whileHover={{ y: -4 }}
+        whileTap={{ scale: 0.98 }}
+        className="group relative flex min-w-[12.5rem] cursor-pointer items-center gap-3 overflow-hidden rounded-2xl border px-4 py-3 outline-none transition-transform focus-visible:ring-2 focus-visible:ring-offset-2"
+        style={{
+          borderColor: isActive
+            ? accentColors.primary
+            : isDark
+            ? "rgba(255,255,255,0.08)"
+            : "rgba(15,23,42,0.08)",
+          backgroundColor: isDark
+            ? "rgba(15,23,42,0.55)"
+            : "rgba(255,255,255,0.9)",
+          boxShadow: isActive
+            ? `0 18px 38px ${skill.color}22`
+            : "0 12px 24px rgba(15, 23, 42, 0.08)",
+          transform: isActive ? "scale(1.03)" : undefined,
         }}
-        layout
-        layoutId={`skill-${skill.id}`}
       >
-        {/* Background Pattern */}
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            background: `radial-gradient(circle at 70% 20%, ${skill.color}, transparent 50%)`,
-          }}
-        />
-
-        {/* Background glow effect */}
         <motion.div
-          className="absolute inset-0 transition-opacity duration-500"
+          className="flex h-10 w-10 items-center justify-center rounded-xl text-lg"
           style={{
-            background: `radial-gradient(circle at center, ${skill.color}20 0%, transparent 70%)`,
-            opacity: isHovered ? 0.3 : 0,
-            filter: "blur(20px)",
+            backgroundColor: `${skill.color}20`,
+            color: skill.color,
           }}
-        />
-
-        <div
-          className={cn(
-            "p-3 sm:p-4 h-full flex flex-col",
-            isExpanded && "overflow-hidden"
-          )}
+          animate={{ rotate: isActive ? 0 : -6 }}
+          transition={{ type: "spring", stiffness: 300, damping: 15 }}
         >
-          <div className="flex items-start justify-between mb-2 flex-shrink-0 relative z-10">
-            <div className="flex items-center min-w-0 flex-1">
-              <motion.div
-                className="w-8 h-8 flex items-center justify-center rounded-lg mr-2 text-sm flex-shrink-0"
-                style={{
-                  backgroundColor: `${skill.color}${isHovered ? "30" : "20"}`,
-                  color: skill.color,
-                }}
-                whileHover={{ scale: 1.1, rotate: 5 }}
-              >
-                {skill.icon}
-              </motion.div>
-              <div className="min-w-0 flex-1">
-                <h3
-                  className={cn(
-                    "font-bold transition-colors duration-300 truncate",
-                    isExpanded ? "text-base" : "text-sm"
-                  )}
-                  style={{ color: isDark ? "#ffffff" : "#1f2937" }}
-                >
-                  {skill.name}
-                </h3>
-                <span className="text-xs text-muted-foreground truncate block">
-                  {skill.category}
-                </span>
-              </div>
-            </div>
+          {skill.icon}
+        </motion.div>
 
-            {/* Compare Button */}
-            <motion.button
-              className="w-6 h-6 rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 flex-shrink-0"
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[11px] font-semibold uppercase tracking-[0.2em] opacity-60">
+            {skill.category}
+          </p>
+          <div className="flex items-center justify-between gap-3">
+            <span className="truncate text-sm font-semibold">{skill.name}</span>
+            <span
+              className="flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wide"
               style={{
-                backgroundColor: `${accentColors.primary}20`,
-                color: accentColors.primary,
-                border: `1px solid ${accentColors.primary}40`,
+                backgroundColor: `${skill.color}18`,
+                color: skill.color,
               }}
-              onClick={onCompare}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              title="Compare this skill"
             >
-              ⚖️
-            </motion.button>
+              {skill.level}%
+            </span>
           </div>
 
-          {/* Proficiency Level */}
-          <div className="mb-2 flex-shrink-0 relative z-10">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-medium text-muted-foreground">
-                Level
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
+            <motion.div
+              className="h-full rounded-full"
+              style={{ backgroundColor: skill.color }}
+              initial={{ width: 0 }}
+              animate={{ width: `${skill.level}%` }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={onCompare}
+          className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-sm opacity-0 shadow-sm transition-opacity group-hover:opacity-95"
+          style={{
+            backgroundColor: `${accentColors.primary}18`,
+            color: accentColors.primary,
+            border: `1px solid ${accentColors.primary}33`,
+          }}
+          aria-label={`Compare ${skill.name}`}
+        >
+          ⚖️
+        </button>
+
+        <motion.div
+          className="pointer-events-none absolute inset-0 opacity-0"
+          animate={{ opacity: isActive ? 0.3 : 0 }}
+          style={{
+            background: `radial-gradient(circle at 15% 15%, ${skill.color}25 0%, transparent 60%)`,
+          }}
+        />
+      </motion.div>
+    );
+  }
+);
+
+SkillChip.displayName = "SkillChip";
+
+const ActiveSkillPanel = memo(
+  ({
+    skill,
+    isDark,
+    onCompare,
+    onOpenDetail,
+  }: {
+    skill: Skill | null;
+    isDark: boolean;
+    onCompare: (skillId: string) => void;
+    onOpenDetail: () => void;
+  }) => {
+    if (!skill) {
+      return (
+        <div className="flex h-full min-h-[300px] flex-col items-center justify-center rounded-3xl border border-dashed border-border/40 p-10 text-center text-muted-foreground">
+          <p className="text-sm font-medium">
+            Hover a skill card to preview its journey.
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <motion.div
+        layout
+        key={skill.id}
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        className="relative overflow-hidden rounded-3xl border p-8 shadow-2xl"
+        style={{
+          background: isDark
+            ? "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.65))"
+            : "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.75))",
+          borderColor: isDark
+            ? "rgba(255,255,255,0.08)"
+            : "rgba(15,23,42,0.08)",
+        }}
+      >
+        <div
+          className="absolute -top-24 right-12 h-48 w-48 rounded-full blur-3xl"
+          style={{ backgroundColor: `${skill.color}35` }}
+        />
+
+        <div className="relative flex flex-col gap-6">
+          <div className="flex items-start gap-4">
+            <div
+              className="flex h-16 w-16 items-center justify-center rounded-2xl text-2xl"
+              style={{
+                backgroundColor: `${skill.color}22`,
+                color: skill.color,
+              }}
+            >
+              {skill.icon}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.4em] opacity-70">
+                {skill.category}
+              </p>
+              <h3 className="mt-1 text-2xl font-bold">{skill.name}</h3>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm opacity-70">
+                <span>{skill.projects} projects shipped</span>
+                <span className="h-1 w-1 rounded-full bg-current opacity-50" />
+                <span>{skill.yearsExperience} years in practice</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-baseline justify-between gap-4">
+              <span className="text-xs font-medium uppercase tracking-[0.3em] opacity-60">
+                Mastery
               </span>
               <span
-                className="text-xs font-bold"
+                className="text-4xl font-black"
                 style={{ color: skill.color }}
               >
                 {skill.level}%
               </span>
             </div>
-            <div className="relative h-1 bg-muted rounded-full overflow-hidden">
+            <div className="mt-3 h-3 overflow-hidden rounded-full bg-muted">
               <motion.div
                 className="h-full rounded-full"
                 style={{ backgroundColor: skill.color }}
                 initial={{ width: 0 }}
                 animate={{ width: `${skill.level}%` }}
-                transition={{ duration: 1, delay: 0.2 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
               />
             </div>
           </div>
 
-          {/* Content Area - Scrollable when expanded */}
-          <div
-            className={cn(
-              "flex-1 relative z-10",
-              isExpanded && "overflow-hidden"
-            )}
-          >
-            <AnimatePresence mode="wait">
-              {isExpanded ? (
-                <motion.div
-                  key="expanded"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "100%" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="h-full"
-                >
-                  {/* Scrollable Content Container */}
-                  <div
-                    className="h-full overflow-y-auto pr-2 space-y-3 skill-card-scroll"
-                    style={{
-                      maxHeight: "260px",
-                    }}
-                  >
-                    {/* Detailed Description */}
-                    <div>
-                      <h4 className="text-sm font-semibold mb-2 text-foreground">
-                        About
-                      </h4>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        {skill.description}
-                      </p>
-                    </div>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {skill.description}
+          </p>
 
-                    {/* Stats */}
-                    <div>
-                      <h4 className="text-sm font-semibold mb-2 text-foreground">
-                        Experience
-                      </h4>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-muted-foreground">
-                            Projects
-                          </span>
-                          <span className="text-xs font-medium text-foreground">
-                            {skill.projects}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-muted-foreground">
-                            Years
-                          </span>
-                          <span className="text-xs font-medium text-foreground">
-                            {skill.yearsExperience}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Proficiency Details */}
-                    <div>
-                      <h4 className="text-sm font-semibold mb-2 text-foreground">
-                        Proficiency
-                      </h4>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-muted-foreground">
-                            {skill.level >= 90
-                              ? "Expert"
-                              : skill.level >= 75
-                              ? "Advanced"
-                              : skill.level >= 60
-                              ? "Intermediate"
-                              : "Beginner"}
-                          </span>
-                          <div
-                            className="text-xs font-bold px-2 py-1 rounded"
-                            style={{
-                              backgroundColor: `${skill.color}20`,
-                              color: skill.color,
-                            }}
-                          >
-                            {skill.level}%
-                          </div>
-                        </div>
-
-                        {/* Progress visualization */}
-                        <div className="w-full bg-muted rounded-full h-2">
-                          <motion.div
-                            className="h-2 rounded-full"
-                            style={{ backgroundColor: skill.color }}
-                            initial={{ width: 0 }}
-                            animate={{ width: `${skill.level}%` }}
-                            transition={{ duration: 1.5, delay: 0.3 }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Additional Metrics */}
-                    <div>
-                      <h4 className="text-sm font-semibold mb-2 text-foreground">
-                        Metrics
-                      </h4>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="text-center p-2 rounded bg-muted/50">
-                          <div className="text-xs font-bold text-foreground">
-                            {Math.round(skill.projects / skill.yearsExperience)}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            Projects/Year
-                          </div>
-                        </div>
-                        <div className="text-center p-2 rounded bg-muted/50">
-                          <div className="text-xs font-bold text-foreground">
-                            {skill.level >= 85
-                              ? "A+"
-                              : skill.level >= 75
-                              ? "A"
-                              : skill.level >= 65
-                              ? "B+"
-                              : "B"}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            Grade
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="collapsed"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="space-y-2"
-                >
-                  {/* Brief Description */}
-                  <p className="text-xs text-muted-foreground line-clamp-2">
-                    {skill.description}
-                  </p>
-
-                  {/* Quick Stats */}
-                  <div className="flex justify-between items-center text-xs text-muted-foreground">
-                    <span>📁 {skill.projects}</span>
-                    <span>⏱️ {skill.yearsExperience}y</span>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => onCompare(skill.id)}
+              className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02]"
+            >
+              ⚖️ Add to comparison
+            </button>
+            <button
+              type="button"
+              onClick={onOpenDetail}
+              className="flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors hover:bg-muted"
+            >
+              ℹ️ View full profile
+            </button>
           </div>
-
-          {/* Hover Glow Effect */}
-          <motion.div
-            className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none"
-            style={{
-              background: `linear-gradient(135deg, ${skill.color}10 0%, transparent 50%, ${accentColors.primary}05 100%)`,
-            }}
-            initial={{ opacity: 0 }}
-            whileHover={{ opacity: 1 }}
-          />
         </div>
       </motion.div>
     );
   }
 );
 
-SkillCard.displayName = "SkillCard";
+ActiveSkillPanel.displayName = "ActiveSkillPanel";
 
-/**
- * Optimized GridView component with 6 categories in a single page layout
- */
 const GridView = ({
   skills,
   setSelectedSkill,
   setHoveredSkill,
   hoveredSkill,
-  setViewMode,
-  setComparisonSkills,
+  onCompareSkill,
 }: GridViewProps) => {
-  const { getAccentColors } = useTheme();
-  const accentColors = getAccentColors();
-  const [expandedSkill, setExpandedSkill] = useState<string | null>(null);
+  const { isDark, getAccentColors } = useTheme();
+  const accentColors = useMemo(() => getAccentColors(), [getAccentColors]);
+  const [activeSkillId, setActiveSkillId] = useState<string | null>(null);
 
-  // Group skills by category for better organization
   const skillsByCategory = useMemo(() => {
-    const categories = skills.reduce((acc, skill) => {
+    const grouped = skills.reduce<Record<string, Skill[]>>((acc, skill) => {
       if (!acc[skill.category]) {
         acc[skill.category] = [];
       }
       acc[skill.category].push(skill);
       return acc;
-    }, {} as Record<string, Skill[]>);
+    }, {});
 
-    // Sort categories by average skill level (highest first)
-    return Object.entries(categories).sort((a, b) => {
-      const avgA =
-        a[1].reduce((sum, skill) => sum + skill.level, 0) / a[1].length;
-      const avgB =
-        b[1].reduce((sum, skill) => sum + skill.level, 0) / b[1].length;
-      return avgB - avgA;
+    return Object.entries(grouped).sort(([, aSkills], [, bSkills]) => {
+      const average = (items: Skill[]) =>
+        items.reduce((total, item) => total + item.level, 0) / items.length;
+      return average(bSkills) - average(aSkills);
     });
   }, [skills]);
 
-  const handleSkillSelect = (skill: Skill) => {
-    if (expandedSkill === skill.id) {
-      setExpandedSkill(null);
-      setSelectedSkill(null);
-    } else {
-      setExpandedSkill(skill.id);
-      setSelectedSkill(skill);
+  useEffect(() => {
+    if (!skills.length) {
+      setActiveSkillId(null);
+      return;
     }
-    // haptics removed
-  };
 
-  const handleCompareClick = (e: React.MouseEvent, skillId: string) => {
-    e.stopPropagation();
-    setViewMode("comparison");
-    setComparisonSkills([skillId]);
-    // haptics removed
-  };
+    if (!skills.some((skill) => skill.id === activeSkillId)) {
+      setActiveSkillId(skills[0].id);
+    }
+  }, [skills, activeSkillId]);
+
+  const activeSkill = useMemo(
+    () => skills.find((skill) => skill.id === activeSkillId) || null,
+    [skills, activeSkillId]
+  );
+
+  const handleCompare = useCallback(
+    (skillId: string) => {
+      onCompareSkill(skillId);
+    },
+    [onCompareSkill]
+  );
+
+  const handleActivateSkill = useCallback((skill: Skill) => {
+    setActiveSkillId(skill.id);
+  }, []);
+
+  if (!skillsByCategory.length) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center rounded-xl border border-dashed border-border/40 p-10 text-center text-muted-foreground">
+        <p className="text-sm font-medium">
+          No skills match the selected filters in grid view.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-full mx-auto h-screen overflow-hidden p-2 sm:p-3 md:p-4">
-      {/* 6-Category Optimized Grid Layout */}
-      <div className="h-[calc(100vh-120px)] sm:h-[calc(100vh-140px)] md:h-[calc(100vh-180px)] overflow-hidden">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-2 sm:gap-3 md:gap-4 h-full skills-grid-6">
-          {skillsByCategory.map(
-            ([categoryName, categorySkills], categoryIndex) => {
-              const categoryColor =
-                categorySkills[0]?.color || accentColors.primary;
-              const avgLevel = Math.round(
-                categorySkills.reduce((sum, skill) => sum + skill.level, 0) /
-                  categorySkills.length
-              );
+    <div className="grid gap-10 lg:grid-cols-[minmax(0,2.4fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,2.6fr)_minmax(0,1fr)]">
+      <div className="space-y-8">
+        {skillsByCategory.map(([categoryName, categorySkills], index) => {
+          const categoryColor =
+            categorySkills[0]?.color || accentColors.primary;
+          const averageLevel = Math.round(
+            categorySkills.reduce((total, skill) => total + skill.level, 0) /
+              categorySkills.length
+          );
 
-              return (
-                <motion.div
-                  key={categoryName}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: categoryIndex * 0.1 }}
-                  className="relative h-full min-h-0 flex flex-col"
-                >
-                  {/* Category Header with Stats */}
-                  <div className="flex items-center justify-between mb-2 md:mb-3 px-2 py-2 rounded-lg bg-card/50 backdrop-blur-sm border border-border/30 category-header">
-                    <div className="flex items-center">
-                      <h4
-                        className="text-sm font-bold mr-2 md:mr-3 category-badge"
-                        style={{ color: categoryColor }}
-                      >
-                        {categoryName}
-                      </h4>
-                      <div
-                        className="px-2 py-1 rounded-full text-xs font-medium"
-                        style={{
-                          backgroundColor: `${categoryColor}20`,
-                          color: categoryColor,
-                        }}
-                      >
-                        {avgLevel}% avg
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground bg-muted rounded-full px-2 py-1">
-                      {categorySkills.length}
-                    </span>
-                  </div>
+          return (
+            <motion.section
+              key={categoryName}
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05, duration: 0.45 }}
+              className="rounded-3xl border px-5 py-6 shadow-sm"
+              style={{
+                backgroundColor: isDark
+                  ? "rgba(15,23,42,0.45)"
+                  : "rgba(255,255,255,0.85)",
+                borderColor: isDark
+                  ? "rgba(255,255,255,0.06)"
+                  : "rgba(15,23,42,0.08)",
+              }}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-baseline gap-3">
+                  <h4
+                    className="text-lg font-semibold"
+                    style={{ color: categoryColor }}
+                  >
+                    {categoryName}
+                  </h4>
+                  <span className="rounded-full bg-muted/60 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                    {categorySkills.length} skills
+                  </span>
+                </div>
 
-                  {/* Vertical Marquee for each category */}
-                  <div className="relative h-full overflow-hidden rounded-lg marquee-container">
-                    <Marquee
-                      pauseOnHover
-                      vertical
-                      className={cn(
-                        "[--duration:25s] h-full",
-                        expandedSkill && "marquee-paused"
-                      )}
-                      reverse={categoryIndex % 2 === 1}
-                    >
-                      {/* Duplicate skills for continuous scroll */}
-                      {[...categorySkills, ...categorySkills].map(
-                        (skill, index) => (
-                          <SkillCard
-                            key={`${skill.id}-${index}`}
-                            skill={skill}
-                            isHovered={hoveredSkill === skill.id}
-                            isExpanded={expandedSkill === skill.id}
-                            onHover={() => setHoveredSkill(skill.id)}
-                            onLeave={() => setHoveredSkill(null)}
-                            onSelect={() => handleSkillSelect(skill)}
-                            onCompare={(e) => handleCompareClick(e, skill.id)}
-                            accentColors={accentColors}
-                          />
-                        )
-                      )}
-                    </Marquee>
+                <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] opacity-70">
+                  <span>Avg mastery</span>
+                  <span
+                    className="rounded-full px-2 py-1 font-semibold"
+                    style={{
+                      backgroundColor: `${categoryColor}18`,
+                      color: categoryColor,
+                    }}
+                  >
+                    {averageLevel}%
+                  </span>
+                </div>
+              </div>
 
-                    {/* Fade Gradients for smooth vertical scroll */}
-                    <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-background to-transparent z-10" />
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-background to-transparent z-10" />
-                  </div>
-                </motion.div>
-              );
-            }
-          )}
-        </div>
+              <div className="mt-6 flex flex-wrap gap-4">
+                {categorySkills.map((skill) => {
+                  const isActive = activeSkillId === skill.id;
+
+                  return (
+                    <SkillChip
+                      key={skill.id}
+                      skill={skill}
+                      isActive={isActive}
+                      isDark={isDark}
+                      accentColors={accentColors}
+                      onActivate={() => handleActivateSkill(skill)}
+                      onHover={() => {
+                        setHoveredSkill(skill.id);
+                        setActiveSkillId(skill.id);
+                      }}
+                      onLeave={() => {
+                        if (hoveredSkill === skill.id) {
+                          setHoveredSkill(null);
+                        }
+                      }}
+                      onCompare={(event) => {
+                        event.stopPropagation();
+                        handleCompare(skill.id);
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            </motion.section>
+          );
+        })}
       </div>
+
+      <ActiveSkillPanel
+        skill={activeSkill}
+        isDark={isDark}
+        onCompare={handleCompare}
+        onOpenDetail={() => {
+          if (activeSkill) {
+            setSelectedSkill(activeSkill);
+          }
+        }}
+      />
     </div>
   );
 };
