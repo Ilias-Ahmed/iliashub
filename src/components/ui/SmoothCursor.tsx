@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useSpring } from "motion/react";
-import { FC, JSX, useEffect, useRef, useState } from "react";
+import { FC, JSX, useCallback, useEffect, useRef, useState } from "react";
 
 interface Position {
   x: number;
@@ -16,6 +16,7 @@ export interface SmoothCursorProps {
     mass: number;
     restDelta: number;
   };
+  enabled?: boolean;
 }
 
 const DefaultCursorSVG: FC = () => {
@@ -80,6 +81,8 @@ const DefaultCursorSVG: FC = () => {
   );
 };
 
+const CURSOR_OVERRIDE_ID = "custom-cursor-override";
+
 export function SmoothCursor({
   cursor = <DefaultCursorSVG />,
   springConfig = {
@@ -88,13 +91,16 @@ export function SmoothCursor({
     mass: 1,
     restDelta: 0.001,
   },
+  enabled = true,
 }: SmoothCursorProps) {
-  const [, setIsMoving] = useState(false);
+  const [motionAllowed, setMotionAllowed] = useState(true);
   const lastMousePos = useRef<Position>({ x: 0, y: 0 });
   const velocity = useRef<Position>({ x: 0, y: 0 });
   const lastUpdateTime = useRef(Date.now());
   const previousAngle = useRef(0);
   const accumulatedRotation = useRef(0);
+  const scaleTimeoutRef = useRef<number | null>(null);
+  const rafIdRef = useRef<number | null>(null);
 
   const cursorX = useSpring(0, springConfig);
   const cursorY = useSpring(0, springConfig);
@@ -110,6 +116,38 @@ export function SmoothCursor({
   });
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotionAllowed = () => setMotionAllowed(!mediaQuery.matches);
+
+    updateMotionAllowed();
+    mediaQuery.addEventListener("change", updateMotionAllowed);
+
+    return () => mediaQuery.removeEventListener("change", updateMotionAllowed);
+  }, []);
+
+  const removeCursorOverride = useCallback(() => {
+    if (typeof document === "undefined") return;
+
+    document.body.style.cursor = "";
+    document.documentElement.style.cursor = "";
+    const existingStyle = document.getElementById(CURSOR_OVERRIDE_ID);
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      return;
+    }
+
+    if (!enabled || !motionAllowed) {
+      removeCursorOverride();
+      return;
+    }
+
     const updateVelocity = (currentPos: Position) => {
       const currentTime = Date.now();
       const deltaTime = currentTime - lastUpdateTime.current;
@@ -125,13 +163,11 @@ export function SmoothCursor({
       lastMousePos.current = currentPos;
     };
 
-    const smoothMouseMove = (e: MouseEvent) => {
-      const currentPos = { x: e.clientX, y: e.clientY };
+    const smoothMouseMove = (event: MouseEvent) => {
+      const currentPos = { x: event.clientX, y: event.clientY };
       updateVelocity(currentPos);
 
-      const speed = Math.sqrt(
-        Math.pow(velocity.current.x, 2) + Math.pow(velocity.current.y, 2)
-      );
+      const speed = Math.hypot(velocity.current.x, velocity.current.y);
 
       cursorX.set(currentPos.x);
       cursorY.set(currentPos.y);
@@ -149,60 +185,68 @@ export function SmoothCursor({
         previousAngle.current = currentAngle;
 
         scale.set(0.95);
-        setIsMoving(true);
-
-        const timeout = setTimeout(() => {
+        if (scaleTimeoutRef.current !== null) {
+          clearTimeout(scaleTimeoutRef.current);
+        }
+        scaleTimeoutRef.current = window.setTimeout(() => {
           scale.set(1);
-          setIsMoving(false);
         }, 150);
-
-        return () => clearTimeout(timeout);
       }
     };
 
-    let rafId: number;
-    const throttledMouseMove = (e: MouseEvent) => {
-      if (rafId) return;
+    const throttledMouseMove = (event: MouseEvent) => {
+      if (rafIdRef.current !== null) return;
 
-      rafId = requestAnimationFrame(() => {
-        smoothMouseMove(e);
-        rafId = 0;
+      rafIdRef.current = window.requestAnimationFrame(() => {
+        smoothMouseMove(event);
+        rafIdRef.current = null;
       });
     };
 
     document.body.style.cursor = "none";
     document.documentElement.style.cursor = "none";
 
-    // Add CSS to force hide cursor on all elements
-    const style = document.createElement("style");
-    style.id = "custom-cursor-override";
-    style.textContent = `
-      *, *:hover, *:focus, *:active {
-        cursor: none !important;
-      }
-    `;
-
-    // Only add if not already present
-    if (!document.getElementById("custom-cursor-override")) {
+    if (!document.getElementById(CURSOR_OVERRIDE_ID)) {
+      const style = document.createElement("style");
+      style.id = CURSOR_OVERRIDE_ID;
+      style.textContent = `
+        *, *:hover, *:focus, *:active {
+          cursor: none !important;
+        }
+      `;
       document.head.appendChild(style);
     }
 
-    window.addEventListener("mousemove", throttledMouseMove);
+    window.addEventListener("mousemove", throttledMouseMove, { passive: true });
 
     return () => {
       window.removeEventListener("mousemove", throttledMouseMove);
-      document.body.style.cursor = "auto";
-      document.documentElement.style.cursor = "auto";
 
-      // Remove the custom cursor override
-      const existingStyle = document.getElementById("custom-cursor-override");
-      if (existingStyle) {
-        existingStyle.remove();
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
       }
 
-      if (rafId) cancelAnimationFrame(rafId);
+      if (scaleTimeoutRef.current !== null) {
+        clearTimeout(scaleTimeoutRef.current);
+        scaleTimeoutRef.current = null;
+      }
+
+      removeCursorOverride();
     };
-  }, [cursorX, cursorY, rotation, scale]);
+  }, [
+    enabled,
+    motionAllowed,
+    cursorX,
+    cursorY,
+    rotation,
+    scale,
+    removeCursorOverride,
+  ]);
+
+  if (!enabled || !motionAllowed) {
+    return null;
+  }
 
   return (
     <motion.div

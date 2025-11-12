@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Mic, MicOff, Volume2 } from "lucide-react";
 import { useNavigation } from "@/contexts/NavigationContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { AnimatePresence, motion } from "framer-motion";
+import { Mic, MicOff, Volume2 } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { CoolMode } from "../ui/CoolMode";
 
 // Define proper types for Speech Recognition
 interface SpeechRecognitionEvent extends Event {
@@ -378,98 +377,89 @@ const VoiceNavigation: React.FC<VoiceNavigationProps> = ({
   return (
     <>
       {/* Voice Control Button */}
-      <CoolMode
-        options={{
-          particle:
-            "https://pbs.twimg.com/profile_images/1782811051504885763/YR5-kWOI_400x400.jpg",
+      <motion.button
+        className={`fixed ${positionClasses[position]} z-50 ${
+          isMobile ? "p-4 min-w-[56px] min-h-[56px]" : "p-3"
+        } rounded-full border-2 shadow-2xl transition-all duration-300 ${
+          isDark
+            ? "bg-gray-900/90 hover:bg-gray-800/90"
+            : "bg-white/90 hover:bg-white/95"
+        } flex items-center justify-center group ${className}`}
+        style={{
+          borderColor: isListening ? "#ef4444" : borderColor,
+          boxShadow: isListening
+            ? "0 4px 20px rgba(239, 68, 68, 0.25)"
+            : `0 4px 20px ${primaryGlow}`,
+          backgroundColor: isDark
+            ? "rgba(17, 24, 39, 0.9)"
+            : "rgba(255, 255, 255, 0.9)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          touchAction: "manipulation",
+          WebkitTapHighlightColor: "transparent",
         }}
+        onClick={toggleListening}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{
+          type: "spring",
+          stiffness: 400,
+          damping: 25,
+        }}
+        aria-label={isListening ? "Stop voice command" : "Start voice command"}
+        disabled={!recognition}
       >
-        <motion.button
-          className={`fixed ${positionClasses[position]} z-50 ${
-            isMobile ? "p-4 min-w-[56px] min-h-[56px]" : "p-3"
-          } rounded-full border-2 shadow-2xl transition-all duration-300 ${
-            isDark
-              ? "bg-gray-900/90 hover:bg-gray-800/90"
-              : "bg-white/90 hover:bg-white/95"
-          } flex items-center justify-center group ${className}`}
-          style={{
-            borderColor: isListening ? "#ef4444" : borderColor,
-            boxShadow: isListening
-              ? "0 4px 20px rgba(239, 68, 68, 0.25)"
-              : `0 4px 20px ${primaryGlow}`,
-            backgroundColor: isDark
-              ? "rgba(17, 24, 39, 0.9)"
-              : "rgba(255, 255, 255, 0.9)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            touchAction: "manipulation",
-            WebkitTapHighlightColor: "transparent",
-          }}
-          onClick={toggleListening}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{
-            type: "spring",
-            stiffness: 400,
-            damping: 25,
-          }}
-          aria-label={
-            isListening ? "Stop voice command" : "Start voice command"
-          }
-          disabled={!recognition}
-        >
-          <AnimatePresence mode="wait">
-            {isListening ? (
-              <motion.div
-                key="listening"
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                exit={{ scale: 0, rotate: 180 }}
-                className="relative"
-              >
-                <Mic size={isMobile ? 24 : 20} style={{ color: "#ef4444" }} />
-                <motion.div
-                  className="absolute inset-0 rounded-full border-2"
-                  style={{ borderColor: "#ef4444" }}
-                  animate={{ scale: [1, 1.3, 1], opacity: [1, 0, 1] }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="idle"
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                exit={{ scale: 0, rotate: 180 }}
-              >
-                <MicOff
-                  size={isMobile ? 24 : 20}
-                  style={{ color: mutedColor }}
-                  className="group-hover:text-primary transition-colors"
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Subtle pulse effect when idle */}
-          {!isListening && (
+        <AnimatePresence mode="wait">
+          {isListening ? (
             <motion.div
-              className="absolute -inset-2 rounded-full border border-opacity-20"
-              style={{ borderColor: primaryColor }}
-              animate={{
-                scale: [1, 1.15, 1],
-                opacity: [0.1, 0.3, 0.1],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.5,
-              }}
-            />
+              key="listening"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              exit={{ scale: 0, rotate: 180 }}
+              className="relative"
+            >
+              <Mic size={isMobile ? 24 : 20} style={{ color: "#ef4444" }} />
+              <motion.div
+                className="absolute inset-0 rounded-full border-2"
+                style={{ borderColor: "#ef4444" }}
+                animate={{ scale: [1, 1.3, 1], opacity: [1, 0, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="idle"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              exit={{ scale: 0, rotate: 180 }}
+            >
+              <MicOff
+                size={isMobile ? 24 : 20}
+                style={{ color: mutedColor }}
+                className="group-hover:text-primary transition-colors"
+              />
+            </motion.div>
           )}
-        </motion.button>
-      </CoolMode>
+        </AnimatePresence>
+
+        {/* Subtle pulse effect when idle */}
+        {!isListening && (
+          <motion.div
+            className="absolute -inset-2 rounded-full border border-opacity-20"
+            style={{ borderColor: primaryColor }}
+            animate={{
+              scale: [1, 1.15, 1],
+              opacity: [0.1, 0.3, 0.1],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.5,
+            }}
+          />
+        )}
+      </motion.button>
 
       {/* Transcript Display */}
       <AnimatePresence>
@@ -590,4 +580,3 @@ const VoiceNavigation: React.FC<VoiceNavigationProps> = ({
 };
 
 export default VoiceNavigation;
-
