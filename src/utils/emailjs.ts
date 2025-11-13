@@ -39,7 +39,9 @@ export const sendContactEmail = async ({
       hasTemplateId: !!EMAILJS_TEMPLATE_ID,
       hasPublicKey: !!EMAILJS_PUBLIC_KEY,
     });
-    throw new Error("Email service is not configured. Please contact the site administrator.");
+    throw new Error(
+      "Email service is not configured. Please contact the site administrator."
+    );
   }
 
   try {
@@ -56,11 +58,13 @@ export const sendContactEmail = async ({
       },
       EMAILJS_PUBLIC_KEY
     );
-    
+
     console.log("Email sent successfully:", result);
     return result;
   } catch (error) {
     console.error("EmailJS Error:", error);
-    throw new Error("Failed to send email. Please try again or contact me directly.");
+    throw new Error(
+      "Failed to send email. Please try again or contact me directly."
+    );
   }
 };
