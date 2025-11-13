@@ -1,12 +1,8 @@
 "use client";
 
+import { useTheme } from "@/contexts/ThemeContext";
 import { motion, useSpring } from "motion/react";
-import { FC, JSX, useCallback, useEffect, useRef, useState } from "react";
-
-interface Position {
-  x: number;
-  y: number;
-}
+import { JSX, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export interface SmoothCursorProps {
   cursor?: JSX.Element;
@@ -19,101 +15,89 @@ export interface SmoothCursorProps {
   enabled?: boolean;
 }
 
-const DefaultCursorSVG: FC = () => {
+const CURSOR_OVERRIDE_ID = "custom-cursor-override";
+
+const DefaultCursor = ({ color }: { color: string }) => {
+  const translucentColor = `${color}33`;
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={50}
-      height={54}
-      viewBox="0 0 50 54"
-      fill="none"
-      style={{ scale: 0.5 }}
+    <div
+      style={{
+        position: "relative",
+        width: "24px",
+        height: "24px",
+        mixBlendMode: "difference",
+      }}
     >
-      <g filter="url(#filter0_d_91_7928)">
-        <path
-          d="M42.6817 41.1495L27.5103 6.79925C26.7269 5.02557 24.2082 5.02558 23.3927 6.79925L7.59814 41.1495C6.75833 42.9759 8.52712 44.8902 10.4125 44.1954L24.3757 39.0496C24.8829 38.8627 25.4385 38.8627 25.9422 39.0496L39.8121 44.1954C41.6849 44.8902 43.4884 42.9759 42.6817 41.1495Z"
-          fill="black"
-        />
-        <path
-          d="M43.7146 40.6933L28.5431 6.34306C27.3556 3.65428 23.5772 3.69516 22.3668 6.32755L6.57226 40.6778C5.3134 43.4156 7.97238 46.298 10.803 45.2549L24.7662 40.109C25.0221 40.0147 25.2999 40.0156 25.5494 40.1082L39.4193 45.254C42.2261 46.2953 44.9254 43.4347 43.7146 40.6933Z"
-          stroke="white"
-          strokeWidth={2.25825}
-        />
-      </g>
-      <defs>
-        <filter
-          id="filter0_d_91_7928"
-          x={0.602397}
-          y={0.952444}
-          width={49.0584}
-          height={52.428}
-          filterUnits="userSpaceOnUse"
-          colorInterpolationFilters="sRGB"
-        >
-          <feFlood floodOpacity={0} result="BackgroundImageFix" />
-          <feColorMatrix
-            in="SourceAlpha"
-            type="matrix"
-            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-            result="hardAlpha"
-          />
-          <feOffset dy={2.25825} />
-          <feGaussianBlur stdDeviation={2.25825} />
-          <feComposite in2="hardAlpha" operator="out" />
-          <feColorMatrix
-            type="matrix"
-            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"
-          />
-          <feBlend
-            mode="normal"
-            in2="BackgroundImageFix"
-            result="effect1_dropShadow_91_7928"
-          />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="effect1_dropShadow_91_7928"
-            result="shape"
-          />
-        </filter>
-      </defs>
-    </svg>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "9999px",
+          border: `1.5px solid ${color}`,
+          backgroundColor: "transparent",
+          boxShadow: `0 0 10px ${translucentColor}`,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: "6px",
+          borderRadius: "9999px",
+          backgroundColor: color,
+          opacity: 0.8,
+        }}
+      />
+    </div>
   );
 };
 
-const CURSOR_OVERRIDE_ID = "custom-cursor-override";
-
 export function SmoothCursor({
-  cursor = <DefaultCursorSVG />,
+  cursor,
   springConfig = {
-    damping: 45,
-    stiffness: 400,
-    mass: 1,
+    damping: 32,
+    stiffness: 320,
+    mass: 0.6,
     restDelta: 0.001,
   },
   enabled = true,
 }: SmoothCursorProps) {
+  const { getAccentColors } = useTheme();
+  const accentColors = getAccentColors();
+  const cursorContent = useMemo(
+    () => cursor ?? <DefaultCursor color={accentColors.primary} />,
+    [cursor, accentColors.primary]
+  );
+
   const [motionAllowed, setMotionAllowed] = useState(true);
-  const lastMousePos = useRef<Position>({ x: 0, y: 0 });
-  const velocity = useRef<Position>({ x: 0, y: 0 });
-  const lastUpdateTime = useRef(Date.now());
-  const previousAngle = useRef(0);
-  const accumulatedRotation = useRef(0);
-  const scaleTimeoutRef = useRef<number | null>(null);
+  const [pointerSupported, setPointerSupported] = useState(true);
   const rafIdRef = useRef<number | null>(null);
+  const hideTimeoutRef = useRef<number | null>(null);
 
   const cursorX = useSpring(0, springConfig);
   const cursorY = useSpring(0, springConfig);
-  const rotation = useSpring(0, {
-    ...springConfig,
-    damping: 60,
-    stiffness: 300,
-  });
-  const scale = useSpring(1, {
-    ...springConfig,
-    stiffness: 500,
-    damping: 35,
-  });
+  const scale = useSpring(0.6, { damping: 20, stiffness: 250 });
+  const opacity = useSpring(0, { damping: 30, stiffness: 200 });
+
+  const removeCursorOverride = useCallback(() => {
+    if (typeof document === "undefined") return;
+
+    document.body.style.cursor = "";
+    document.documentElement.style.cursor = "";
+    const existingStyle = document.getElementById(CURSOR_OVERRIDE_ID);
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+  }, []);
+
+  const scheduleHide = useCallback(() => {
+    if (hideTimeoutRef.current !== null) {
+      clearTimeout(hideTimeoutRef.current);
+    }
+    hideTimeoutRef.current = window.setTimeout(() => {
+      opacity.set(0);
+      scale.set(0.6);
+    }, 1400);
+  }, [opacity, scale]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -127,15 +111,15 @@ export function SmoothCursor({
     return () => mediaQuery.removeEventListener("change", updateMotionAllowed);
   }, []);
 
-  const removeCursorOverride = useCallback(() => {
-    if (typeof document === "undefined") return;
+  useEffect(() => {
+    if (typeof window === "undefined") return;
 
-    document.body.style.cursor = "";
-    document.documentElement.style.cursor = "";
-    const existingStyle = document.getElementById(CURSOR_OVERRIDE_ID);
-    if (existingStyle) {
-      existingStyle.remove();
-    }
+    const finePointer = window.matchMedia("(pointer: fine)").matches;
+    const anyFinePointer = window.matchMedia("(any-pointer: fine)").matches;
+    const touchPoints = navigator.maxTouchPoints ?? 0;
+    const touchOnly = !finePointer && !anyFinePointer && touchPoints > 0;
+
+    setPointerSupported(!touchOnly && (finePointer || anyFinePointer));
   }, []);
 
   useEffect(() => {
@@ -143,65 +127,15 @@ export function SmoothCursor({
       return;
     }
 
-    if (!enabled || !motionAllowed) {
+    if (!pointerSupported) {
       removeCursorOverride();
       return;
     }
 
-    const updateVelocity = (currentPos: Position) => {
-      const currentTime = Date.now();
-      const deltaTime = currentTime - lastUpdateTime.current;
-
-      if (deltaTime > 0) {
-        velocity.current = {
-          x: (currentPos.x - lastMousePos.current.x) / deltaTime,
-          y: (currentPos.y - lastMousePos.current.y) / deltaTime,
-        };
-      }
-
-      lastUpdateTime.current = currentTime;
-      lastMousePos.current = currentPos;
-    };
-
-    const smoothMouseMove = (event: MouseEvent) => {
-      const currentPos = { x: event.clientX, y: event.clientY };
-      updateVelocity(currentPos);
-
-      const speed = Math.hypot(velocity.current.x, velocity.current.y);
-
-      cursorX.set(currentPos.x);
-      cursorY.set(currentPos.y);
-
-      if (speed > 0.1) {
-        const currentAngle =
-          Math.atan2(velocity.current.y, velocity.current.x) * (180 / Math.PI) +
-          90;
-
-        let angleDiff = currentAngle - previousAngle.current;
-        if (angleDiff > 180) angleDiff -= 360;
-        if (angleDiff < -180) angleDiff += 360;
-        accumulatedRotation.current += angleDiff;
-        rotation.set(accumulatedRotation.current);
-        previousAngle.current = currentAngle;
-
-        scale.set(0.95);
-        if (scaleTimeoutRef.current !== null) {
-          clearTimeout(scaleTimeoutRef.current);
-        }
-        scaleTimeoutRef.current = window.setTimeout(() => {
-          scale.set(1);
-        }, 150);
-      }
-    };
-
-    const throttledMouseMove = (event: MouseEvent) => {
-      if (rafIdRef.current !== null) return;
-
-      rafIdRef.current = window.requestAnimationFrame(() => {
-        smoothMouseMove(event);
-        rafIdRef.current = null;
-      });
-    };
+    if (!enabled || !motionAllowed) {
+      removeCursorOverride();
+      return;
+    }
 
     document.body.style.cursor = "none";
     document.documentElement.style.cursor = "none";
@@ -217,19 +151,77 @@ export function SmoothCursor({
       document.head.appendChild(style);
     }
 
-    window.addEventListener("mousemove", throttledMouseMove, { passive: true });
+    const handlePointerMove = (event: PointerEvent | MouseEvent) => {
+      if (rafIdRef.current !== null) return;
+
+      const { clientX, clientY } = event;
+      rafIdRef.current = window.requestAnimationFrame(() => {
+        cursorX.set(clientX);
+        cursorY.set(clientY);
+        opacity.set(0.95);
+        scale.set(1);
+        scheduleHide();
+        rafIdRef.current = null;
+      });
+    };
+
+    const handlePointerDown = () => {
+      opacity.set(1);
+      scale.set(0.85);
+      scheduleHide();
+    };
+
+    const handlePointerUp = () => {
+      scale.set(1.05);
+      scheduleHide();
+    };
+
+    const handlePointerLeave = () => {
+      opacity.set(0);
+      scale.set(0.6);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove, {
+      passive: true,
+    });
+    window.addEventListener("mousemove", handlePointerMove, {
+      passive: true,
+    });
+    window.addEventListener("pointerdown", handlePointerDown, {
+      passive: true,
+    });
+    window.addEventListener("mousedown", handlePointerDown, {
+      passive: true,
+    });
+    window.addEventListener("pointerup", handlePointerUp, {
+      passive: true,
+    });
+    window.addEventListener("mouseup", handlePointerUp, {
+      passive: true,
+    });
+    window.addEventListener("pointerleave", handlePointerLeave);
+    window.addEventListener("mouseleave", handlePointerLeave);
+
+    scheduleHide();
 
     return () => {
-      window.removeEventListener("mousemove", throttledMouseMove);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("mousemove", handlePointerMove);
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("mousedown", handlePointerDown);
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("mouseup", handlePointerUp);
+      window.removeEventListener("pointerleave", handlePointerLeave);
+      window.removeEventListener("mouseleave", handlePointerLeave);
 
       if (rafIdRef.current !== null) {
         cancelAnimationFrame(rafIdRef.current);
         rafIdRef.current = null;
       }
 
-      if (scaleTimeoutRef.current !== null) {
-        clearTimeout(scaleTimeoutRef.current);
-        scaleTimeoutRef.current = null;
+      if (hideTimeoutRef.current !== null) {
+        clearTimeout(hideTimeoutRef.current);
+        hideTimeoutRef.current = null;
       }
 
       removeCursorOverride();
@@ -239,12 +231,14 @@ export function SmoothCursor({
     motionAllowed,
     cursorX,
     cursorY,
-    rotation,
-    scale,
+    opacity,
+    scheduleHide,
     removeCursorOverride,
+    scale,
+    pointerSupported,
   ]);
 
-  if (!enabled || !motionAllowed) {
+  if (!enabled || !motionAllowed || !pointerSupported) {
     return null;
   }
 
@@ -256,21 +250,21 @@ export function SmoothCursor({
         top: cursorY,
         translateX: "-50%",
         translateY: "-50%",
-        rotate: rotation,
-        scale: scale,
         zIndex: 100,
         pointerEvents: "none",
-        willChange: "transform",
+        willChange: "transform, opacity",
+        scale,
+        opacity,
       }}
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{
         type: "spring",
-        stiffness: 400,
-        damping: 30,
+        stiffness: 260,
+        damping: 28,
       }}
     >
-      {cursor}
+      {cursorContent}
     </motion.div>
   );
 }

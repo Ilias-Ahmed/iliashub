@@ -167,8 +167,7 @@ const Index = () => {
 
   return (
     <>
-      {/* Simplified cursor with option to disable */}
-      {!isMobile && <SmoothCursor enabled={!isLoading} />}
+      <SmoothCursor enabled={!isLoading} />
 
       <Suspense fallback={null}>
         {isLoading && (
