@@ -1,270 +1,190 @@
-"use client";
-
 import { useTheme } from "@/contexts/ThemeContext";
-import { motion, useSpring } from "motion/react";
-import { JSX, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface SmoothCursorProps {
-  cursor?: JSX.Element;
-  springConfig?: {
-    damping: number;
-    stiffness: number;
-    mass: number;
-    restDelta: number;
-  };
   enabled?: boolean;
 }
 
-const CURSOR_OVERRIDE_ID = "custom-cursor-override";
-
-const DefaultCursor = ({ color }: { color: string }) => {
-  const translucentColor = `${color}33`;
-  return (
-    <div
-      style={{
-        position: "relative",
-        width: "24px",
-        height: "24px",
-        mixBlendMode: "difference",
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          borderRadius: "9999px",
-          border: `1.5px solid ${color}`,
-          backgroundColor: "transparent",
-          boxShadow: `0 0 10px ${translucentColor}`,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          inset: "6px",
-          borderRadius: "9999px",
-          backgroundColor: color,
-          opacity: 0.8,
-        }}
-      />
-    </div>
-  );
-};
-
-export function SmoothCursor({
-  cursor,
-  springConfig = {
-    damping: 32,
-    stiffness: 320,
-    mass: 0.6,
-    restDelta: 0.001,
-  },
-  enabled = true,
-}: SmoothCursorProps) {
+export function SmoothCursor({ enabled = true }: SmoothCursorProps) {
   const { getAccentColors } = useTheme();
   const accentColors = getAccentColors();
-  const cursorContent = useMemo(
-    () => cursor ?? <DefaultCursor color={accentColors.primary} />,
-    [cursor, accentColors.primary]
-  );
 
-  const [motionAllowed, setMotionAllowed] = useState(true);
-  const [pointerSupported, setPointerSupported] = useState(true);
-  const rafIdRef = useRef<number | null>(null);
-  const hideTimeoutRef = useRef<number | null>(null);
-
-  const cursorX = useSpring(0, springConfig);
-  const cursorY = useSpring(0, springConfig);
-  const scale = useSpring(0.6, { damping: 20, stiffness: 250 });
-  const opacity = useSpring(0, { damping: 30, stiffness: 200 });
-
-  const removeCursorOverride = useCallback(() => {
-    if (typeof document === "undefined") return;
-
-    document.body.style.cursor = "";
-    document.documentElement.style.cursor = "";
-    const existingStyle = document.getElementById(CURSOR_OVERRIDE_ID);
-    if (existingStyle) {
-      existingStyle.remove();
-    }
-  }, []);
-
-  const scheduleHide = useCallback(() => {
-    if (hideTimeoutRef.current !== null) {
-      clearTimeout(hideTimeoutRef.current);
-    }
-    hideTimeoutRef.current = window.setTimeout(() => {
-      opacity.set(0);
-      scale.set(0.6);
-    }, 1400);
-  }, [opacity, scale]);
+  const cursorDotRef = useRef<HTMLDivElement>(null);
+  const cursorOutlineRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isPointer, setIsPointer] = useState(false);
+  const positionRef = useRef({ x: 0, y: 0 });
+  const requestRef = useRef<number | undefined>(undefined);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    // Check if device supports touch
+    const checkTouch = () => {
+      const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      const hasPointer = window.matchMedia("(pointer: fine)").matches;
+      setIsTouchDevice(hasTouch && !hasPointer);
+    };
 
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updateMotionAllowed = () => setMotionAllowed(!mediaQuery.matches);
-
-    updateMotionAllowed();
-    mediaQuery.addEventListener("change", updateMotionAllowed);
-
-    return () => mediaQuery.removeEventListener("change", updateMotionAllowed);
+    checkTouch();
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (!enabled || isTouchDevice) return;
 
-    const finePointer = window.matchMedia("(pointer: fine)").matches;
-    const anyFinePointer = window.matchMedia("(any-pointer: fine)").matches;
-    const touchPoints = navigator.maxTouchPoints ?? 0;
-    const touchOnly = !finePointer && !anyFinePointer && touchPoints > 0;
+    const dot = cursorDotRef.current;
+    const outline = cursorOutlineRef.current;
+    if (!dot || !outline) return;
 
-    setPointerSupported(!touchOnly && (finePointer || anyFinePointer));
-  }, []);
+    let dotX = 0;
+    let dotY = 0;
+    let outlineX = 0;
+    let outlineY = 0;
+    let currentX = 0;
+    let currentY = 0;
 
-  useEffect(() => {
-    if (typeof window === "undefined" || typeof document === "undefined") {
-      return;
-    }
+    const animate = () => {
+      // Smooth following effect
+      const dotSpeed = 0.2;
+      const outlineSpeed = 0.12;
 
-    if (!pointerSupported) {
-      removeCursorOverride();
-      return;
-    }
+      dotX += (currentX - dotX) * dotSpeed;
+      dotY += (currentY - dotY) * dotSpeed;
+      outlineX += (currentX - outlineX) * outlineSpeed;
+      outlineY += (currentY - outlineY) * outlineSpeed;
 
-    if (!enabled || !motionAllowed) {
-      removeCursorOverride();
-      return;
-    }
+      // Apply transforms
+      dot.style.transform = `translate(${dotX - 4}px, ${dotY - 4}px)`;
+      outline.style.transform = `translate(${outlineX - 20}px, ${
+        outlineY - 20
+      }px)`;
 
+      requestRef.current = requestAnimationFrame(animate);
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      currentX = e.clientX;
+      currentY = e.clientY;
+      positionRef.current = { x: e.clientX, y: e.clientY };
+
+      if (!isVisible) {
+        setIsVisible(true);
+      }
+
+      // Check if hovering over interactive element
+      const target = e.target as HTMLElement;
+      const isInteractive = target.closest(
+        'a, button, input, textarea, select, [role="button"], [onclick]'
+      );
+      setIsPointer(!!isInteractive);
+    };
+
+    const handleMouseEnter = () => {
+      setIsVisible(true);
+    };
+
+    const handleMouseLeave = () => {
+      setIsVisible(false);
+    };
+
+    const handleMouseDown = () => {
+      if (dot && outline) {
+        dot.style.transform += " scale(0.8)";
+        outline.style.transform += " scale(1.3)";
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (dot && outline) {
+        dot.style.transform = dot.style.transform.replace(" scale(0.8)", "");
+        outline.style.transform = outline.style.transform.replace(
+          " scale(1.3)",
+          ""
+        );
+      }
+    };
+
+    // Hide default cursor
     document.body.style.cursor = "none";
-    document.documentElement.style.cursor = "none";
+    const style = document.createElement("style");
+    style.innerHTML = "* { cursor: none !important; }";
+    document.head.appendChild(style);
 
-    if (!document.getElementById(CURSOR_OVERRIDE_ID)) {
-      const style = document.createElement("style");
-      style.id = CURSOR_OVERRIDE_ID;
-      style.textContent = `
-        *, *:hover, *:focus, *:active {
-          cursor: none !important;
-        }
-      `;
-      document.head.appendChild(style);
-    }
+    // Add event listeners
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseenter", handleMouseEnter);
+    document.addEventListener("mouseleave", handleMouseLeave);
+    document.addEventListener("mousedown", handleMouseDown);
+    document.addEventListener("mouseup", handleMouseUp);
 
-    const handlePointerMove = (event: PointerEvent | MouseEvent) => {
-      if (rafIdRef.current !== null) return;
-
-      const { clientX, clientY } = event;
-      rafIdRef.current = window.requestAnimationFrame(() => {
-        cursorX.set(clientX);
-        cursorY.set(clientY);
-        opacity.set(0.95);
-        scale.set(1);
-        scheduleHide();
-        rafIdRef.current = null;
-      });
-    };
-
-    const handlePointerDown = () => {
-      opacity.set(1);
-      scale.set(0.85);
-      scheduleHide();
-    };
-
-    const handlePointerUp = () => {
-      scale.set(1.05);
-      scheduleHide();
-    };
-
-    const handlePointerLeave = () => {
-      opacity.set(0);
-      scale.set(0.6);
-    };
-
-    window.addEventListener("pointermove", handlePointerMove, {
-      passive: true,
-    });
-    window.addEventListener("mousemove", handlePointerMove, {
-      passive: true,
-    });
-    window.addEventListener("pointerdown", handlePointerDown, {
-      passive: true,
-    });
-    window.addEventListener("mousedown", handlePointerDown, {
-      passive: true,
-    });
-    window.addEventListener("pointerup", handlePointerUp, {
-      passive: true,
-    });
-    window.addEventListener("mouseup", handlePointerUp, {
-      passive: true,
-    });
-    window.addEventListener("pointerleave", handlePointerLeave);
-    window.addEventListener("mouseleave", handlePointerLeave);
-
-    scheduleHide();
+    // Start animation
+    requestRef.current = requestAnimationFrame(animate);
 
     return () => {
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("mousemove", handlePointerMove);
-      window.removeEventListener("pointerdown", handlePointerDown);
-      window.removeEventListener("mousedown", handlePointerDown);
-      window.removeEventListener("pointerup", handlePointerUp);
-      window.removeEventListener("mouseup", handlePointerUp);
-      window.removeEventListener("pointerleave", handlePointerLeave);
-      window.removeEventListener("mouseleave", handlePointerLeave);
+      // Cleanup
+      document.body.style.cursor = "";
+      style.remove();
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseenter", handleMouseEnter);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+      document.removeEventListener("mousedown", handleMouseDown);
+      document.removeEventListener("mouseup", handleMouseUp);
 
-      if (rafIdRef.current !== null) {
-        cancelAnimationFrame(rafIdRef.current);
-        rafIdRef.current = null;
+      if (requestRef.current) {
+        cancelAnimationFrame(requestRef.current);
       }
-
-      if (hideTimeoutRef.current !== null) {
-        clearTimeout(hideTimeoutRef.current);
-        hideTimeoutRef.current = null;
-      }
-
-      removeCursorOverride();
     };
-  }, [
-    enabled,
-    motionAllowed,
-    cursorX,
-    cursorY,
-    opacity,
-    scheduleHide,
-    removeCursorOverride,
-    scale,
-    pointerSupported,
-  ]);
+  }, [enabled, isTouchDevice, isVisible]);
 
-  if (!enabled || !motionAllowed || !pointerSupported) {
+  if (!enabled || isTouchDevice) {
     return null;
   }
 
   return (
-    <motion.div
-      style={{
-        position: "fixed",
-        left: cursorX,
-        top: cursorY,
-        translateX: "-50%",
-        translateY: "-50%",
-        zIndex: 100,
-        pointerEvents: "none",
-        willChange: "transform, opacity",
-        scale,
-        opacity,
-      }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{
-        type: "spring",
-        stiffness: 260,
-        damping: 28,
-      }}
-    >
-      {cursorContent}
-    </motion.div>
+    <>
+      {/* Cursor Dot */}
+      <div
+        ref={cursorDotRef}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "8px",
+          height: "8px",
+          backgroundColor: accentColors.primary,
+          borderRadius: "50%",
+          pointerEvents: "none",
+          zIndex: 9999,
+          mixBlendMode: "difference",
+          transition: "opacity 0.3s ease, transform 0.15s ease",
+          opacity: isVisible ? 1 : 0,
+          willChange: "transform",
+        }}
+      />
+
+      {/* Cursor Outline */}
+      <div
+        ref={cursorOutlineRef}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "40px",
+          height: "40px",
+          border: `2px solid ${accentColors.primary}`,
+          borderRadius: "50%",
+          pointerEvents: "none",
+          zIndex: 9998,
+          transition:
+            "opacity 0.3s ease, width 0.2s ease, height 0.2s ease, transform 0.15s ease",
+          opacity: isVisible ? 0.5 : 0,
+          ...(isPointer && {
+            width: "60px",
+            height: "60px",
+            opacity: 0.3,
+          }),
+          willChange: "transform",
+        }}
+      />
+    </>
   );
 }
