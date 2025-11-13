@@ -20,6 +20,10 @@ const ScrollProgressBar: React.FC<ScrollProgressBarProps> = ({
   const accentColors = getAccentColors();
 
   useEffect(() => {
+    if (progress !== undefined) {
+      return;
+    }
+
     let ticking = false;
     const lastValues = { percent: -1, visible: false };
 
@@ -46,17 +50,19 @@ const ScrollProgressBar: React.FC<ScrollProgressBarProps> = ({
       });
     };
 
-  window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
-  return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [progress]);
 
   // If progress is provided externally, use it
   useEffect(() => {
-    if (progress !== undefined) {
-      setScrollPercentage(Math.round(progress * 100));
-      setVisible(progress > 0);
+    if (progress === undefined) {
+      return;
     }
+
+    setScrollPercentage(Math.round(progress * 100));
+    setVisible(progress > 0);
   }, [progress]);
 
   // Get accent-based gradient - updated to use accent colors from theme

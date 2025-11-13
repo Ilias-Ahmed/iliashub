@@ -4,8 +4,15 @@ import { SmoothCursor } from "@/components/ui/SmoothCursor";
 import { NavigationProvider } from "@/contexts/NavigationContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Hero from "@/pages/Hero";
-import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useLocation } from "react-router-dom";
 
 const Toaster = React.lazy(() =>
   import("@/components/ui/sonner").then((mod) => ({ default: mod.Toaster }))
@@ -34,9 +41,8 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const isMobile = useIsMobile();
   const location = useLocation();
-  const navigate = useNavigate();
   const scrollingRef = useRef(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollRafRef = useRef<number | null>(null);
 
   // Define navigation sections
   const navSections = useMemo(
@@ -111,47 +117,45 @@ const Index = () => {
   // Optimized scroll handler with better throttling
   const handleScroll = useCallback(() => {
     if (scrollingRef.current) return;
-
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
-    const scrollTop = window.scrollY;
-    const progress = Math.min(1, Math.max(0, scrollTop / (documentHeight - windowHeight)));
-
-    setScrollProgress(progress);
-
-    // Debounced URL updates
-    if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      return;
     }
 
-    scrollTimeoutRef.current = setTimeout(() => {
-      const viewportMid = scrollTop + windowHeight / 2;
+    if (scrollRafRef.current !== null) {
+      return;
+    }
 
-      for (const section of navSections) {
-        const element = document.getElementById(section.id);
-        if (!element) continue;
+    scrollRafRef.current = window.requestAnimationFrame(() => {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const maxScrollable = Math.max(documentHeight - windowHeight, 1);
+      const nextProgress = Math.min(1, Math.max(0, scrollTop / maxScrollable));
 
-        const rect = element.getBoundingClientRect();
-        const sectionTop = scrollTop + rect.top;
-        const sectionBottom = sectionTop + rect.height;
-
-        if (viewportMid >= sectionTop && viewportMid <= sectionBottom) {
-          const targetPath = section.id === "home" ? "/" : `/${section.id}`;
-          if (location.pathname !== targetPath) {
-            navigate(targetPath, { replace: true });
-          }
-          break;
+      setScrollProgress((prev) => {
+        if (Math.abs(prev - nextProgress) < 0.003) {
+          return prev;
         }
-      }
-    }, 150);
-  }, [navSections, navigate, location.pathname]);
+        return nextProgress;
+      });
+
+      scrollRafRef.current = null;
+    });
+  }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
     window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
+      if (scrollRafRef.current !== null) {
+        cancelAnimationFrame(scrollRafRef.current);
+        scrollRafRef.current = null;
       }
     };
   }, [handleScroll]);
@@ -163,8 +167,7 @@ const Index = () => {
 
   return (
     <>
-      {/* Simplified cursor with option to disable */}
-      {!isMobile && <SmoothCursor enabled={!isLoading} />}
+      <SmoothCursor enabled={!isLoading} />
 
       <Suspense fallback={null}>
         {isLoading && (

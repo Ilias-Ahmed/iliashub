@@ -173,8 +173,7 @@ export const projectsData: Project[] = [
       "MIPedia is your one-stop personal platform providing developer tips, coding resources, and career support.",
     longDescription:
       "MIPedia is a personal service-based startup aimed at helping beginner to advanced developers with curated coding resources, career preparation tools, and project showcases. It's a growing hub for students and software engineers.",
-    image:
-      "https://images.unsplash.com/photo-1581092795360-7043e6d16df4?w=800&h=600&fit=crop",
+    image: "/images/mipedia.png",
     tags: ["Next.js", "Notion API", "Vercel", "Personal"],
     technologies: [
       "Next.js",
@@ -184,7 +183,7 @@ export const projectsData: Project[] = [
       "TypeScript",
       "Supabase",
     ],
-    link: "https://mipedia.tech",
+    link: "https://mipedia-beta.vercel.app/",
     github: "https://github.com/Ilias-Ahmed/MIPedia",
     category: "Startup",
     year: "2025",
