@@ -72,7 +72,7 @@ const ProjectsSection = memo(() => {
 
   return (
     <section
-      className="px-6 relative overflow-hidden"
+      className="px-6 py-10 relative overflow-hidden"
       id="projects"
       ref={ref}
       onMouseMove={handleSectionMouseMove}
