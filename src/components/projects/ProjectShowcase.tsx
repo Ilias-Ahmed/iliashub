@@ -26,7 +26,7 @@ interface ProjectShowcaseProps {
 
 const ProjectShowcase = ({
   projects,
-  autoplay = true,
+  autoplay = false, // Disabled by default for performance
   showNavigation = true,
 }: ProjectShowcaseProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -215,10 +215,11 @@ const ProjectShowcase = ({
                   <video
                     className="w-full h-full object-cover"
                     src={currentProject.videoUrl}
-                    autoPlay
+                    autoPlay={false}
                     muted
-                    loop
+                    loop={false}
                     playsInline
+                    controls
                   />
                 ) : currentProject.demoUrl ? (
                   <iframe

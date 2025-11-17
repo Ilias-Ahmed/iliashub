@@ -21,19 +21,14 @@ const NotFound = () => {
         transition={{ duration: 0.6 }}
       >
         {/* 404 */}
-        <motion.h1
+        <h1
           className="text-8xl font-extrabold mb-4 tracking-tight"
-          animate={{
-            textShadow: [
-              "0 0 10px rgba(99,102,241,0.4)",
-              "0 0 20px rgba(99,102,241,0.6)",
-              "0 0 10px rgba(99,102,241,0.4)",
-            ],
+          style={{
+            textShadow: "0 0 15px rgba(99,102,241,0.5)",
           }}
-          transition={{ duration: 2, repeat: Infinity }}
         >
           404
-        </motion.h1>
+        </h1>
 
         {/* Message */}
         <p

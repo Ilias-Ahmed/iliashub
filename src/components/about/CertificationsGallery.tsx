@@ -19,16 +19,16 @@ const StackedCertifications = ({
   const { isDark, getAccentColors } = useTheme();
   const accentColors = getAccentColors();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false); // Disabled by default for performance
 
-  // Auto-play (guard against empty list)
+  // Auto-play (guard against empty list) - only when user hasn't interacted
   useEffect(() => {
-    if (!isAutoPlaying || certifications.length <= 1) return;
+    if (!isAutoPlaying || certifications.length <= 1 || !isInView) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % certifications.length);
-    }, 4000);
+    }, 5000); // Increased interval for less frequent updates
     return () => clearInterval(interval);
-  }, [isAutoPlaying, certifications.length]);
+  }, [isAutoPlaying, certifications.length, isInView]);
 
   const handleDotClick = (index: number) => {
     setCurrentIndex(index);
@@ -219,17 +219,11 @@ const StackedCertifications = ({
                     </div>
 
                     {offset === 0 && (
-                      <motion.div
-                        className="absolute inset-0 rounded-2xl pointer-events-none"
+                      <div
+                        className="absolute inset-0 rounded-2xl pointer-events-none opacity-70"
                         style={{
                           background: `linear-gradient(45deg, transparent, ${accentColors.primary}10, transparent)`,
                           boxShadow: `inset 0 0 0 1px ${accentColors.primary}30`,
-                        }}
-                        animate={{ opacity: [0.5, 1, 0.5] }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          ease: "easeInOut",
                         }}
                       />
                     )}
@@ -240,7 +234,6 @@ const StackedCertifications = ({
           </div>
         </motion.div>
       </div>
-
     </motion.div>
   );
 };

@@ -168,7 +168,7 @@ const Home: React.FC = () => {
                 className="max-w-full h-full max-h-[320px] sm:max-h-[520px] lg:max-h-[700px] shadow-sm backdrop-blur-md text-[13px] sm:text-sm"
                 startOnView
                 sequence
-                loop={!prefersReducedMotion}
+                loop={false}
                 loopDelay={2000}
               >
                 <TypingAnimation

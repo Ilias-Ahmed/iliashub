@@ -96,11 +96,9 @@ const LoadingScreen = ({
           >
             <div className="relative h-12 w-12">
               <div className="absolute inset-0 rounded-full border-2 border-muted opacity-50" />
-              <motion.div
-                className="absolute inset-0 rounded-full border-2"
+              <div
+                className="absolute inset-0 rounded-full border-2 border-t-transparent animate-spin"
                 style={{ borderColor: accentColors.primary }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
               />
             </div>
 
