@@ -3,7 +3,7 @@ import ScrollProgressBar from "@/components/ui/ScrollProgressBar";
 import { SmoothCursor } from "@/components/ui/SmoothCursor";
 import { NavigationProvider } from "@/contexts/NavigationContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import Hero from "@/pages/Hero";
+import Home from "@/pages/Home";
 import React, {
   Suspense,
   useCallback,
@@ -24,13 +24,6 @@ const AboutSection = React.lazy(() => import("@/components/about"));
 const SkillsSection = React.lazy(() => import("@/components/skills"));
 const ProjectsSection = React.lazy(() => import("@/components/projects"));
 const ContactSection = React.lazy(() => import("@/components/contact"));
-
-// Optimized loading fallback
-const SectionFallback = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-  </div>
-);
 
 /**
  * Optimized Main Index component with reduced complexity
@@ -183,26 +176,24 @@ const Index = () => {
           {/* Main content */}
           <main className="relative z-10">
             <section id="home" className="relative">
-              <Hero />
+              <Home />
             </section>
 
-            <Suspense fallback={<SectionFallback />}>
-              <section id="about" className="relative">
-                <AboutSection />
-              </section>
+            <section id="about" className="relative">
+              <AboutSection />
+            </section>
 
-              <section id="skills" className="relative">
-                <SkillsSection />
-              </section>
+            <section id="skills" className="relative">
+              <SkillsSection />
+            </section>
 
-              <section id="projects" className="relative">
-                <ProjectsSection />
-              </section>
+            <section id="projects" className="relative">
+              <ProjectsSection />
+            </section>
 
-              <section id="contact" className="relative">
-                <ContactSection />
-              </section>
-            </Suspense>
+            <section id="contact" className="relative">
+              <ContactSection />
+            </section>
           </main>
 
           {/* Navigation System */}
