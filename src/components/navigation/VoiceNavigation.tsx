@@ -419,12 +419,6 @@ const VoiceNavigation: React.FC<VoiceNavigationProps> = ({
               className="relative"
             >
               <Mic size={isMobile ? 24 : 20} style={{ color: "#ef4444" }} />
-              <motion.div
-                className="absolute inset-0 rounded-full border-2"
-                style={{ borderColor: "#ef4444" }}
-                animate={{ scale: [1, 1.3, 1], opacity: [1, 0, 1] }}
-                transition={{ duration: 1, repeat: Infinity }}
-              />
             </motion.div>
           ) : (
             <motion.div
@@ -442,8 +436,8 @@ const VoiceNavigation: React.FC<VoiceNavigationProps> = ({
           )}
         </AnimatePresence>
 
-        {/* Subtle pulse effect when idle */}
-        {!isListening && (
+        {/* Remove idle pulse for performance */}
+        {false && !isListening && (
           <motion.div
             className="absolute -inset-2 rounded-full border border-opacity-20"
             style={{ borderColor: primaryColor }}

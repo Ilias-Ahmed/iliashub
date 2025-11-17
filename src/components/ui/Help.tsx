@@ -312,17 +312,15 @@ const Help: React.FC<HelpProps> = ({
                 </div>
               </div>
             </div>
-            <motion.div
+            <div
               className="text-xs font-mono px-2 py-1 rounded"
               style={{
                 backgroundColor: `${accentColor}20`,
                 color: accentColor,
               }}
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity }}
             >
               TRY IT
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       )}

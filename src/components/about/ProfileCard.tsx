@@ -1,11 +1,6 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
-import {
-  Brain,
-  Heart,
-  Target,
-  Zap,
-} from "lucide-react";
+import { Brain, Heart, Target, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import profileImage from "/images/profile.png?url";
 
@@ -43,13 +38,13 @@ const ProfileCard = () => {
     },
   ];
 
-
   useEffect(() => {
     setIsVisible(true);
-    const interval = setInterval(() => {
-      setActiveCard((prev) => (prev + 1) % personalityCards.length);
-    }, 4000);
-    return () => clearInterval(interval);
+    // Disabled auto-rotation for performance - users can click to switch
+    // const interval = setInterval(() => {
+    //   setActiveCard((prev) => (prev + 1) % personalityCards.length);
+    // }, 4000);
+    // return () => clearInterval(interval);
   }, [personalityCards.length]);
 
   return (
@@ -64,7 +59,7 @@ const ProfileCard = () => {
         {/* Background with Profile Image Integration */}
         <motion.div className="absolute inset-0" />
 
-        <motion.div
+        <div
           className="absolute top-0 right-0 w-1/2 h-full opacity-5 md:opacity-10"
           style={{
             backgroundImage: `url(${profileImage})`,
@@ -76,44 +71,18 @@ const ProfileCard = () => {
             WebkitMaskImage:
               "linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 50%, transparent 100%)",
           }}
-          animate={{
-            scale: [1, 1.05, 1],
-            opacity: [0.05, 0.1, 0.05],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
         />
 
-        {/* Floating Geometric Elements - Scaled for mobile */}
-        <motion.div
+        {/* Static Geometric Elements - Performance optimized */}
+        <div
           className="absolute top-4 left-4 md:top-10 md:left-10 w-12 h-12 md:w-20 md:h-20 rounded-full opacity-20"
           style={{ backgroundColor: accentColors.primary }}
-          animate={{
-            y: [0, -10, 0],
-            rotate: [0, 180, 360],
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
         />
-        <motion.div
+        <div
           className="absolute bottom-10 right-10 md:bottom-20 md:right-20 w-10 h-10 md:w-16 md:h-16 opacity-15"
           style={{
             backgroundColor: accentColors.secondary,
             clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
-          }}
-          animate={{
-            rotate: [0, 120, 240, 360],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "linear",
           }}
         />
 
@@ -139,19 +108,16 @@ const ProfileCard = () => {
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.5, type: "spring" }}
                 >
-                  <motion.div
+                  <div
                     className="w-2 h-2 rounded-full"
                     style={{ backgroundColor: accentColors.primary }}
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
                   />
                   <span className="text-xs md:text-sm font-medium">
                     About Me
                   </span>
                 </motion.div>
 
-                <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 md:mb-3">
-                </h3>
+                <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 md:mb-3"></h3>
                 <p className="text-sm md:text-base lg:text-lg opacity-80 leading-relaxed">
                   I'm not just a developer—I'm a digital architect who believes
                   in the power of technology to solve real-world problems. My
@@ -282,7 +248,6 @@ const ProfileCard = () => {
           </div>
         </div>
       </div>
-
     </motion.div>
   );
 };

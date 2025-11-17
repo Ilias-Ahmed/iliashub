@@ -36,16 +36,6 @@ const ProjectsSection = memo(() => {
     [safeProjectsData]
   );
 
-  // Spotlight cursor position for background flair
-  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({
-    x: 0,
-    y: 0,
-  });
-  const handleSectionMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
-
   const title = "Featured Projects";
   const titleChars = title.split("");
 
@@ -72,39 +62,14 @@ const ProjectsSection = memo(() => {
 
   return (
     <section
-      className="px-6 relative overflow-hidden"
+      className="px-6 py-10 relative overflow-hidden"
       id="projects"
       ref={ref}
-      onMouseMove={handleSectionMouseMove}
     >
-      {/* Simplified Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full opacity-10 blur-3xl"
-          style={{ backgroundColor: accentColors.primary }}
-        />
-        <div
-          className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full opacity-5 blur-3xl"
-          style={{ backgroundColor: accentColors.secondary }}
-        />
-      </div>
-
-      {/* Spotlight background that follows cursor (desktop only) */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0 hidden md:block"
-        aria-hidden="true"
-        style={{
-          background: `radial-gradient(300px 300px at ${mousePos.x}px ${mousePos.y}px, ${accentColors.primary}20, transparent 60%)`,
-          transition: "background 80ms linear",
-        }}
-      />
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <header
-          className="mb-12 md:mb-16"
-          aria-labelledby="projects-title"
-        >
+        <header className="mb-12 md:mb-16" aria-labelledby="projects-title">
           <div className="text-left">
             <h2
               id="projects-title"

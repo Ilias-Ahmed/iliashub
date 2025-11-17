@@ -25,8 +25,8 @@ interface AccentColors {
   glow: string;
 }
 
-// Main Hero Component
-const Hero: React.FC = () => {
+// Main Home Component
+const Home: React.FC = () => {
   const [currentRole, setCurrentRole] = useState(0);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -93,24 +93,21 @@ const Hero: React.FC = () => {
                 <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-foreground/60">
                   Frontend Developer • React • TypeScript
                 </p>
-                <span 
+                <span
                   className="block mt-3 h-0.5 w-16 bg-current"
                   style={{ color: accentColors.primary }}
-                  aria-hidden="true" 
+                  aria-hidden="true"
                 />
               </div>
               <h1 className="text-[2rem] sm:text-[2.75rem] lg:text-[4.25rem] font-extrabold leading-[1.05] tracking-tight uppercase">
-                <span
-                  className="block"
-                  style={{ color: accentColors.primary }}
-                >
+                <span className="block" style={{ color: accentColors.primary }}>
                   ILIAS AHMED
                 </span>
               </h1>
 
               {/* Dynamic role */}
               <div className="h-9 sm:h-12 flex items-center">
-                <h2 
+                <h2
                   className="text-lg sm:text-2xl font-semibold lg:font-medium uppercase tracking-wide text-foreground/80 transition-opacity duration-500"
                   key={currentRole}
                 >
@@ -134,7 +131,9 @@ const Hero: React.FC = () => {
                     stroke={accentColors.primary}
                     strokeWidth="3"
                     fill="none"
-                    className={prefersReducedMotion ? "opacity-100" : "animate-pulse"}
+                    className={
+                      prefersReducedMotion ? "opacity-100" : "animate-pulse"
+                    }
                   />
                 </svg>
               </span>
@@ -169,7 +168,7 @@ const Hero: React.FC = () => {
                 className="max-w-full h-full max-h-[320px] sm:max-h-[520px] lg:max-h-[700px] shadow-sm backdrop-blur-md text-[13px] sm:text-sm"
                 startOnView
                 sequence
-                loop={!prefersReducedMotion}
+                loop={false}
                 loopDelay={2000}
               >
                 <TypingAnimation
@@ -222,4 +221,4 @@ const Hero: React.FC = () => {
   );
 };
 
-export default Hero;
+export default Home;

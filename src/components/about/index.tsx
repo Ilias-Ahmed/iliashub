@@ -1,6 +1,6 @@
 import { Tabs, TabsList } from "@/components/ui/tabs";
 import { useTheme } from "@/contexts/ThemeContext";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { certifications, timelineData } from "./aboutData";
 import CertificationsGallery from "./CertificationsGallery";
 import ExperienceTimeline from "./ExperienceTimeline";
@@ -9,37 +9,9 @@ import ProfileCard from "./ProfileCard";
 const AboutSection = memo(() => {
   const ref = useRef(null);
   const [activeTab, setActiveTab] = useState("profile");
-  const [scrollY, setScrollY] = useState(0);
-
   const { isDark, getAccentColors } = useTheme();
   const accentColors = getAccentColors();
 
-  // Track scroll position for parallax effects - throttled for performance
-  const handleScroll = useCallback(() => {
-    if (typeof window !== "undefined") {
-      setScrollY(window.scrollY);
-    }
-  }, []);
-
-  // Throttled scroll handler
-  const throttledScrollHandler = useCallback(() => {
-    let ticking = false;
-    return () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          handleScroll();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-  }, [handleScroll]);
-
-  useEffect(() => {
-    const scrollHandler = throttledScrollHandler();
-    window.addEventListener("scroll", scrollHandler, { passive: true });
-    return () => window.removeEventListener("scroll", scrollHandler);
-  }, [throttledScrollHandler]);
 
   return (
     <section
@@ -48,23 +20,6 @@ const AboutSection = memo(() => {
       ref={ref}
       aria-label="About Section"
     >
-      {/* Simplified floating gradient orbs */}
-      <div
-        className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full blur-3xl opacity-10"
-        style={{
-          backgroundColor: accentColors.primary,
-          transform: `translateY(${scrollY * 0.02}px)`,
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full blur-3xl opacity-5"
-        style={{
-          backgroundColor: accentColors.secondary,
-          transform: `translateY(${-scrollY * 0.03}px)`,
-        }}
-        aria-hidden="true"
-      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Section Header */}

@@ -2,8 +2,6 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { timelineData } from "./aboutData";
-// haptics removed
-
 interface ExperienceTimelineProps {
   timelineData: typeof timelineData;
 }

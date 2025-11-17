@@ -70,7 +70,9 @@ export const AnimatedSpan = ({
       ref={elementRef}
       className={cn(
         "grid text-sm font-normal tracking-tight transition-all duration-300",
-        shouldAnimate ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1",
+        shouldAnimate
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 -translate-y-1",
         className
       )}
       style={{
@@ -137,7 +139,16 @@ export const TypingAnimation = ({
 
     const startTimeout = setTimeout(() => setStarted(true), delay);
     return () => clearTimeout(startTimeout);
-  }, [delay, startOnView, isInView, started, sequence, sequence?.activeIndex, sequence?.sequenceStarted, itemIndex]);
+  }, [
+    delay,
+    startOnView,
+    isInView,
+    started,
+    sequence,
+    sequence?.activeIndex,
+    sequence?.sequenceStarted,
+    itemIndex,
+  ]);
 
   useEffect(() => {
     if (!started) return;
@@ -199,9 +210,11 @@ export const Terminal = ({
   const childArray = useMemo(() => Children.toArray(children), [children]);
   const childCount = childArray.length;
 
+  // Disable loop by default for performance - only loop once max
   useEffect(() => {
     if (!sequence || !loop) return;
     if (activeIndex < childCount) return;
+    if (cycle >= 1) return; // Stop after 1 loop to prevent infinite resource usage
 
     const t = setTimeout(() => {
       setActiveIndex(0);
@@ -209,13 +222,15 @@ export const Terminal = ({
     }, Math.max(0, loopDelay));
 
     return () => clearTimeout(t);
-  }, [activeIndex, childCount, loop, loopDelay, sequence]);
+  }, [activeIndex, childCount, loop, loopDelay, sequence, cycle]);
 
   const contextValue = useMemo<SequenceContextValue | null>(() => {
     if (!sequence) return null;
     return {
       completeItem: (index: number) => {
-        setActiveIndex((current) => (index === current ? current + 1 : current));
+        setActiveIndex((current) =>
+          index === current ? current + 1 : current
+        );
       },
       activeIndex,
       sequenceStarted: sequenceHasStarted,
