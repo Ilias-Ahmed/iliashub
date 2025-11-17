@@ -66,17 +66,6 @@ const ProjectsSection = memo(() => {
       id="projects"
       ref={ref}
     >
-      {/* Simplified Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full opacity-10 blur-3xl"
-          style={{ backgroundColor: accentColors.primary }}
-        />
-        <div
-          className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full opacity-5 blur-3xl"
-          style={{ backgroundColor: accentColors.secondary }}
-        />
-      </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}

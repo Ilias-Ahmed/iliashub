@@ -96,21 +96,6 @@ const SkillsSection = () => {
       className="px-4 sm:px-6 relative overflow-hidden skills-section"
       id="skills"
     >
-      {/* Background Elements */}
-      <div className="absolute inset-0 -z-10">
-        <div
-          className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full blur-3xl opacity-20"
-          style={{ backgroundColor: accentColors.primary }}
-        />
-        <div
-          className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full blur-3xl opacity-15"
-          style={{ backgroundColor: accentColors.secondary }}
-        />
-        <div
-          className="absolute top-2/3 left-1/3 w-48 h-48 rounded-full blur-3xl opacity-10"
-          style={{ backgroundColor: "#10b981" }}
-        />
-      </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}

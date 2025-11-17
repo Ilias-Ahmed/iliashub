@@ -1,5 +1,4 @@
-import { useTheme } from "@/contexts/ThemeContext";
-import { memo, useMemo, useRef } from "react";
+import { memo, useRef } from "react";
 
 import AvailabilityBadges from "@/components/contact/AvailabilityBadges";
 import BuyMeCoffeeButton from "@/components/contact/BuyMeCoffeeButton";
@@ -11,35 +10,21 @@ const ContactSection = memo(() => {
   const sectionRef = useRef(null);
   const formRef = useRef(null);
 
-  const { isDark, getAccentColors } = useTheme();
-  const accentColors = getAccentColors();
 
-  // Memoize background style to prevent recalculation
-  const backgroundStyle = useMemo(
-    () => ({
-      background: isDark
-        ? `radial-gradient(ellipse at center, ${accentColors.primary}05 0%, transparent 50%)`
-        : `radial-gradient(ellipse at center, ${accentColors.primary}08 0%, transparent 50%)`,
-    }),
-    [isDark, accentColors.primary]
-  );
 
   return (
     <section
       ref={sectionRef}
       className="py-24 px-6 relative overflow-hidden theme-transition"
       id="contact"
-      style={backgroundStyle}
     >
       {/* Simplified Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
           className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-10"
-          style={{ backgroundColor: accentColors.primary }}
         />
         <div
           className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl opacity-5"
-          style={{ backgroundColor: accentColors.secondary }}
         />
       </div>
 
