@@ -1,6 +1,6 @@
+import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useTheme } from "@/contexts/ThemeContext";
 
 const NotFound = () => {
   const { isDark } = useTheme();
@@ -13,27 +13,6 @@ const NotFound = () => {
         color: isDark ? "#ffffff" : "#000000",
       }}
     >
-      {/* Cursor Glow */}
-      <motion.div
-        className="pointer-events-none absolute rounded-full opacity-25"
-        style={{
-          width: 250,
-          height: 250,
-          background: isDark
-            ? "radial-gradient(circle, rgba(99,102,241,0.4), transparent 70%)"
-            : "radial-gradient(circle, rgba(79,70,229,0.4), transparent 70%)",
-        }}
-        animate={{
-          x: ["-50%", "50%", "-30%"],
-          y: ["-50%", "20%", "-10%"],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
       {/* Container */}
       <motion.div
         className="relative z-10 text-center p-8 max-w-lg mx-auto"

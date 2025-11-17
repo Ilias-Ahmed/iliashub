@@ -1,6 +1,5 @@
 import Navigation from "@/components/navigation/Navigation";
 import ScrollProgressBar from "@/components/ui/ScrollProgressBar";
-import { SmoothCursor } from "@/components/ui/SmoothCursor";
 import { NavigationProvider } from "@/contexts/NavigationContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Home from "@/pages/Home";
@@ -160,8 +159,6 @@ const Index = () => {
 
   return (
     <>
-      <SmoothCursor enabled={!isLoading} />
-
       <Suspense fallback={null}>
         {isLoading && (
           <LoadingScreen onLoadingComplete={handleLoadingComplete} />
