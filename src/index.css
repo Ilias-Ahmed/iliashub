@@ -125,6 +125,9 @@
     width: 100%;
     margin: 0;
     padding: 0;
+    /* Improve touch scrolling on mobile */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
   }
 
   body {
@@ -135,6 +138,8 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
       Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* Prevent pull-to-refresh on mobile */
+    overscroll-behavior: contain;
   }
 
   /* Enhanced focus styles */
@@ -143,9 +148,23 @@
     outline-offset: 2px;
   }
 
-  /* Smooth scrolling */
+  /* Smooth scrolling - native on all devices */
   html {
     scroll-behavior: smooth;
+  }
+
+  /* Optimize scrolling performance on mobile */
+  @media (max-width: 768px) {
+    html {
+      /* Use auto scroll on mobile for better touch response */
+      scroll-behavior: auto;
+    }
+
+    body {
+      /* Enable hardware acceleration for smoother scrolling */
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
   }
 
   /* Selection styles */
@@ -213,7 +232,7 @@
     .project-reel-track {
       animation: none;
     }
-    
+
     * {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
