@@ -161,9 +161,9 @@
     }
 
     body {
-      /* Enable hardware acceleration for smoother scrolling */
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
+      /* Avoid transforms here so fixed UI (nav/back-to-top) stays anchored */
+      -webkit-transform: none;
+      transform: none;
     }
   }
 
