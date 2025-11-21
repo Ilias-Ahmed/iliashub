@@ -121,7 +121,7 @@ const VisxSkillsVisualization: React.FC<VisxSkillsVisualizationProps> = ({
     // Responsive chart dimensions
     const isMobile = window.innerWidth < 768;
     const isTablet = window.innerWidth < 1024;
-    
+
     const chartWidth = isMobile ? Math.min(350, window.innerWidth - 80) : isTablet ? 500 : 600;
     const chartHeight = isMobile ? 280 : isTablet ? 350 : 400;
 
@@ -271,64 +271,6 @@ const VisxSkillsVisualization: React.FC<VisxSkillsVisualizationProps> = ({
               style={{ backgroundColor: accentColors.secondary }}
             />
           </div>
-        </motion.div>
-
-        {/* Stats Summary */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8"
-        >
-          {[
-            {
-              label: "Total Skills",
-              value: skills.length,
-              suffix: "",
-            },
-            {
-              label: "Avg Proficiency",
-              value: Math.round(
-                skills.reduce((acc, skill) => acc + skill.level, 0) /
-                  skills.length
-              ),
-              suffix: "%",
-            },
-            {
-              label: "Expert Level",
-              value: skills.filter((skill) => skill.level >= 90).length,
-              suffix: " skills",
-            },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="text-center p-4 rounded-lg border backdrop-blur-sm"
-              style={{
-                backgroundColor: isDark
-                  ? "rgba(255,255,255,0.05)"
-                  : "rgba(255,255,255,0.8)",
-                borderColor: isDark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(0,0,0,0.1)",
-              }}
-            >
-              <div
-                className="text-2xl font-bold mb-1"
-                style={{ color: accentColors.primary }}
-              >
-                {stat.value}
-                {stat.suffix}
-              </div>
-              <div
-                className="text-sm"
-                style={{
-                  color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)",
-                }}
-              >
-                {stat.label}
-              </div>
-            </div>
-          ))}
         </motion.div>
       </motion.div>
     </div>
