@@ -1,7 +1,6 @@
 import ProjectGrid from "@/components/projects/ProjectGrid";
 import { projectsData } from "@/components/projects/projectsData";
 import ProjectShowcase from "@/components/projects/ProjectShowcase";
-import ProjectStats from "@/components/projects/ProjectStats";
 import ProjectTimeline from "@/components/projects/ProjectTimeline";
 import ProjectViewToggle from "@/components/projects/ProjectViewToggle";
 import { Project, ViewMode } from "@/components/projects/types";
@@ -94,9 +93,6 @@ const ProjectsSection = memo(() => {
             <ProjectTimeline projects={safeProjectsData} />
           )}
         </div>
-
-        {/* Project Stats */}
-        <ProjectStats />
       </div>
     </section>
   );
