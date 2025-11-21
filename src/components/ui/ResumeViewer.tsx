@@ -14,7 +14,9 @@ try {
     import.meta.url
   ).toString();
 } catch (e) {
-  console.warn("PDF worker setup warning:", e);
+  if (import.meta.env.DEV) {
+    console.warn("PDF worker setup warning:", e);
+  }
 }
 
 type Props = { isOpen: boolean; onClose: () => void };
@@ -103,8 +105,10 @@ const ResumeViewer: React.FC<Props> = ({ isOpen, onClose }) => {
                   file={pdfUrl}
                   onLoadSuccess={onDocumentLoadSuccess}
                   onLoadError={(err) => {
-                    console.warn("PDF load error:", err);
-                    console.error("Failed to load PDF file:", pdfUrl);
+                    if (import.meta.env.DEV) {
+                      console.warn("PDF load error:", err);
+                      console.error("Failed to load PDF file:", pdfUrl);
+                    }
                   }}
                   loading={
                     <div className="h-[60vh] grid place-items-center">

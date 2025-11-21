@@ -279,7 +279,7 @@ const ProjectStats = () => {
       icon: <TrendingUp size={24} />,
       description:
         "Reliable, high-performance applications with enterprise-grade stability",
-      color: "#10b981",
+      color: accentColors.primary,
     },
   ];
 

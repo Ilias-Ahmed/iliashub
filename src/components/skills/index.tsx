@@ -1,6 +1,10 @@
+import { EmptyState } from "@/components/ui/EmptyState";
+import { LoadingState } from "@/components/ui/Spinner";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useFilteredData } from "@/hooks/use-filtered-data";
+import { useToggleList } from "@/hooks/use-toggle-list";
 import { motion, useInView } from "framer-motion";
-import { lazy, Suspense, useCallback, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useRef, useState } from "react";
 import { skills } from "./skillsData";
 import SkillsFilters from "./SkillsFilters";
 import { Skill, ViewMode } from "./types";
@@ -11,30 +15,6 @@ const MasteryView = lazy(() => import("./MasteryView"));
 const ComparisonView = lazy(() => import("./ComparisonView"));
 const VisxSkillsVisualization = lazy(() => import("./VisxSkillsVisualization"));
 const SkillDetailModal = lazy(() => import("./SkillDetailModal"));
-
-// Loading fallback component
-const LoadingFallback = ({ height = "400px" }: { height?: string }) => {
-  const { getAccentColors } = useTheme();
-  const accentColors = getAccentColors();
-
-  return (
-    <div
-      className="flex items-center justify-center rounded-xl border border-border/30"
-      style={{ height }}
-    >
-      <div className="flex flex-col items-center space-y-4">
-        <div
-          className="w-8 h-8 rounded-full animate-spin border-2 border-transparent"
-          style={{
-            borderTopColor: accentColors.primary,
-            borderRightColor: accentColors.secondary,
-          }}
-        />
-        <p className="text-sm text-muted-foreground">Loading...</p>
-      </div>
-    </div>
-  );
-};
 
 /**
  * Optimized Skills section component with performance monitoring and lazy loading
@@ -47,43 +27,28 @@ const SkillsSection = () => {
   const accentColors = getAccentColors();
 
   // State management with optimized updates
-  const [viewMode, setViewMode] = useState<ViewMode>("mastery");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
-  const [comparisonSkills, setComparisonSkills] = useState<string[]>([]);
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
 
-  // Memoized filter function for better performance
-  const filteredSkills = useMemo(() => {
-    return skills.filter((skill) => {
-      const matchesCategory =
-        selectedCategory === "All" || skill.category === selectedCategory;
-      const matchesSearch =
-        skill.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        skill.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        skill.description.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
-    });
-  }, [selectedCategory, searchQuery]);
+  // Use custom hooks for data filtering and comparison management
+  const {
+    filteredData: filteredSkills,
+    selectedCategory,
+    setSelectedCategory,
+    searchQuery,
+    setSearchQuery,
+    resetFilters,
+  } = useFilteredData(skills, {
+    categoryKey: "category",
+    searchKeys: ["name", "category", "description"],
+  });
 
-  // Optimized comparison skill toggle
-  const toggleComparisonSkill = useCallback((skillId: string) => {
-    setComparisonSkills((prev) => {
-      if (prev.includes(skillId)) {
-        return prev.filter((id) => id !== skillId);
-      } else if (prev.length < 3) {
-        return [...prev, skillId];
-      }
-      return prev;
-    });
-  }, []);
-
-  // Reset filters function
-  const resetFilters = useCallback(() => {
-    setSelectedCategory("All");
-    setSearchQuery("");
-  }, []);
+  const {
+    items: comparisonSkills,
+    toggle: toggleComparisonSkill,
+    set: setComparisonSkills,
+  } = useToggleList<string>(3);
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -96,7 +61,6 @@ const SkillsSection = () => {
       className="px-4 sm:px-6 relative overflow-hidden skills-section"
       id="skills"
     >
-
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
         <motion.div
@@ -126,7 +90,14 @@ const SkillsSection = () => {
             transition={{ duration: 0.6 }}
             className="mb-8 px-2 sm:px-4 md:px-0"
           >
-            <Suspense fallback={<LoadingFallback height="300px" />}>
+            <Suspense
+              fallback={
+                <LoadingState
+                  height="300px"
+                  message="Loading visualization..."
+                />
+              }
+            >
               <VisxSkillsVisualization skills={skills.slice(0, 8)} />
             </Suspense>
           </motion.div>
@@ -151,7 +122,11 @@ const SkillsSection = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="min-h-[600px]"
         >
-          <Suspense fallback={<LoadingFallback height="600px" />}>
+          <Suspense
+            fallback={
+              <LoadingState height="600px" message="Loading skills..." />
+            }
+          >
             {viewMode === "grid" && (
               <GridView
                 skills={filteredSkills}
@@ -204,45 +179,15 @@ const SkillsSection = () => {
 
         {/* Empty State */}
         {filteredSkills.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-8"
-          >
-            <div
-              className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center"
-              style={{ backgroundColor: `${accentColors.primary}20` }}
-            >
-              <span className="text-3xl">🔍</span>
-            </div>
-            <h3
-              className="text-xl font-semibold mb-4"
-              style={{ color: isDark ? "#ffffff" : "#1f2937" }}
-            >
-              No Skills Found
-            </h3>
-            <p
-              className="max-w-md mx-auto"
-              style={{
-                color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)",
-              }}
-            >
-              Try adjusting your search criteria or category filter to find the
-              skills you're looking for.
-            </p>
-            <motion.button
-              onClick={resetFilters}
-              className="mt-6 px-6 py-3 rounded-lg font-medium transition-all duration-200"
-              style={{
-                backgroundColor: accentColors.primary,
-                color: "white",
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Clear Filters
-            </motion.button>
-          </motion.div>
+          <EmptyState
+            icon="🔍"
+            title="No Skills Found"
+            description="Try adjusting your search criteria or category filter to find the skills you're looking for."
+            action={{
+              label: "Clear Filters",
+              onClick: resetFilters,
+            }}
+          />
         )}
       </div>
 

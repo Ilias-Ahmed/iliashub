@@ -39,27 +39,6 @@ const ProjectsSection = memo(() => {
   const title = "Featured Projects";
   const titleChars = title.split("");
 
-  // Magnetic hover util (no state, mutate element transform)
-  const magnet = (el: HTMLElement, e: React.MouseEvent, strength = 0.25) => {
-    const rect = el.getBoundingClientRect();
-    const relX = e.clientX - rect.left - rect.width / 2;
-    const relY = e.clientY - rect.top - rect.height / 2;
-    const tx = relX * strength * 0.1;
-    const ty = relY * strength * 0.1;
-    el.style.transform = `translate(${tx}px, ${ty}px)`;
-  };
-
-  const resetMagnet = (el: HTMLElement) => {
-    el.style.transform = "translate(0, 0)";
-  };
-
-  const handleReelItemMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    magnet(e.currentTarget, e, 0.6);
-  };
-  const handleReelItemLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    resetMagnet(e.currentTarget);
-  };
-
   return (
     <section
       className="px-6 py-10 relative overflow-hidden"
@@ -98,31 +77,6 @@ const ProjectsSection = memo(() => {
 
         {/* View Toggle */}
         <ProjectViewToggle activeView={viewMode} onChange={setViewMode} />
-
-        {/* Simplified thumbnail reel */}
-        {safeProjectsData.length > 0 && (
-          <div className="relative mb-10">
-            <div className="project-reel mask-fade-x">
-              <div className="project-reel-track" aria-hidden="true">
-                {safeProjectsData.concat(safeProjectsData).map((p, i) => (
-                  <div
-                    className="reel-item transition-transform duration-150 will-change-transform"
-                    key={`${p.id}-reel-${i}`}
-                    onMouseMove={handleReelItemMove}
-                    onMouseLeave={handleReelItemLeave}
-                  >
-                    <img
-                      src={p.image}
-                      alt={p.title}
-                      className="w-40 h-24 md:w-56 md:h-32 object-cover rounded-lg opacity-80 hover:opacity-100 transition-opacity"
-                      loading="lazy"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Project Views */}
         <div>

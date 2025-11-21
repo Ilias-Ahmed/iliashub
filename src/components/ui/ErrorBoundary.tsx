@@ -1,11 +1,11 @@
+import { motion } from "framer-motion";
 import React, {
   Component,
   ErrorInfo,
   ReactNode,
-  useState,
   useEffect,
+  useState,
 } from "react";
-import { motion } from "framer-motion";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -55,7 +55,9 @@ class ErrorBoundaryClass extends Component<
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error to an error reporting service
-    console.error("Uncaught error:", error, errorInfo);
+    if (import.meta.env.DEV) {
+      console.error("Uncaught error:", error, errorInfo);
+    }
 
     this.setState({
       error,

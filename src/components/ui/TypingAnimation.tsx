@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useInView } from "motion/react";
+import { useInView } from "framer-motion";
 import {
   Children,
   createContext,

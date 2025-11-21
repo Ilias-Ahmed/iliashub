@@ -128,7 +128,9 @@ const VoiceNavigation: React.FC<VoiceNavigationProps> = ({
       if (isProcessingRef.current) return;
       isProcessingRef.current = true;
 
-      console.log("Processing voice command:", command);
+      if (import.meta.env.DEV) {
+        console.log("Processing voice command:", command);
+      }
       setLastCommand(command);
 
       try {
@@ -214,7 +216,9 @@ const VoiceNavigation: React.FC<VoiceNavigationProps> = ({
           });
         }
       } catch (error) {
-        console.error("Error processing voice command:", error);
+        if (import.meta.env.DEV) {
+          console.error("Error processing voice command:", error);
+        }
         toast.error("Failed to process voice command");
       } finally {
         isProcessingRef.current = false;
@@ -242,7 +246,9 @@ const VoiceNavigation: React.FC<VoiceNavigationProps> = ({
 
         // Setup event handlers
         recognitionInstance.onstart = () => {
-          console.log("Voice recognition started");
+          if (import.meta.env.DEV) {
+            console.log("Voice recognition started");
+          }
           setIsListening(true);
           setTranscript("");
           setInterimTranscript("");
@@ -275,11 +281,13 @@ const VoiceNavigation: React.FC<VoiceNavigationProps> = ({
         };
 
         recognitionInstance.onerror = (event: SpeechRecognitionErrorEvent) => {
-          console.error(
-            "Speech recognition error:",
-            event.error,
-            event.message
-          );
+          if (import.meta.env.DEV) {
+            console.error(
+              "Speech recognition error:",
+              event.error,
+              event.message
+            );
+          }
 
           let errorMessage = "Voice recognition error";
           switch (event.error) {
@@ -305,7 +313,9 @@ const VoiceNavigation: React.FC<VoiceNavigationProps> = ({
         };
 
         recognitionInstance.onend = () => {
-          console.log("Voice recognition ended");
+          if (import.meta.env.DEV) {
+            console.log("Voice recognition ended");
+          }
           setIsListening(false);
           setInterimTranscript("");
 
@@ -317,11 +327,15 @@ const VoiceNavigation: React.FC<VoiceNavigationProps> = ({
         setRecognition(recognitionInstance);
         setIsSupported(true);
       } catch (error) {
-        console.error("Failed to initialize speech recognition:", error);
+        if (import.meta.env.DEV) {
+          console.error("Failed to initialize speech recognition:", error);
+        }
         setIsSupported(false);
       }
     } else {
-      console.log("Speech Recognition not supported in this browser");
+      if (import.meta.env.DEV) {
+        console.log("Speech Recognition not supported in this browser");
+      }
       setIsSupported(false);
     }
 
@@ -356,7 +370,9 @@ const VoiceNavigation: React.FC<VoiceNavigationProps> = ({
           }
         }, autoStopTimeout);
       } catch (error) {
-        console.error("Failed to start voice recognition:", error);
+        if (import.meta.env.DEV) {
+          console.error("Failed to start voice recognition:", error);
+        }
         toast.error("Failed to start voice recognition");
       }
     }
