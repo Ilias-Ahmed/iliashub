@@ -109,6 +109,30 @@
     display: none;
   }
 
+  /* Enable scrollbar for resume viewer on desktop */
+  .resume-scroll-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  }
+
+  .resume-scroll-container::-webkit-scrollbar {
+    display: block;
+    width: 8px;
+  }
+
+  .resume-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .resume-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
+
+  .resume-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
   html,
   body {
     overflow-x: hidden;
@@ -195,9 +219,9 @@
     }
   }
 
-  /* Reduced motion support */
+  /* Reduced motion support - exclude orbit animations */
   @media (prefers-reduced-motion: reduce) {
-    * {
+    *:not(.animate-orbit):not(.animate-orbit-reverse) {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
@@ -205,13 +229,15 @@
   }
 }
 
-/* Orbit animation for OrbitingCircles */
+/* Orbit animation for OrbitingCircles - always run regardless of motion preferences */
 .animate-orbit {
-  animation: orbit calc(var(--duration) * 1s) linear infinite;
+  animation: orbit calc(var(--duration) * 1s) linear infinite !important;
+  animation-play-state: running !important;
 }
 
 .animate-orbit-reverse {
-  animation: orbit-reverse calc(var(--duration) * 1s) linear infinite;
+  animation: orbit-reverse calc(var(--duration) * 1s) linear infinite !important;
+  animation-play-state: running !important;
 }
 
 @keyframes orbit {

@@ -1,14 +1,10 @@
-// haptics removed
 import { AnimatePresence, motion } from "framer-motion";
-import { Download, FileText, X } from "lucide-react";
+import { Download, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 
 // Configure the PDF.js worker for react-pdf (Vite/ESM)
-// Use the worker shipped by the installed pdfjs-dist to avoid version mismatches
 try {
-  // This path is resolved by Vite at build-time
-  // NOTE: Keep it in sync with the installed pdfjs-dist version
   pdfjs.GlobalWorkerOptions.workerSrc = new URL(
     "pdfjs-dist/build/pdf.worker.min.mjs",
     import.meta.url
@@ -23,29 +19,36 @@ type Props = { isOpen: boolean; onClose: () => void };
 
 const ResumeViewer: React.FC<Props> = ({ isOpen, onClose }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [numPages, setNumPages] = useState<number>(1);
-  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [numPages, setNumPages] = useState<number>(0);
   const [width, setWidth] = useState<number>(800);
   const pdfUrl = `${import.meta.env.BASE_URL}resume.pdf`;
 
-  // Resize handler to fit the Page to modal width
+  // Resize handler to fit pages to container width
   useEffect(() => {
     const update = () => {
       const w = containerRef.current?.clientWidth ?? 800;
-      setWidth(Math.min(1000, w - 32)); // padding adjustment
+      setWidth(Math.min(900, w - 48)); // padding adjustment
     };
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
-    setPageNumber(1);
   };
-
-  const canPrev = pageNumber > 1;
-  const canNext = pageNumber < numPages;
 
   return (
     <AnimatePresence>
@@ -54,105 +57,102 @@ const ResumeViewer: React.FC<Props> = ({ isOpen, onClose }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md"
         >
-          <motion.div
-            initial={{ scale: 0.97, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.97, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 280, damping: 26 }}
-            className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 border border-white/10 rounded-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
+          {/* Close button - top right */}
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ delay: 0.1 }}
+            onClick={onClose}
+            className="fixed top-4 right-4 z-[100] p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all duration-200 shadow-xl backdrop-blur-sm border border-white/20 group"
+            aria-label="Close resume viewer"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10 bg-black/20">
-              <motion.h3
-                initial={{ x: -10, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                className="text-xl font-bold text-white flex items-center gap-2"
-              >
-                <FileText className="text-primary" size={20} />
-                <span>My Resume</span>
-              </motion.h3>
+            <X
+              size={24}
+              className="group-hover:rotate-90 transition-transform duration-300"
+            />
+          </motion.button>
 
-              <div className="flex items-center gap-2">
-                <a
-                  href="/resume.pdf"
-                  download="Ilias_Ahmed_Resume.pdf"
-                  className="px-3 py-1.5 rounded-full bg-primary/20 text-primary hover:bg-primary/30 transition-colors text-sm flex items-center gap-2"
-                  onClick={() => {}}
-                >
-                  <Download size={16} />
-                  <span>Download</span>
-                </a>
-                <button
-                  onClick={() => {
-                    onClose();
-                    // haptics removed
-                  }}
-                  className="p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
-                  aria-label="Close resume viewer"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-            </div>
+          {/* Download button - top left */}
+          <motion.a
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ delay: 0.1 }}
+            href="/resume.pdf"
+            download="Ilias_Ahmed_Resume.pdf"
+            className="fixed top-4 left-4 z-[100] px-4 py-3 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all duration-200 text-sm flex items-center gap-2 shadow-xl backdrop-blur-sm border border-primary/30 font-medium"
+          >
+            <Download size={18} />
+            <span className="hidden sm:inline">Download Resume</span>
+          </motion.a>
 
-            {/* Content */}
-            <div ref={containerRef} className="flex-1 overflow-auto p-4">
-              <div className="mx-auto max-w-[1000px]">
-                <Document
-                  file={pdfUrl}
-                  onLoadSuccess={onDocumentLoadSuccess}
-                  onLoadError={(err) => {
-                    if (import.meta.env.DEV) {
-                      console.warn("PDF load error:", err);
-                      console.error("Failed to load PDF file:", pdfUrl);
-                    }
-                  }}
-                  loading={
-                    <div className="h-[60vh] grid place-items-center">
-                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-                    </div>
+          {/* Scrollable content container */}
+          <div
+            ref={containerRef}
+            className="absolute inset-0 overflow-y-auto overflow-x-hidden pt-20 pb-8 px-4 resume-scroll-container"
+          >
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 20, opacity: 0 }}
+              transition={{ delay: 0.15 }}
+              className="max-w-4xl mx-auto"
+            >
+              <Document
+                file={pdfUrl}
+                onLoadSuccess={onDocumentLoadSuccess}
+                onLoadError={(err) => {
+                  if (import.meta.env.DEV) {
+                    console.error("Failed to load PDF:", err);
                   }
-                >
-                  <Page
-                    pageNumber={pageNumber}
-                    width={width}
-                    renderTextLayer={false}
-                    renderAnnotationLayer={false}
-                  />
-                </Document>
-              </div>
-            </div>
-
-            {/* Footer: simple pager if multiple pages */}
-            {numPages > 1 && (
-              <div className="border-t border-white/10 p-3 flex items-center justify-between bg-black/20 text-sm text-gray-300">
-                <span>
-                  Page {pageNumber} of {numPages}
-                </span>
-                <div className="flex items-center gap-2">
-                  <button
-                    disabled={!canPrev}
-                    onClick={() => setPageNumber((p) => Math.max(1, p - 1))}
-                    className="px-2 py-1 rounded bg-white/10 disabled:opacity-40 hover:bg-white/20"
+                }}
+                loading={
+                  <div className="min-h-screen grid place-items-center">
+                    <div className="text-center space-y-4">
+                      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+                      <p className="text-white/60 text-sm">Loading resume...</p>
+                    </div>
+                  </div>
+                }
+                error={
+                  <div className="min-h-screen grid place-items-center">
+                    <div className="text-center space-y-4 text-white/80">
+                      <p className="text-lg font-semibold">
+                        Failed to load resume
+                      </p>
+                      <p className="text-sm text-white/60">
+                        Please try downloading instead
+                      </p>
+                    </div>
+                  </div>
+                }
+                className="flex flex-col gap-6"
+              >
+                {/* Render all pages */}
+                {Array.from(new Array(numPages), (_, index) => (
+                  <motion.div
+                    key={`page_${index + 1}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * index, duration: 0.3 }}
+                    className="bg-white shadow-2xl rounded-lg overflow-hidden mx-auto"
                   >
-                    Prev
-                  </button>
-                  <button
-                    disabled={!canNext}
-                    onClick={() =>
-                      setPageNumber((p) => Math.min(numPages, p + 1))
-                    }
-                    className="px-2 py-1 rounded bg-white/10 disabled:opacity-40 hover:bg-white/20"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            )}
-          </motion.div>
+                    <Page
+                      pageNumber={index + 1}
+                      width={width}
+                      renderTextLayer={false}
+                      renderAnnotationLayer={false}
+                      className="mx-auto"
+                    />
+                  </motion.div>
+                ))}
+              </Document>
+            </motion.div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
