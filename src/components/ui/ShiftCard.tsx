@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, MotionProps, motion } from "motion/react";
+import { AnimatePresence, MotionProps, motion } from "framer-motion";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";

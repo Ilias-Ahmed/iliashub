@@ -9,7 +9,7 @@ import {
   useSpring,
   useTransform,
   type SpringOptions,
-} from "motion/react";
+} from "framer-motion";
 import React, {
   Children,
   cloneElement,

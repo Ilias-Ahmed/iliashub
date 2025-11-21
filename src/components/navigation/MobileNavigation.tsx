@@ -4,6 +4,7 @@ import {
   type ThemeAccent,
   type ThemeMode,
 } from "@/contexts/ThemeContext";
+import { haptics } from "@/utils/haptics";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronRight,
@@ -126,28 +127,37 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   // Handle navigation
   const handleNavigation = (sectionId: string) => {
     try {
+      haptics.selection();
       navigateToSection(sectionId);
       closeMenu();
     } catch (error) {
-      console.error("Navigation error:", error);
+      if (import.meta.env.DEV) {
+        console.error("Navigation error:", error);
+      }
     }
   };
 
   // Handle theme change
   const handleThemeChange = (newMode: ThemeMode) => {
     try {
+      haptics.light();
       setTheme(newMode);
     } catch (error) {
-      console.error("Theme change error:", error);
+      if (import.meta.env.DEV) {
+        console.error("Theme change error:", error);
+      }
     }
   };
 
   // Handle accent change
   const handleAccentChange = (newAccent: ThemeAccent) => {
     try {
+      haptics.light();
       setAccent(newAccent);
     } catch (error) {
-      console.error("Accent change error:", error);
+      if (import.meta.env.DEV) {
+        console.error("Accent change error:", error);
+      }
     }
   };
 

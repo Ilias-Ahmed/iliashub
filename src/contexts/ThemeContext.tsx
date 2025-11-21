@@ -167,7 +167,9 @@ export function ThemeProvider({
         accent: savedAccent ?? defaultOptions.accent ?? DEFAULT_ACCENT,
       };
     } catch (error) {
-      console.warn("Failed to load theme from localStorage:", error);
+      if (import.meta.env.DEV) {
+        console.warn("Failed to load theme from localStorage:", error);
+      }
       return {
         mode: defaultOptions.mode ?? DEFAULT_THEME,
         accent: defaultOptions.accent ?? DEFAULT_ACCENT,
@@ -276,7 +278,9 @@ export function ThemeProvider({
         localStorage.setItem("theme", mode);
         localStorage.setItem("accent", accent);
       } catch (error) {
-        console.warn("Failed to save theme to localStorage:", error);
+        if (import.meta.env.DEV) {
+          console.warn("Failed to save theme to localStorage:", error);
+        }
       }
 
       // Update meta theme-color

@@ -4,6 +4,7 @@ import {
   type ThemeAccent,
   type ThemeMode,
 } from "@/contexts/ThemeContext";
+import { AnimatePresence } from "framer-motion";
 import {
   CheckCircle,
   ChevronUp,
@@ -17,7 +18,6 @@ import {
   User,
   Workflow,
 } from "lucide-react";
-import { AnimatePresence } from "motion/react";
 import React, {
   useCallback,
   useEffect,

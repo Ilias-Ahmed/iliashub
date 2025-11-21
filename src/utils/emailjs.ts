@@ -13,8 +13,7 @@ export const isEmailJSConfigured = () => {
 export const initEmailJS = () => {
   if (EMAILJS_PUBLIC_KEY) {
     emailjs.init(EMAILJS_PUBLIC_KEY);
-    console.log("EmailJS initialized successfully");
-  } else {
+  } else if (import.meta.env.DEV) {
     console.error("EmailJS Public Key is missing");
   }
 };
@@ -34,11 +33,13 @@ export const sendContactEmail = async ({
   message,
 }: ContactEmailPayload) => {
   if (!isEmailJSConfigured()) {
-    console.error("EmailJS Configuration:", {
-      hasServiceId: !!EMAILJS_SERVICE_ID,
-      hasTemplateId: !!EMAILJS_TEMPLATE_ID,
-      hasPublicKey: !!EMAILJS_PUBLIC_KEY,
-    });
+    if (import.meta.env.DEV) {
+      console.error("EmailJS Configuration:", {
+        hasServiceId: !!EMAILJS_SERVICE_ID,
+        hasTemplateId: !!EMAILJS_TEMPLATE_ID,
+        hasPublicKey: !!EMAILJS_PUBLIC_KEY,
+      });
+    }
     throw new Error(
       "Email service is not configured. Please contact the site administrator."
     );
@@ -59,10 +60,11 @@ export const sendContactEmail = async ({
       EMAILJS_PUBLIC_KEY
     );
 
-    console.log("Email sent successfully:", result);
     return result;
   } catch (error) {
-    console.error("EmailJS Error:", error);
+    if (import.meta.env.DEV) {
+      console.error("EmailJS Error:", error);
+    }
     throw new Error(
       "Failed to send email. Please try again or contact me directly."
     );
