@@ -70,9 +70,7 @@ const SkillChip = memo(
             : isDark
             ? "rgba(255,255,255,0.08)"
             : "rgba(15,23,42,0.08)",
-          backgroundColor: isDark
-            ? "rgba(15,23,42,0.55)"
-            : "rgba(255,255,255,0.9)",
+
           boxShadow: isActive
             ? `0 18px 38px ${skill.color}22`
             : "0 12px 24px rgba(15, 23, 42, 0.08)",
@@ -136,9 +134,6 @@ const SkillChip = memo(
         <motion.div
           className="pointer-events-none absolute inset-0 opacity-0"
           animate={{ opacity: isActive ? 0.3 : 0 }}
-          style={{
-            background: `radial-gradient(circle at 15% 15%, ${skill.color}25 0%, transparent 60%)`,
-          }}
         />
       </motion.div>
     );
@@ -150,7 +145,6 @@ SkillChip.displayName = "SkillChip";
 const ActiveSkillPanel = memo(
   ({
     skill,
-    isDark,
     onCompare,
     onOpenDetail,
   }: {
@@ -177,14 +171,7 @@ const ActiveSkillPanel = memo(
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
         className="relative overflow-hidden rounded-3xl border p-8 shadow-2xl"
-        style={{
-          background: isDark
-            ? "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.65))"
-            : "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.75))",
-          borderColor: isDark
-            ? "rgba(255,255,255,0.08)"
-            : "rgba(15,23,42,0.08)",
-        }}
+
       >
         <div
           className="absolute -top-24 right-12 h-48 w-48 rounded-full blur-3xl"
@@ -349,9 +336,6 @@ const GridView = ({
               transition={{ delay: index * 0.05, duration: 0.45 }}
               className="rounded-3xl border px-5 py-6 shadow-sm"
               style={{
-                backgroundColor: isDark
-                  ? "rgba(15,23,42,0.45)"
-                  : "rgba(255,255,255,0.85)",
                 borderColor: isDark
                   ? "rgba(255,255,255,0.06)"
                   : "rgba(15,23,42,0.08)",
