@@ -1,7 +1,6 @@
 import { useTheme } from "@/contexts/ThemeContext";
-// haptics removed
 import { motion } from "framer-motion";
-import { BarChart3, GitCompare, Grid3X3, Search, X } from "lucide-react";
+import { BarChart3, GitCompare, Grid3X3, X } from "lucide-react";
 import { skills } from "./skillsData";
 import { ViewMode } from "./types";
 
@@ -10,8 +9,6 @@ interface SkillsFiltersProps {
   setViewMode: (mode: ViewMode) => void;
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
   setComparisonSkills: (skills: string[]) => void;
 }
 
@@ -23,8 +20,6 @@ const SkillsFilters = ({
   setViewMode,
   selectedCategory,
   setSelectedCategory,
-  searchQuery,
-  setSearchQuery,
   setComparisonSkills,
 }: SkillsFiltersProps) => {
   const { isDark, getAccentColors } = useTheme();
@@ -47,12 +42,6 @@ const SkillsFilters = ({
     if (mode !== "comparison") {
       setComparisonSkills([]);
     }
-    // haptics removed
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-    // haptics removed
   };
 
   return (
@@ -63,51 +52,12 @@ const SkillsFilters = ({
       className="mb-8"
     >
       <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
-        {/* Search Bar */}
-        <div className="relative flex-1 max-w-md">
-          <Search
-            size={20}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2"
-            style={{
-              color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)",
-            }}
-          />
-          <input
-            type="text"
-            placeholder="Search skills..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-10 py-3 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2"
-            style={{
-              backgroundColor: isDark
-                ? "rgba(255,255,255,0.05)"
-                : "rgba(255,255,255,0.8)",
-              borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
-              color: isDark ? "#ffffff" : "#1f2937",
-            }}
-          />
-          {searchQuery && (
-            <button
-              onClick={clearSearch}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:opacity-70 transition-opacity"
-              style={{
-                color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)",
-              }}
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
-
         {/* Category Filter */}
         <div className="flex flex-wrap gap-2">
           {categories.map((category) => (
             <motion.button
               key={category}
-              onClick={() => {
-                setSelectedCategory(category);
-                // haptics removed
-              }}
+              onClick={() => setSelectedCategory(category)}
               className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
               style={{
                 backgroundColor:
@@ -200,7 +150,7 @@ const SkillsFilters = ({
       </div>
 
       {/* Active Filters Display */}
-      {(selectedCategory !== "All" || searchQuery) && (
+      {selectedCategory !== "All" && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
@@ -212,49 +162,25 @@ const SkillsFilters = ({
               color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)",
             }}
           >
-            Active filters:
+            Active filter:
           </span>
 
-          {selectedCategory !== "All" && (
-            <span
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm"
-              style={{
-                backgroundColor: `${accentColors.primary}20`,
-                color: accentColors.primary,
-                border: `1px solid ${accentColors.primary}30`,
-              }}
+          <span
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm"
+            style={{
+              backgroundColor: `${accentColors.primary}20`,
+              color: accentColors.primary,
+              border: `1px solid ${accentColors.primary}30`,
+            }}
+          >
+            Category: {selectedCategory}
+            <button
+              onClick={() => setSelectedCategory("All")}
+              className="hover:opacity-70 transition-opacity"
             >
-              Category: {selectedCategory}
-              <button
-                onClick={() => {
-                  setSelectedCategory("All");
-                  // haptics removed
-                }}
-                className="hover:opacity-70 transition-opacity"
-              >
-                <X size={14} />
-              </button>
-            </span>
-          )}
-
-          {searchQuery && (
-            <span
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm"
-              style={{
-                backgroundColor: `${accentColors.primary}20`,
-                color: accentColors.primary,
-                border: `1px solid ${accentColors.primary}30`,
-              }}
-            >
-              Search: "{searchQuery}"
-              <button
-                onClick={clearSearch}
-                className="hover:opacity-70 transition-opacity"
-              >
-                <X size={14} />
-              </button>
-            </span>
-          )}
+              <X size={14} />
+            </button>
+          </span>
         </motion.div>
       )}
     </motion.div>

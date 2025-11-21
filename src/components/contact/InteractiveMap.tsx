@@ -6,6 +6,20 @@ const InteractiveMap = () => {
   const { isDark, getAccentColors } = useTheme();
   const accentColors = getAccentColors();
 
+  // Kamrup, Assam coordinates
+  const location = {
+    name: "Kamrup, Assam, India",
+    lat: 26.1433,
+    lng: 91.7898,
+  };
+
+  // Google Maps URL with exact coordinates
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`;
+
+  const handleMapClick = () => {
+    window.open(mapUrl, "_blank", "noopener,noreferrer");
+  };
+
   const gradientId = useMemo(
     () => `mapGradient-${Math.random().toString(36).slice(2, 9)}`,
     []
@@ -28,17 +42,27 @@ const InteractiveMap = () => {
 
   return (
     <div
-      className="rounded-2xl border theme-transition"
+      className="rounded-2xl border theme-transition cursor-pointer group"
       style={{ backgroundColor, borderColor }}
+      onClick={handleMapClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleMapClick();
+        }
+      }}
+      aria-label={`Open ${location.name} in Google Maps`}
     >
-      <div className="relative overflow-hidden rounded-xl">
+      <div className="relative overflow-hidden rounded-xl transition-transform duration-300 group-hover:scale-[1.02]">
         <svg
           className="h-[200px] w-full"
           viewBox="0 0 400 200"
           role="img"
           aria-labelledby="contact-map-title"
         >
-          <title id="contact-map-title">Map showing Kamrup, Assam</title>
+          <title id="contact-map-title">Map showing {location.name}</title>
           <defs>
             <linearGradient id={gradientId} x1="0%" x2="100%" y1="0%" y2="100%">
               <stop offset="0%" stopColor={isDark ? "#1f2937" : "#f1f5f9"} />
@@ -91,7 +115,7 @@ const InteractiveMap = () => {
 
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div
-            className="flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium backdrop-blur"
+            className="flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium backdrop-blur transition-all duration-300 group-hover:scale-110"
             style={{
               backgroundColor: isDark
                 ? "rgba(17,24,39,0.75)"
@@ -101,7 +125,21 @@ const InteractiveMap = () => {
             }}
           >
             <MapPin size={14} style={{ color: accentColors.primary }} />
-            <span>Kamrup, Assam</span>
+            <span>{location.name}</span>
+          </div>
+        </div>
+
+        {/* Click indicator - subtle hint */}
+        <div className="pointer-events-none absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div
+            className="text-xs px-2 py-1 rounded backdrop-blur-sm"
+            style={{
+              backgroundColor: `${accentColors.primary}20`,
+              color: accentColors.primary,
+              border: `1px solid ${accentColors.primary}40`,
+            }}
+          >
+            Click to view
           </div>
         </div>
       </div>

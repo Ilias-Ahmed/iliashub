@@ -36,8 +36,6 @@ const SkillsSection = () => {
     filteredData: filteredSkills,
     selectedCategory,
     setSelectedCategory,
-    searchQuery,
-    setSearchQuery,
     resetFilters,
   } = useFilteredData(skills, {
     categoryKey: "category",
@@ -82,7 +80,7 @@ const SkillsSection = () => {
         </motion.div>
 
         {/* Skills Visualization - Only render if skills are not filtered for performance */}
-        {selectedCategory === "All" && !searchQuery && (
+        {selectedCategory === "All" && (
           <motion.div
             variants={itemVariants}
             initial="hidden"
@@ -109,8 +107,6 @@ const SkillsSection = () => {
           setViewMode={setViewMode}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
           setComparisonSkills={setComparisonSkills}
         />
 
@@ -158,7 +154,7 @@ const SkillsSection = () => {
         </motion.div>
 
         {/* Results Summary */}
-        {(selectedCategory !== "All" || searchQuery) && (
+        {selectedCategory !== "All" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -172,7 +168,6 @@ const SkillsSection = () => {
             >
               Showing {filteredSkills.length} of {skills.length} skills
               {selectedCategory !== "All" && ` in ${selectedCategory}`}
-              {searchQuery && ` matching "${searchQuery}"`}
             </p>
           </motion.div>
         )}
