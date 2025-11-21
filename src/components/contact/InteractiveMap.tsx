@@ -25,11 +25,6 @@ const InteractiveMap = () => {
     []
   );
 
-  const backgroundColor = isDark
-    ? "rgba(17, 24, 39, 0.65)"
-    : "rgba(255, 255, 255, 0.92)";
-
-  const borderColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(15,23,42,0.08)";
 
   const gridStroke = isDark ? "rgba(255,255,255,0.08)" : "rgba(15,23,42,0.1)";
 
@@ -43,7 +38,6 @@ const InteractiveMap = () => {
   return (
     <div
       className="rounded-2xl border theme-transition cursor-pointer group"
-      style={{ backgroundColor, borderColor }}
       onClick={handleMapClick}
       role="button"
       tabIndex={0}
@@ -63,12 +57,6 @@ const InteractiveMap = () => {
           aria-labelledby="contact-map-title"
         >
           <title id="contact-map-title">Map showing {location.name}</title>
-          <defs>
-            <linearGradient id={gradientId} x1="0%" x2="100%" y1="0%" y2="100%">
-              <stop offset="0%" stopColor={isDark ? "#1f2937" : "#f1f5f9"} />
-              <stop offset="100%" stopColor={isDark ? "#111827" : "#e2e8f0"} />
-            </linearGradient>
-          </defs>
 
           <rect width="400" height="200" fill={`url(#${gradientId})`} />
 
@@ -117,9 +105,6 @@ const InteractiveMap = () => {
           <div
             className="flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium backdrop-blur transition-all duration-300 group-hover:scale-110"
             style={{
-              backgroundColor: isDark
-                ? "rgba(17,24,39,0.75)"
-                : "rgba(255,255,255,0.9)",
               borderColor: `${accentColors.primary}80`,
               color: isDark ? "#f8fafc" : "#0f172a",
             }}
@@ -134,7 +119,6 @@ const InteractiveMap = () => {
           <div
             className="text-xs px-2 py-1 rounded backdrop-blur-sm"
             style={{
-              backgroundColor: `${accentColors.primary}20`,
               color: accentColors.primary,
               border: `1px solid ${accentColors.primary}40`,
             }}

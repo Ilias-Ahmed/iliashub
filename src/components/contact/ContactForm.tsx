@@ -115,12 +115,7 @@ const ContactForm = () => {
   return (
     <div
       className="p-8 rounded-2xl border theme-transition"
-      style={{
-        backgroundColor: isDark
-          ? "rgba(17, 24, 39, 0.65)"
-          : "rgba(255, 255, 255, 0.92)",
-        borderColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(15,23,42,0.08)",
-      }}
+
     >
       <h3 className="text-2xl font-bold mb-6">Connect with me</h3>
 
