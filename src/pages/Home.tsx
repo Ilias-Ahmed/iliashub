@@ -11,7 +11,7 @@ const ResumeViewer = React.lazy(() => import("@/components/ui/ResumeViewer"));
 
 // Constants - optimized for performance
 const ROTATING_ROLES = [
-  "Full Stack Developer",
+  "Software Developer",
   "Problem Solver",
   "Tech Innovator",
 ];
@@ -91,7 +91,7 @@ const Home: React.FC = () => {
               {/* Eyebrow label */}
               <div>
                 <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-foreground/60">
-                  Frontend Developer • React • TypeScript
+                  Fullstack Developer • Tech Enthusiast • Lifelong Learner
                 </p>
                 <span
                   className="block mt-3 h-0.5 w-16 bg-current"

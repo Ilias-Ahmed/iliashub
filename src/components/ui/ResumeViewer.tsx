@@ -67,7 +67,7 @@ const ResumeViewer: React.FC<Props> = ({ isOpen, onClose }) => {
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ delay: 0.1 }}
             onClick={onClose}
-            className="fixed top-4 right-4 z-[100] p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all duration-200 shadow-xl backdrop-blur-sm border border-white/20 group"
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all duration-200 shadow-xl backdrop-blur-sm border border-white/20 group"
             aria-label="Close resume viewer"
           >
             <X

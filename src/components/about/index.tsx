@@ -22,25 +22,6 @@ const AboutSection = memo(() => {
     >
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-        {/* Section Header */}
-        <div className="mb-12 md:mb-16">
-          <div>
-            <p
-              className="heading-eyebrow"
-              style={{ color: accentColors.primary }}
-            >
-              About
-            </p>
-            <span className="accent-rule mt-3 block" aria-hidden="true" />
-          </div>
-          <h2
-            className="heading-display-sm use-display-on-lg mt-5 text-letterpress"
-            style={{ color: accentColors.primary }}
-          >
-            Beyond The Code
-          </h2>
-        </div>
-
         {/* Interactive Tabs */}
         <Tabs
           defaultValue="profile"
